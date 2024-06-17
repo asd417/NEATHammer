@@ -80,7 +80,13 @@ class CombatCommander
 
     static int		workerPullScore(BWAPI::Unit worker);
 
+
 public:
+    void            NEAT_UpdateSquads();
+    void            NEAT_CreateSquads();
+    void            NEAT_AssignToSquad(BWAPI::Unitset units, int squadIndex);
+    void            NEAT_RemoveFromSquad(BWAPI::Unitset units, int squadIndex);
+    void            NEAT_SetSquadOrder(SquadOrderTypes type, int squadIndex, BWAPI::TilePosition position);
 
     CombatCommander();
 

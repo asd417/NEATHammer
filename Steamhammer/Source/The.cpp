@@ -87,5 +87,5 @@ void The::update()
     }
 
     ops.update();
-    staticDefense.update();
+    //staticDefense.update();
 }

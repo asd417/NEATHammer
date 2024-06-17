@@ -48,61 +48,72 @@ CombatCommander::CombatCommander()
 {
 }
 
+
+
 // Called once at the start of the game.
 // You can also create new squads at other times.
 void CombatCommander::initializeSquads()
 {
-    // The idle squad includes workers at work (not idle at all) and unassigned units.
-    _squadData.createSquad("Idle", IdlePriority).getOrder().setStatus("Work");
-
-    // These squads don't care what order they are given.
-    // They analyze the situation for themselves.
-    if (the.self()->getRace() == BWAPI::Races::Zerg)
-    {
-        // The overlord squad has only overlords, but not all overlords.
-        // They may be assigned elsewhere too.
-        _squadData.createSquad("Overlord", OverlordPriority).getOrder().setStatus("Look");
-
-        // The scourge squad has all the scourge.
-        if (the.selfRace() == BWAPI::Races::Zerg)
-        {
-            _squadData.createSquad("Scourge", ScourgePriority).getOrder().setStatus("Wait");
-        }
-    }
+    NEAT_CreateSquads();
     
-    // The ground squad will pressure an enemy base.
-    _squadData.createSquad("Ground", AttackPriority);
+    //// The idle squad includes workers at work (not idle at all) and unassigned units.
+    //_squadData.createSquad("Idle", IdlePriority).getOrder().setStatus("Work");
 
-    // The flying squad separates air units so they can act independently.
-    _squadData.createSquad("Flying", AttackPriority);
+    //// These squads don't care what order they are given.
+    //// They analyze the situation for themselves.
+    //if (the.self()->getRace() == BWAPI::Races::Zerg)
+    //{
+    //    // The overlord squad has only overlords, but not all overlords.
+    //    // They may be assigned elsewhere too.
+    //    _squadData.createSquad("Overlord", OverlordPriority).getOrder().setStatus("Look");
 
-    // The recon squad carries out reconnaissance in force to deny enemy bases.
-    // It is filled in when enough units are available.
-    Squad & reconSquad = _squadData.createSquad("Recon", ReconPriority);
-    reconSquad.setOrder(SquadOrder("Recon"));
-    reconSquad.setCombatSimRadius(200);  // combat sim includes units in a smaller radius than for a combat squad
-    // reconSquad.setFightVisible(true);    // combat sim sees only visible enemy units (not all known enemies)
+    //    // The scourge squad has all the scourge.
+    //    if (the.selfRace() == BWAPI::Races::Zerg)
+    //    {
+    //        _squadData.createSquad("Scourge", ScourgePriority).getOrder().setStatus("Wait");
+    //    }
+    //}
+    //
+    //// The ground squad will pressure an enemy base.
+    //_squadData.createSquad("Ground", AttackPriority);
 
-    BWAPI::Position ourBasePosition = BWAPI::Position(the.self()->getStartLocation());
+    //// The flying squad separates air units so they can act independently.
+    //_squadData.createSquad("Flying", AttackPriority);
 
-    // The scout defense squad chases the enemy worker scout.
-    if (Config::Micro::ScoutDefenseRadius > 0)
-    {
-        _squadData.createSquad("ScoutDefense", ScoutDefensePriority).
-            setOrder(SquadOrder(SquadOrderTypes::Defend, ourBasePosition, Config::Micro::ScoutDefenseRadius, false, "Stop that scout"));
-    }
+    //// The recon squad carries out reconnaissance in force to deny enemy bases.
+    //// It is filled in when enough units are available.
+    //Squad & reconSquad = _squadData.createSquad("Recon", ReconPriority);
+    //reconSquad.setOrder(SquadOrder("Recon"));
+    //reconSquad.setCombatSimRadius(200);  // combat sim includes units in a smaller radius than for a combat squad
+    //// reconSquad.setFightVisible(true);    // combat sim sees only visible enemy units (not all known enemies)
 
-    // If we're expecting to drop, create a drop squad.
-    // It is initially ordered to hold ground until it can load up and go.
-    if (StrategyManager::Instance().dropIsPlanned())
-    {
-        _squadData.createSquad("Drop", DropPriority).
-            setOrder(SquadOrder(SquadOrderTypes::Hold, ourBasePosition, AttackRadius, false, "Wait for transport"));
-    }
+    //BWAPI::Position ourBasePosition = BWAPI::Position(the.self()->getStartLocation());
+
+    //// The scout defense squad chases the enemy worker scout.
+    //if (Config::Micro::ScoutDefenseRadius > 0)
+    //{
+    //    _squadData.createSquad("ScoutDefense", ScoutDefensePriority).
+    //        setOrder(SquadOrder(SquadOrderTypes::Defend, ourBasePosition, Config::Micro::ScoutDefenseRadius, false, "Stop that scout"));
+    //}
+
+    //// If we're expecting to drop, create a drop squad.
+    //// It is initially ordered to hold ground until it can load up and go.
+    //if (StrategyManager::Instance().dropIsPlanned())
+    //{
+    //    _squadData.createSquad("Drop", DropPriority).
+    //        setOrder(SquadOrder(SquadOrderTypes::Hold, ourBasePosition, AttackRadius, false, "Wait for transport"));
+    //}
 }
 
 void CombatCommander::update(const BWAPI::Unitset & combatUnits)
 {
+    /*if (!_initialized)
+    {
+        initializeSquads();
+        _initialized = true;
+    }*/
+    
+    //NEAT initializes 5 squads
     if (!_initialized)
     {
         initializeSquads();
@@ -115,7 +126,7 @@ void CombatCommander::update(const BWAPI::Unitset & combatUnits)
 
     if (frame8 == 1)
     {
-        updateIdleSquad();
+        /*updateIdleSquad();
         updateIrradiatedSquad();
         updateOverlordSquad();
         updateScourgeSquad();
@@ -124,17 +135,18 @@ void CombatCommander::update(const BWAPI::Unitset & combatUnits)
         updateBaseDefenseSquads();
         updateWatchSquads();
         updateReconSquad();
-        updateAttackSquads();
+        updateAttackSquads();*/
+        NEAT_UpdateSquads();
     }
     else if (frame8 % 4 == 2)
     {
         doComsatScan();
     }
 
-    if (the.now() % 20 == 1)
+    /*if (the.now() % 20 == 1)
     {
         doLarvaTrick();
-    }
+    }*/
 
     loadOrUnloadBunkers();
 
@@ -1703,6 +1715,41 @@ int CombatCommander::workerPullScore(BWAPI::Unit worker)
         (worker->getShields() == worker->getType().maxShields() ? 4 : 0) +
         (worker->isCarryingGas() ? -3 : 0) +
         (worker->isCarryingMinerals() ? -2 : 0);
+}
+
+//NEAT start with no squads
+void UAlbertaBot::CombatCommander::NEAT_UpdateSquads()
+{
+
+}
+
+void UAlbertaBot::CombatCommander::NEAT_CreateSquads()
+{
+    _squadData.createSquad("0", IdlePriority).getOrder().setStatus("Work");
+    _squadData.createSquad("1", IdlePriority);
+    _squadData.createSquad("2", IdlePriority);
+    _squadData.createSquad("3", IdlePriority);
+    _squadData.createSquad("4", IdlePriority);
+}
+
+void CombatCommander::NEAT_AssignToSquad(BWAPI::Unitset units, int squadIndex)
+{
+    for (BWAPI::Unit u : units) {
+        _squadData.getSquad(std::to_string(squadIndex)).addUnit(u);
+    }
+}
+
+void CombatCommander::NEAT_RemoveFromSquad(BWAPI::Unitset units, int squadIndex)
+{
+    for (BWAPI::Unit u : units) {
+        _squadData.getSquad(std::to_string(squadIndex)).removeUnit(u);
+    }
+}
+
+void CombatCommander::NEAT_SetSquadOrder(SquadOrderTypes type, int squadIndex, BWAPI::TilePosition position) {
+    std::string status = "NEATSquadStatus";
+    _squadData.getSquad(std::to_string(squadIndex)).setOrder(
+        SquadOrder(type, { position.x * 32, position.y * 32}, 5, status));
 }
 
 // Pull workers off of mining and into the attack squad.

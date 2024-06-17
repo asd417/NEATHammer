@@ -295,6 +295,15 @@ MacroAct::MacroAct(MacroCommandType t)
 {
 }
 
+UAlbertaBot::MacroAct::MacroAct(MacroCommandType t, const BWAPI::TilePosition& tile)
+    : _macroCommandType(t)
+    , _type(MacroActs::Command)
+    , _macroLocation(MacroLocation::Anywhere)
+    , _tileLocation(tile)
+    , _parent(nullptr)
+{
+}
+
 MacroAct::MacroAct(MacroCommandType t, int amount)
     : _macroCommandType(t, amount)
     , _type(MacroActs::Command)
@@ -427,10 +436,10 @@ MacroCommand MacroAct::getCommandType() const
 
 MacroLocation MacroAct::getMacroLocation() const
 {
-    if (isBuilding() && getUnitType() == BWAPI::UnitTypes::Zerg_Hatchery && StrategyBossZerg::Instance().hiddenBaseNext())
+    /*if (isBuilding() && getUnitType() == BWAPI::UnitTypes::Zerg_Hatchery && StrategyBossZerg::Instance().hiddenBaseNext())
     {
         return MacroLocation::Hidden;
-    }
+    }*/
     return _macroLocation;
 }
 
@@ -470,11 +479,11 @@ int MacroAct::supplyRequired() const
 int MacroAct::mineralPrice() const
 {
     if (isCommand()) {
-        if (_macroCommandType.getType() == MacroCommandType::ExtractorTrickDrone ||
-            _macroCommandType.getType() == MacroCommandType::ExtractorTrickZergling) {
-            // 50 for the extractor and 50 for the unit. Never mind that you get some back.
-            return 100;
-        }
+        //if (_macroCommandType.getType() == MacroCommandType::ExtractorTrickDrone ||
+        //    _macroCommandType.getType() == MacroCommandType::ExtractorTrickZergling) {
+        //    // 50 for the extractor and 50 for the unit. Never mind that you get some back.
+        //    return 100;
+        //}
         return 0;
     }
     if (isUnit())
@@ -805,6 +814,7 @@ bool MacroAct::canProduce(BWAPI::Unit producer) const
 }
 
 // Create a unit or start research.
+
 void MacroAct::produce(BWAPI::Unit producer) const
 {
     UAB_ASSERT(producer != nullptr, "producer was null");

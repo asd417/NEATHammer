@@ -171,6 +171,7 @@
     <ClCompile Include="..\Source\MicroScourge.cpp" />
     <ClCompile Include="..\Source\MicroTanks.cpp" />
     <ClCompile Include="..\Source\MicroTransports.cpp" />
+    <ClCompile Include="..\Source\NEATCommander.cpp" />
     <ClCompile Include="..\Source\OpeningTiming.cpp" />
     <ClCompile Include="..\Source\OpeningTimingRecord.cpp" />
     <ClCompile Include="..\Source\OpponentModel.cpp" />
@@ -194,7 +195,6 @@
     <ClCompile Include="..\Source\SquadData.cpp" />
     <ClCompile Include="..\Source\SquadOrder.cpp" />
     <ClCompile Include="..\Source\StaticDefense.cpp" />
-    <ClCompile Include="..\Source\StrategyBossZerg.cpp" />
     <ClCompile Include="..\Source\StrategyManager.cpp" />
     <ClCompile Include="..\Source\TacticsOrders.cpp" />
     <ClCompile Include="..\Source\The.cpp" />
@@ -260,6 +260,7 @@
     <ClInclude Include="..\Source\MicroScourge.h" />
     <ClInclude Include="..\Source\MicroTanks.h" />
     <ClInclude Include="..\Source\MicroTransports.h" />
+    <ClInclude Include="..\Source\NEATCommander.h" />
     <ClInclude Include="..\Source\OpeningTiming.h" />
     <ClInclude Include="..\Source\OpeningTimingRecord.h" />
     <ClInclude Include="..\Source\OpponentModel.h" />
@@ -283,7 +284,6 @@
     <ClInclude Include="..\Source\SquadData.h" />
     <ClInclude Include="..\Source\SquadOrder.h" />
     <ClInclude Include="..\Source\StaticDefense.h" />
-    <ClInclude Include="..\Source\StrategyBossZerg.h" />
     <ClInclude Include="..\Source\StrategyManager.h" />
     <ClInclude Include="..\Source\TacticsOrders.h" />
     <ClInclude Include="..\Source\The.h" />

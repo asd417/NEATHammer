@@ -26,6 +26,23 @@ MacroCommand::MacroCommand(MacroCommandType type, int amount)
     UAB_ASSERT(hasNumericArgument(type), "extra MacroCommand argument");
 }
 
+MacroCommand::MacroCommand(MacroCommandType type, int amount, int amount2)
+    : _type(type)
+    , _amount(amount)
+    , _amount2(amount2)
+    , _unitType(BWAPI::UnitTypes::None)
+{
+    UAB_ASSERT(hasNumericArgument2(type), "extra MacroCommand argument");
+}
+
+UAlbertaBot::MacroCommand::MacroCommand(MacroCommandType type, int amount, int amount2, BWAPI::UnitType unitType)
+    : _type(type)
+    , _amount(amount)
+    , _amount2(amount2)
+    , _unitType(unitType)
+{
+}
+
 MacroCommand::MacroCommand(MacroCommandType type, BWAPI::UnitType unitType)
     : _type(type)
     , _amount(0)
@@ -37,27 +54,19 @@ MacroCommand::MacroCommand(MacroCommandType type, BWAPI::UnitType unitType)
 const std::list<MacroCommandType> MacroCommand::allCommandTypes()
 {
     return std::list<MacroCommandType>
-    { MacroCommandType::Scout
-    , MacroCommandType::ScoutIfNeeded
-    , MacroCommandType::ScoutLocation
-    , MacroCommandType::ScoutOnceOnly
-    , MacroCommandType::ScoutWhileSafe
-    , MacroCommandType::StartGas
+    { 
+      MacroCommandType::StartGas
     , MacroCommandType::StopGas
-    , MacroCommandType::GasUntil
-    , MacroCommandType::StealGas
-    , MacroCommandType::ExtractorTrickDrone
-    , MacroCommandType::ExtractorTrickZergling
     , MacroCommandType::Aggressive
     , MacroCommandType::Defensive
-    , MacroCommandType::PullWorkers
-    , MacroCommandType::PullWorkersLeaving
-    , MacroCommandType::ReleaseWorkers
     , MacroCommandType::PostWorker
     , MacroCommandType::UnpostWorkers
     , MacroCommandType::Nonadaptive
     , MacroCommandType::Lift
     , MacroCommandType::QueueBarrier
+    , MacroCommandType::AssignToSquad
+    , MacroCommandType::RemoveFromSquad
+    , MacroCommandType::SetSquadOrder
     };
 }
 
@@ -65,40 +74,34 @@ const std::list<MacroCommandType> MacroCommand::allCommandTypes()
 bool MacroCommand::hasNumericArgument(MacroCommandType t)
 {
     return
-        t == MacroCommandType::GasUntil ||
-        t == MacroCommandType::PullWorkers ||
-        t == MacroCommandType::PullWorkersLeaving;
+        t == MacroCommandType::SetSquadOrder //used as squad index
+        || t == MacroCommandType::AssignToSquad //used as squad index
+        || t == MacroCommandType::RemoveFromSquad //used as squad index
+
+        ;
+}
+// The command has a second numeric argument, the _amount2
+bool UAlbertaBot::MacroCommand::hasNumericArgument2(MacroCommandType t)
+{
+    return
+        t == MacroCommandType::SetSquadOrder //used as order type
+        || t == MacroCommandType::AssignToSquad //used as search radius 
+        || t == MacroCommandType::RemoveFromSquad //used as search radius 
+        ;
 }
 
 // The command has a unit type argument, the _unitType.
 bool MacroCommand::hasUnitArgument(MacroCommandType t)
 {
-    return
-        t == MacroCommandType::Lift;
+    return 
+        t == MacroCommandType::Lift
+        || t == MacroCommandType::AssignToSquad
+        || t == MacroCommandType::RemoveFromSquad
+        ;
 }
 
 const std::string MacroCommand::getName(MacroCommandType t)
 {
-    if (t == MacroCommandType::Scout)
-    {
-        return "go scout";
-    }
-    if (t == MacroCommandType::ScoutIfNeeded)
-    {
-        return "go scout if needed";
-    }
-    if (t == MacroCommandType::ScoutLocation)
-    {
-        return "go scout location";
-    }
-    if (t == MacroCommandType::ScoutOnceOnly)
-    {
-        return "go scout once around";
-    }
-    if (t == MacroCommandType::ScoutWhileSafe)
-    {
-        return "go scout while safe";
-    }
     if (t == MacroCommandType::StartGas)
     {
         return "go start gas";
@@ -107,22 +110,6 @@ const std::string MacroCommand::getName(MacroCommandType t)
     {
         return "go stop gas";
     }
-    if (t == MacroCommandType::GasUntil)
-    {
-        return "go gas until";
-    }
-    if (t == MacroCommandType::StealGas)
-    {
-        return "go steal gas";
-    }
-    if (t == MacroCommandType::ExtractorTrickDrone)
-    {
-        return "go extractor trick drone";
-    }
-    if (t == MacroCommandType::ExtractorTrickZergling)
-    {
-        return "go extractor trick zergling";
-    }
     if (t == MacroCommandType::Aggressive)
     {
         return "go aggressive";
@@ -130,18 +117,6 @@ const std::string MacroCommand::getName(MacroCommandType t)
     if (t == MacroCommandType::Defensive)
     {
         return "go defensive";
-    }
-    if (t == MacroCommandType::PullWorkers)
-    {
-        return "go pull workers";
-    }
-    if (t == MacroCommandType::PullWorkersLeaving)
-    {
-        return "go pull workers leaving";
-    }
-    if (t == MacroCommandType::ReleaseWorkers)
-    {
-        return "go release workers";
     }
     if (t == MacroCommandType::PostWorker)
     {
@@ -162,6 +137,18 @@ const std::string MacroCommand::getName(MacroCommandType t)
     if (t == MacroCommandType::QueueBarrier)
     {
         return "go queue barrier";
+    }
+    if (t == MacroCommandType::AssignToSquad)
+    {
+        return "assign to squad";
+    }
+    if (t == MacroCommandType::RemoveFromSquad)
+    {
+        return "remove to squad";
+    }
+    if (t == MacroCommandType::SetSquadOrder)
+    {
+        return "order squad";
     }
 
     UAB_ASSERT(t == MacroCommandType::None, "unrecognized MacroCommandType");

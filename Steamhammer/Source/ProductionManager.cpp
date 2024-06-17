@@ -51,15 +51,15 @@ void ProductionManager::update()
 
     // If we're in trouble, adjust the production queue to help.
     // Includes scheduling supply as needed.
-    StrategyManager::Instance().handleUrgentProductionIssues(_queue);
+    //StrategyManager::Instance().handleUrgentProductionIssues(_queue);
 
     // Drop any initial queue items which can't be produced next because they are missing
     // prerequisites. This prevents most queue deadlocks.
     // Zerg does this separately (and more elaborately) in handleUrgentProductionIssues() above.
-    if (the.selfRace() != BWAPI::Races::Zerg)
-    {
+    //if (the.selfRace() != BWAPI::Races::Zerg)
+    //{
         dropJammedItemsFromQueue();
-    }
+    //}
 
     // Carry out production goals, plus any other needed goal housekeeping.
     updateGoals();
@@ -80,6 +80,7 @@ void ProductionManager::update()
         }
 
         goOutOfBookAndClearQueue();
+        //NEAT network evaluation starts in here
         StrategyManager::Instance().freshProductionPlan();
     }
 
@@ -90,87 +91,8 @@ void ProductionManager::update()
 // If something important was destroyed, we may want to react.
 void ProductionManager::onUnitDestroy(BWAPI::Unit unit)
 {
-    // If it's not our unit, we don't care.
-    if (!unit || unit->getPlayer() != the.self())
-    {
-        return;
-    }
-    
-    // If we're zerg, we break out of the opening in narrow cases.
-    if (the.selfRace() == BWAPI::Races::Zerg && !isOutOfBook())
-    {
-        if (unit->getType() == BWAPI::UnitTypes::Zerg_Hatchery ||
-            unit->getType() == BWAPI::UnitTypes::Zerg_Lair ||
-            unit->getType() == BWAPI::UnitTypes::Zerg_Spire ||
-            unit->getType() == BWAPI::UnitTypes::Zerg_Hydralisk_Den)
-        {
-            // We lost a key tech or production building.
-            goOutOfBookAndClearQueue();
-        }
-        else if (!_queue.isEmpty() &&
-            _queue.getHighestPriorityItem().macroAct.gasPrice() > the.self()->gas() &&
-            the.my.all.count(BWAPI::UnitTypes::Zerg_Extractor) == 0)
-        {
-            // We lost all extractors and need gas.
-            goOutOfBookAndClearQueue();
-        }
-        return;
-    }
+    //Report to Network but do nothing
 
-    // If it's a worker or a building, it affects the production plan.
-    if (unit->getType().isWorker() && !_outOfBook)
-    {
-        // We lost a worker in the opening. Replace it.
-        // This helps if a small number of workers are killed. If many are killed, you're toast anyway.
-        // Still, it's better than breaking out of the opening altogether.
-        _queue.queueAsHighestPriority(unit->getType());
-
-        // If we have a gateway and no zealots, or a barracks and no marines,
-        // consider making a military unit first. To, you know, stay alive and stuff.
-        if (the.selfRace() == BWAPI::Races::Protoss)
-        {
-            if (the.my.completed.count(BWAPI::UnitTypes::Protoss_Gateway) > 0 &&
-                the.my.all.count(BWAPI::UnitTypes::Protoss_Zealot) == 0 &&
-                !_queue.anyInNextN(BWAPI::UnitTypes::Protoss_Zealot, 2) &&
-                (the.self()->minerals() >= 150 || the.my.completed.count(BWAPI::UnitTypes::Protoss_Probe) > 3))
-            {
-                _queue.queueAsHighestPriority(BWAPI::UnitTypes::Protoss_Zealot);
-            }
-        }
-        else if (the.selfRace() == BWAPI::Races::Terran)
-        {
-            if (the.my.completed.count(BWAPI::UnitTypes::Terran_Barracks) > 0 &&
-                the.my.all.count(BWAPI::UnitTypes::Terran_Marine) == 0 &&
-                !_queue.anyInNextN(BWAPI::UnitTypes::Terran_Marine, 2) &&
-                (the.self()->minerals() >= 100 || the.my.completed.count(BWAPI::UnitTypes::Terran_SCV) > 3))
-            {
-                _queue.queueAsHighestPriority(BWAPI::UnitTypes::Terran_Marine);
-            }
-        }
-        else // zerg
-        {
-            if (the.my.all.count(BWAPI::UnitTypes::Zerg_Drone) <= 9 &&
-                the.self()->deadUnitCount(BWAPI::UnitTypes::Zerg_Drone) >= 4)
-            {
-                goOutOfBook();      // too many drones lost, go out of book anyway
-            }
-            if (the.my.completed.count(BWAPI::UnitTypes::Zerg_Spawning_Pool) > 0 &&
-                the.my.all.count(BWAPI::UnitTypes::Zerg_Zergling) == 0 &&
-                !_queue.anyInNextN(BWAPI::UnitTypes::Zerg_Zergling, 2) &&
-                (the.self()->minerals() >= 100 || the.my.completed.count(BWAPI::UnitTypes::Zerg_Drone) > 3))
-            {
-                _queue.queueAsHighestPriority(BWAPI::UnitTypes::Zerg_Zergling);
-            }
-        }
-    }
-    else if (unit->getType().isBuilding() &&
-        !(UnitUtil::CanAttackAir(unit) || UnitUtil::CanAttackGround(unit)) &&
-        unit->getType().supplyProvided() == 0)
-    {
-        // We lost a building other than static defense or supply. It may be serious. Replan from scratch.
-        // BWAPI::Broodwar->printf("critical building loss");
-        goOutOfBookAndClearQueue();
-    }
 }
 
 // Drop any initial items from the queue that will demonstrably cause a production jam.
@@ -204,13 +126,6 @@ bool ProductionManager::itemCanBeProduced(const MacroAct & act) const
 
 void ProductionManager::manageBuildOrderQueue()
 {
-    // If the extractor trick is in progress, do that.
-    if (_extractorTrickState != ExtractorTrick::None)
-    {
-        doExtractorTrick();
-        return;
-    }
-
     // If we were planning to build and assigned a worker, but the queue was then
     // changed behind our back: Release the worker and continue.
     if (_queue.isModified() && _assignedWorkerForThisBuilding &&
@@ -228,30 +143,10 @@ void ProductionManager::manageBuildOrderQueue()
 
         const BuildOrderItem & currentItem = _queue.getHighestPriorityItem();
 
-        // WORKAROUND for BOSS bug of making too many gateways: Limit the count.
-        // Idea borrowed from Locutus by Bruce Nielsen.
-        if (currentItem.macroAct.isUnit() &&
-            currentItem.macroAct.getUnitType() == BWAPI::UnitTypes::Protoss_Gateway &&
-            the.my.all.count(BWAPI::UnitTypes::Protoss_Gateway) >= std::min(12, 4 * the.bases.baseCount(the.self())))
-        {
-            _queue.doneWithHighestPriorityItem();
-            _lastProductionFrame = the.now();
-            continue;
-        }
-
-        // WORKAROUND for another instance of the same BOSS bug: Keep terran to 1 starport.
-        if (currentItem.macroAct.isUnit() &&
-            currentItem.macroAct.getUnitType() == BWAPI::UnitTypes::Terran_Starport &&
-            the.my.all.count(BWAPI::UnitTypes::Terran_Starport) >= 1)
-        {
-            _queue.doneWithHighestPriorityItem();
-            _lastProductionFrame = the.now();
-            continue;
-        }
-
         // If this is a command, execute it and keep going.
         if (currentItem.macroAct.isCommand())
         {
+            // NEAT Network macro actions gets executed here
             executeCommand(currentItem.macroAct);
             _queue.doneWithHighestPriorityItem();
             _lastProductionFrame = the.now();
@@ -478,45 +373,12 @@ BWAPI::Unit ProductionManager::getProducer(MacroAct act) const
         return nullptr;
     }
 
-    // We may want to choose the producer by location.
-    BWAPI::Position closestTo = BWAPI::Positions::None;     // "don't care where"
-    if (act.getMacroLocation() != MacroLocation::Anywhere)
+    //NEAT network decides where to produce
+    BWAPI::Position closestTo = { act.getTileLocation().x * 32, act.getTileLocation().y * 32 };
+    if (act.isUnit() && the.selfRace().getID() == BWAPI::Races::Zerg.getID())
     {
-        closestTo = the.placer.getMacroLocationPos(act.getMacroLocation());
+        return getClosestLarvaToPosition(closestTo);
     }
-    else if (act.isUnit())
-    {
-        // We can produce from anywhere. But try the best places first when we can tell.
-
-        // If we're producing from a larva, seek an appropriate one.
-        if (act.whatBuilds() == BWAPI::UnitTypes::Zerg_Larva)
-        {
-            return getBestLarva(act, candidateProducers);
-        }
-
-        // Trick: If we're producing a worker, choose the producer (command center or nexus)
-        // which is farthest from the main base. That way expansions are preferentially
-        // populated with less need to transfer workers.
-        // This affects terran and protoss; zerg uses getBestLarva() above.
-        if (act.isWorker())
-        {
-            return getFarthestUnitFromPosition(candidateProducers,
-                the.bases.myMain()->getPosition());
-        }
-
-        // Lurkers, guardians, devourers.
-        if (UnitUtil::IsMorphedUnitType(act.getUnitType()))
-        {
-            return getBestMorphCandidate(candidateProducers);
-        }
-
-        // If we're morphing a lair, do it out of enemy vision if possible.
-        if (act.getUnitType() == BWAPI::UnitTypes::Zerg_Lair)
-        {
-            return getBestHatcheryForLair(candidateProducers);
-        }
-    }
-
     return getClosestUnitToPosition(candidateProducers, closestTo);
 }
 
@@ -525,134 +387,6 @@ bool compareByDronesNeeded(Base * left, Base * right)
 {
     return
         left->getMaxWorkers() - left->getNumWorkers() > right->getMaxWorkers() - right->getNumWorkers();
-}
-
-// We're producing a zerg unit from a larva.
-// The list of candidate producers is guaranteed not empty.
-BWAPI::Unit ProductionManager::getBestLarva(const MacroAct & act, const std::vector<BWAPI::Unit> & candidateLarvas) const
-{
-    // 1. Find goals, that is, bases to try to be near.
-    std::vector<Base *> bestBases;
-
-    if (act.getUnitType() == BWAPI::UnitTypes::Zerg_Drone)
-    {
-        // Try to make the drone at a base that needs more drones.
-        for (Base * base : the.bases.getAll())
-        {
-            if (base->getOwner() == the.self() &&
-                base->getDepot() && base->getDepot()->isCompleted() &&
-                !base->inWorkerDanger())
-            {
-                bestBases.push_back(base);
-            }
-        }
-        std::stable_sort(bestBases.begin(), bestBases.end(), compareByDronesNeeded);
-    }
-    else if (act.getUnitType() == BWAPI::UnitTypes::Zerg_Overlord)
-    {
-        bool hunters = the.info.enemyHasOverlordHunters();
-
-        // Are any bases in danger of attack?
-        bool inDanger = false;
-        for (Base * base : the.bases.getAll())
-        {
-            if (base->inOverlordDanger())
-            {
-                inDanger = true;
-                break;
-            }
-        }
-
-        if (hunters || inDanger)
-        {
-            // Some bases are in danger. Look for safe ones to spawn an overlord.
-            for (Base * base : the.bases.getAll())
-            {
-                if (base->getOwner() == the.self() && base->getDepot() && base->getDepot()->isCompleted())
-                {
-                    if (base->inOverlordDanger())
-                    {
-                        // Skip this one.
-                    }
-                    else if (hunters)
-                    {
-                        // Include this one if there is a spore.
-                        if (BWAPI::Broodwar->getClosestUnit(
-                            base->getCenter(),
-                            BWAPI::Filter::GetType == BWAPI::UnitTypes::Zerg_Spore_Colony && BWAPI::Filter::IsOwned,
-                            8 * 32))
-                        {
-                            bestBases.push_back(base);
-                        }
-                    }
-                    else
-                    {
-                        // This base is OK, include it.
-                        bestBases.push_back(base);
-                    }
-                }
-            }
-        }
-        // Otherwise there is no preference, so leave bestBases unpopulated.
-    }
-
-    // 2. Score larvas and choose the best.
-    BWAPI::Unit bestLarva = nullptr;
-    int bestScore = -1;      // higher is better; it will be >= 0
-    for (BWAPI::Unit larva : candidateLarvas)
-    {
-        int score = 0;
-
-        // All else being equal, prefer a hatchery with more larvas, especially if it has three.
-        // A hatchery with three larvas cannot spawn more.
-        // Also prefer a larva with no hatchery, since it probably won't live long.
-        if (larva->getHatchery())
-        {
-            int nLarvasAtHatch = larva->getHatchery()->getLarva().size();
-            if (nLarvasAtHatch == 3)
-            {
-                score += 50;
-            }
-            else
-            {
-                score += nLarvasAtHatch;
-            }
-        }
-        else
-        {
-            // No hatchery, a loose larva. A bonus only if no enemy is close.
-            // The larva is presumably at a base that was just destroyed, so wait for the enemy to leave.
-            if (nullptr == BWAPI::Broodwar->getClosestUnit(larva->getPosition(), BWAPI::Filter::IsEnemy, 192))
-            {
-                score += 40;
-            }
-        }
-
-        // Add points for being close to a preferred base.
-        const int maxTileDist = 14;
-        int baseScore = 200;
-        for (Base * base : bestBases)
-        {
-            int tileDist = base->getTileDistance(larva->getTilePosition());
-            if (tileDist <= maxTileDist)
-            {
-                score += baseScore + maxTileDist - tileDist;
-            }
-            baseScore -= 10;
-            if (baseScore <= 0)
-            {
-                break;
-            }
-        }
-
-        if (score > bestScore)
-        {
-            bestLarva = larva;
-            bestScore = score;
-        }
-    }
-
-    return bestLarva;
 }
 
 BWAPI::Unit ProductionManager::getClosestUnitToPosition(const std::vector<BWAPI::Unit> & units, BWAPI::Position closestTo) const
@@ -686,37 +420,6 @@ BWAPI::Unit ProductionManager::getClosestUnitToPosition(const std::vector<BWAPI:
     return closestUnit;
 }
 
-BWAPI::Unit ProductionManager::getFarthestUnitFromPosition(const std::vector<BWAPI::Unit> & units, BWAPI::Position farthest) const
-{
-    if (units.empty())
-    {
-        return nullptr;
-    }
-
-    // if we don't care where the unit is return the first one we have
-    if (farthest == BWAPI::Positions::None)
-    {
-        return *(units.begin());
-    }
-
-    BWAPI::Unit farthestUnit = nullptr;
-    int maxDist(-1);
-
-    for (BWAPI::Unit unit : units)
-    {
-        UAB_ASSERT(unit != nullptr, "Unit was null");
-
-        int distance = unit->getDistance(farthest);
-        if (distance > maxDist)
-        {
-            farthestUnit = unit;
-            maxDist = distance;
-        }
-    }
-
-    return farthestUnit;
-}
-
 // Exclude larvas that have been ordered to morph into something else.
 // NOTE This is part of a workaround for a BWAPI 4.4.0 latency compensation bug.
 BWAPI::Unit ProductionManager::getClosestLarvaToPosition(BWAPI::Position closestTo) const
@@ -735,77 +438,6 @@ BWAPI::Unit ProductionManager::getClosestLarvaToPosition(BWAPI::Position closest
     }
 
     return getClosestUnitToPosition(larvas, closestTo);
-}
-
-// We want to morph a lurker, guardian, or devourer. Try to choose a candidate that won't die quickly.
-BWAPI::Unit ProductionManager::getBestMorphCandidate(const std::vector<BWAPI::Unit> & candidates) const
-{
-    int bestScore = INT_MIN;      // higher is better
-    BWAPI::Unit bestParent = nullptr;
-
-    for (BWAPI::Unit parent : candidates)
-    {
-        int score = 13 * 32;
-        if (the.attacks(parent))
-        {
-            // In enemy static defense range. Reject even if it's the only choice.
-            continue;
-        }
-        else if (the.airAttacks.at(parent->getTilePosition()))
-        {
-            score = 0;      // in static detection range
-        }
-        else
-        {
-            BWAPI::Unit nearestEnemy = BWAPI::Broodwar->getClosestUnit(
-                parent->getPosition(),
-                BWAPI::Filter::IsEnemy,
-                11 * 32);
-            if (nearestEnemy)
-            {
-                score = parent->getDistance(nearestEnemy);
-            }
-        }
-        if (score > bestScore)
-        {
-            bestScore = score;
-            bestParent = parent;
-        }
-    }
-
-    return bestParent;
-}
-
-// We want to morph a lair. Try to do it in a safe place out of enemy vision.
-BWAPI::Unit ProductionManager::getBestHatcheryForLair(const std::vector<BWAPI::Unit> & hatcheries) const
-{
-    int bestScore = INT_MIN;      // higher is better
-    BWAPI::Unit bestHatch = nullptr;
-
-    for (BWAPI::Unit hatchery : hatcheries)
-    {
-        BWAPI::Unit nearestEnemy = BWAPI::Broodwar->getClosestUnit(
-            hatchery->getPosition(),
-            BWAPI::Filter::IsEnemy,
-            14 * 32);
-        int score = 16 * 32;
-        if (nearestEnemy)
-        {
-           score = hatchery->getDistance(nearestEnemy);
-        }
-        if (the.bases.myStart()->getOwner() == the.self() &&
-            the.zone.at(hatchery) == the.zone.at(the.bases.myStart()->getTilePosition()))
-        {
-            score += 8 * 32 + int(the.random.range(5.0));   // a little jitter for variety
-        }
-        if (score > bestScore)
-        {
-            bestScore = score;
-            bestHatch = hatchery;
-        }
-    }
-
-    return bestHatch;
 }
 
 // Create a unit, start research, etc.
@@ -930,48 +562,22 @@ int ProductionManager::getFreeGas() const
     return the.self()->gas() - BuildingManager::Instance().getReservedGas();
 }
 
+//Why is productionManager executing non-production macro commands...
 void ProductionManager::executeCommand(const MacroAct & act)
 {
     UAB_ASSERT(act.isCommand(), "not a command");
 
     MacroCommandType cmd = act.getCommandType().getType();
 
-    if (cmd == MacroCommandType::Scout ||
-        cmd == MacroCommandType::ScoutIfNeeded||
-        cmd == MacroCommandType::ScoutLocation ||
-        cmd == MacroCommandType::ScoutOnceOnly ||
-        cmd == MacroCommandType::ScoutWhileSafe)
-    {
-        ScoutManager::Instance().setScoutCommand(cmd);
-    }
-    else if (cmd == MacroCommandType::StealGas)
-    {
-        ScoutManager::Instance().setGasSteal();
-    }
-    else if (cmd == MacroCommandType::StopGas)
+//NEATCommander will not use ScoutManager.
+//Instead it uses existing squad and squad command type to figure that out.
+    if (cmd == MacroCommandType::StopGas)
     {
         WorkerManager::Instance().setCollectGas(false);
     }
     else if (cmd == MacroCommandType::StartGas)
     {
         WorkerManager::Instance().setCollectGas(true);
-    }
-    else if (cmd == MacroCommandType::GasUntil)
-    {
-        WorkerManager::Instance().setCollectGas(true);
-        // NOTE This normally works correctly, but can be wrong if we turn gas on and off too quickly.
-        //      It's wrong if e.g. we collect 100, then ask to collect 100 more before the first 100 is spent.
-        _targetGasAmount = the.self()->gatheredGas()
-            - the.self()->gas()
-            + act.getCommandType().getAmount();
-    }
-    else if (cmd == MacroCommandType::ExtractorTrickDrone)
-    {
-        startExtractorTrick(BWAPI::UnitTypes::Zerg_Drone);
-    }
-    else if (cmd == MacroCommandType::ExtractorTrickZergling)
-    {
-        startExtractorTrick(BWAPI::UnitTypes::Zerg_Zergling);
     }
     else if (cmd == MacroCommandType::Aggressive)
     {
@@ -981,19 +587,6 @@ void ProductionManager::executeCommand(const MacroAct & act)
     {
         CombatCommander::Instance().setAggression(false);
     }
-    else if (cmd == MacroCommandType::PullWorkers)
-    {
-        CombatCommander::Instance().pullWorkers(act.getCommandType().getAmount());
-    }
-    else if (cmd == MacroCommandType::PullWorkersLeaving)
-    {
-        int nWorkers = WorkerManager::Instance().getNumMineralWorkers() + WorkerManager::Instance().getNumGasWorkers();
-        CombatCommander::Instance().pullWorkers(nWorkers - act.getCommandType().getAmount());
-    }
-    else if (cmd == MacroCommandType::ReleaseWorkers)
-    {
-        CombatCommander::Instance().releaseWorkers();
-    }
     else if (cmd == MacroCommandType::PostWorker)
     {
         WorkerManager::Instance().postWorker(act.getMacroLocation());
@@ -1002,9 +595,47 @@ void ProductionManager::executeCommand(const MacroAct & act)
     {
         WorkerManager::Instance().unpostWorkers(act.getMacroLocation());
     }
-    else if (cmd == MacroCommandType::Nonadaptive)
+    //Put all units of type within given radius of given tile position into squad with squadindex
+    else if (cmd == MacroCommandType::AssignToSquad)
     {
-        StrategyBossZerg::Instance().setNonadaptive(true);
+        BWAPI::UnitFilter filter = BWAPI::UnitFilter(act.getUnitType());
+        int radius = act.getCommandType().getAmount2();
+        //Clamp radius between 3 and 256
+        radius = radius < 3 ? 3 : radius;
+        radius = radius > 256 ? 256 : radius;
+        BWAPI::Unitset foundUnits = BWAPI::Broodwar->getUnitsInRadius(act.getTileLocation().x * 32, act.getTileLocation().y * 32, radius * 32, filter);
+        int squadIndex = act.getCommandType().getAmount();
+        // There are only 5 squads with index 0 1 2 3 4
+        squadIndex = squadIndex < 0 ? 0 : squadIndex;
+        squadIndex = squadIndex > 4 ? 4 : squadIndex;
+        CombatCommander::Instance().NEAT_AssignToSquad(foundUnits, squadIndex);
+    }
+    //Remove all units of type within given radius of given tile position into squad with squadindex
+    else if (cmd == MacroCommandType::RemoveFromSquad)
+    {
+        BWAPI::UnitFilter filter = BWAPI::UnitFilter(act.getUnitType());
+        int radius = act.getCommandType().getAmount2();
+        //Clamp radius between 3 and 256
+        radius = radius < 3 ? 3 : radius;
+        radius = radius > 256 ? 256 : radius;
+        BWAPI::Unitset foundUnits = BWAPI::Broodwar->getUnitsInRadius(act.getTileLocation().x * 32, act.getTileLocation().y * 32, radius * 32, filter);
+        int squadIndex = act.getCommandType().getAmount();
+        // There are only 5 squads with index 0 1 2 3 4
+        squadIndex = squadIndex < 0 ? 0 : squadIndex;
+        squadIndex = squadIndex > 4 ? 4 : squadIndex;
+        CombatCommander::Instance().NEAT_RemoveFromSquad(foundUnits, squadIndex);
+    }
+    else if (cmd == MacroCommandType::SetSquadOrder) 
+    {
+        int squadIndex = act.getCommandType().getAmount();
+        // There are only 5 squads with index 0 1 2 3 4
+        squadIndex = squadIndex < 0 ? 0 : squadIndex;
+        squadIndex = squadIndex > 4 ? 4 : squadIndex;
+        int orderType = act.getCommandType().getAmount2();
+        // There are only 10 order types
+        orderType = orderType < 0 ? 0 : orderType;
+        orderType = orderType > 9 ? 9 : orderType;
+        CombatCommander::Instance().NEAT_SetSquadOrder((SquadOrderTypes)orderType, squadIndex, { act.getTileLocation().x, act.getTileLocation().y });
     }
     else if (cmd == MacroCommandType::Lift)
     {
@@ -1126,171 +757,7 @@ ProductionManager & ProductionManager::Instance()
 
 void ProductionManager::initialize()
 {
-    setBuildOrder(StrategyManager::Instance().getOpeningBookBuildOrder());
-}
-
-// We're zerg and doing the extractor trick to get an extra drone or pair of zerglings,
-// as specified in the argument.
-// Set a flag to start the procedure, and handle various error cases.
-void ProductionManager::startExtractorTrick(BWAPI::UnitType type)
-{
-    // Only zerg can do the extractor trick.
-    if (the.self()->getRace() != BWAPI::Races::Zerg)
-    {
-        return;
-    }
-
-    // If we're not supply blocked, then we may have lost units earlier.
-    // We may or may not have a larva available now, so instead of finding a larva and
-    // morphing the unit here, we set a special case extractor trick state to do it
-    // when a larva becomes available.
-    // We can't queue a unit, because when we return the caller will delete the front queue
-    // item--Steamhammer used to do that, but Arrak found the bug.
-    if (the.self()->supplyTotal() - the.self()->supplyUsed() >= 2)
-    {
-        if (_extractorTrickUnitType != BWAPI::UnitTypes::None)
-        {
-            _extractorTrickState = ExtractorTrick::MakeUnitBypass;
-            _extractorTrickUnitType = type;
-        }
-        return;
-    }
-    
-    // We need a free drone to execute the trick.
-    if (WorkerManager::Instance().getNumMineralWorkers() <= 0)
-    {
-        return;
-    }
-
-    // And we need a free geyser to do it on.
-    if (the.placer.getRefineryPosition() == BWAPI::TilePositions::None)
-    {
-        return;
-    }
-    
-    _extractorTrickState = ExtractorTrick::Start;
-    _extractorTrickUnitType = type;
-}
-
-// The extractor trick is in progress. Take the next step, when possible.
-// At most one step occurs per frame.
-void ProductionManager::doExtractorTrick()
-{
-    if (_extractorTrickState == ExtractorTrick::Start)
-    {
-        UAB_ASSERT(!_extractorTrickBuilding, "already have an extractor trick building");
-        int nDrones = WorkerManager::Instance().getNumMineralWorkers();
-        if (nDrones <= 0)
-        {
-            // Oops, we can't do it without a free drone. Give up.
-            _extractorTrickState = ExtractorTrick::None;
-        }
-        // If there are "many" drones mining, assume we'll get resources to finish the trick.
-        // Otherwise wait for the full 100 before we start.
-        // NOTE 100 assumes we are making a drone or a pair of zerglings.
-        else if (getFreeMinerals() >= 100 || (nDrones >= 6 && getFreeMinerals() >= 76))
-        {
-            // We also need a larva to make the drone.
-            if (the.self()->completedUnitCount(BWAPI::UnitTypes::Zerg_Larva) > 0)
-            {
-                BWAPI::TilePosition loc = BWAPI::TilePosition(0, 0);     // this gets ignored
-                Building & b = BuildingManager::Instance().addTrackedBuildingTask(MacroAct(BWAPI::UnitTypes::Zerg_Extractor), loc, nullptr, false);
-                _extractorTrickState = ExtractorTrick::ExtractorOrdered;
-                _extractorTrickBuilding = &b;    // points into building manager's queue of buildings
-            }
-        }
-    }
-    else if (_extractorTrickState == ExtractorTrick::ExtractorOrdered)
-    {
-        if (_extractorTrickUnitType == BWAPI::UnitTypes::None)
-        {
-            _extractorTrickState = ExtractorTrick::UnitOrdered;
-        }
-        else
-        {
-            int supplyAvail = the.self()->supplyTotal() - the.self()->supplyUsed();
-            if (supplyAvail >= 2 &&
-                getFreeMinerals() >= _extractorTrickUnitType.mineralPrice() &&
-                getFreeGas() >= _extractorTrickUnitType.gasPrice())
-            {
-                // We can build a unit now: The extractor started, or another unit died somewhere.
-                // Well, there is one more condition: We need a larva.
-                BWAPI::Unit larva = getClosestLarvaToPosition(the.bases.myMain()->getPosition());
-                if (larva && _extractorTrickUnitType != BWAPI::UnitTypes::None)
-                {
-                    if (_extractorTrickUnitType == BWAPI::UnitTypes::Zerg_Zergling &&
-                        the.my.completed.count(BWAPI::UnitTypes::Zerg_Spawning_Pool) == 0)
-                    {
-                        // We want a zergling but don't have the tech.
-                        // Give up by doing nothing and moving on.
-                    }
-                    else
-                    {
-                        the.micro.Make(larva, _extractorTrickUnitType);
-                    }
-                    _extractorTrickState = ExtractorTrick::UnitOrdered;
-                }
-            }
-            else if (supplyAvail < -2)
-            {
-                // Uh oh, we must have lost an overlord or a hatchery. Give up by moving on.
-                _extractorTrickState = ExtractorTrick::UnitOrdered;
-            }
-            else if (WorkerManager::Instance().getNumMineralWorkers() <= 0)
-            {
-                // Drone massacre, or all drones pulled to fight. Give up by moving on.
-                _extractorTrickState = ExtractorTrick::UnitOrdered;
-            }
-        }
-    }
-    else if (_extractorTrickState == ExtractorTrick::UnitOrdered)
-    {
-        UAB_ASSERT(_extractorTrickBuilding, "no extractor to cancel");
-        BuildingManager::Instance().cancelBuilding(*_extractorTrickBuilding);
-        _extractorTrickState = ExtractorTrick::None;
-        _extractorTrickUnitType = BWAPI::UnitTypes::None;
-        _extractorTrickBuilding = nullptr;
-    }
-    else if (_extractorTrickState == ExtractorTrick::MakeUnitBypass)
-    {
-        // We did the extractor trick when we didn't need to, whether because the opening was
-        // miswritten or because units were lost before we got here.
-        // This special state lets us construct the unit we want anyway, bypassing the extractor.
-        BWAPI::Unit larva = getClosestLarvaToPosition(the.bases.myMain()->getPosition());
-        if (larva &&
-            getFreeMinerals() >= _extractorTrickUnitType.mineralPrice() &&
-            getFreeGas() >= _extractorTrickUnitType.gasPrice())
-        {
-            the.micro.Make(larva, _extractorTrickUnitType);
-            _extractorTrickState = ExtractorTrick::None;
-        }
-    }
-    else
-    {
-        UAB_ASSERT(false, "unexpected extractor trick state (possibly None)");
-    }
-}
-
-void ProductionManager::liftBuildings(BWAPI::UnitType type) const
-{
-    for (BWAPI::Unit u : the.self()->getUnits())
-    {
-        if (u->getType() == type && u->canLift())
-        {
-            (void)the.micro.Lift(u);
-        }
-    }
-}
-
-void ProductionManager::queueGasSteal()
-{
-    _queue.queueAsHighestPriority(MacroAct(the.self()->getRace().getRefinery(), MacroLocation::GasSteal), true);
-}
-
-// Has a gas steal has been queued?
-bool ProductionManager::isGasStealInQueue() const
-{
-    return _queue.isGasStealInQueue() || BuildingManager::Instance().isGasStealInQueue();
+    //setBuildOrder(StrategyManager::Instance().getOpeningBookBuildOrder());
 }
 
 // The next item in the queue is a building that requires a worker to construct.

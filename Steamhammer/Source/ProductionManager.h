@@ -38,13 +38,9 @@ class ProductionManager
     int                 _combatMineralsSpent;
     int                 _combatGasSpent;
     
-    BWAPI::Unit			getBestLarva(const MacroAct & act, const std::vector<BWAPI::Unit> & candidateLarvas) const;
     BWAPI::Unit         getClosestUnitToPosition(const std::vector<BWAPI::Unit> & units, BWAPI::Position closestTo) const;
-    BWAPI::Unit         getFarthestUnitFromPosition(const std::vector<BWAPI::Unit> & units, BWAPI::Position farthest) const;
     BWAPI::Unit         getClosestLarvaToPosition(BWAPI::Position closestTo) const;
-    BWAPI::Unit         getBestMorphCandidate(const std::vector<BWAPI::Unit> & candidates) const;
-    BWAPI::Unit         getBestHatcheryForLair(const std::vector<BWAPI::Unit> & hatcheries) const;
-    
+
     void				executeCommand(const MacroAct & act);
     void				updateGoals();
     void                create(BWAPI::Unit producer, const BuildOrderItem & item);
@@ -57,8 +53,6 @@ class ProductionManager
 
     int                 getFreeMinerals() const;
     int                 getFreeGas() const;
-
-    void				doExtractorTrick();
 
     BWAPI::Unit         getProducer(MacroAct t) const;
 
@@ -76,9 +70,6 @@ public:
     void	drawProductionInformation(int x, int y);
     void	startExtractorTrick(BWAPI::UnitType type);
     void    liftBuildings(BWAPI::UnitType type) const;
-
-    void	queueGasSteal();
-    bool	isGasStealInQueue() const;
 
     bool	nextIsBuilding() const;
 

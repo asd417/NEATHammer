@@ -422,15 +422,15 @@ void StaticDefense::plan()
 
 void StaticDefense::startBuilding(BWAPI::UnitType building, const BWAPI::TilePosition & tile)
 {
-    BuildOrderQueue & queue = the.production.getQueue();
+    //BuildOrderQueue & queue = the.production.getQueue();
 
-    // Replace zerg drones if low.
-    if (building.getRace() == BWAPI::Races::Zerg && the.my.all.count(BWAPI::UnitTypes::Zerg_Drone) <= _MinDroneLimit)
-    {
-        queue.queueAsHighestPriority(BWAPI::UnitTypes::Zerg_Drone);
-    }
+    //// Replace zerg drones if low.
+    //if (building.getRace() == BWAPI::Races::Zerg && the.my.all.count(BWAPI::UnitTypes::Zerg_Drone) <= _MinDroneLimit)
+    //{
+    //    queue.queueAsHighestPriority(BWAPI::UnitTypes::Zerg_Drone);
+    //}
 
-    queue.queueAsHighestPriority(MacroAct(building, tile));
+    //queue.queueAsHighestPriority(MacroAct(building, tile));
 }
 
 // The building manager sometimes forgets about sunkens and spores while building them, and
@@ -492,72 +492,73 @@ bool StaticDefense::morphStrandedCreeps(BWAPI::UnitType type)
 // Urgently start all ground defenses needed at the front base.
 bool StaticDefense::startFrontGroundBuildings()
 {
-    Base * front = the.bases.myFront();
+    return false;
+    //Base * front = the.bases.myFront();
 
-    if (!front || !front->isMyCompletedBase())
-    {
-        return false;
-    }
+    //if (!front || !front->isMyCompletedBase())
+    //{
+    //    return false;
+    //}
 
-    int nActual = front->getNumUnits(_ground);
-    if (_ground == BWAPI::UnitTypes::Zerg_Sunken_Colony)
-    {
-        // For sunkens, also count creeps, which will probably turn into sunkens.
-        // NOTE We do this only for front base defenses. Others are OK because they are built more slowly.
-        nActual += front->getNumUnits(BWAPI::UnitTypes::Zerg_Creep_Colony);
-    }
-    // Also count queued buildings, without checking where they are set to be built.
-    nActual += the.production.getQueue().numInNextN(_ground, 2 * _plan.atFront);
+    //int nActual = front->getNumUnits(_ground);
+    //if (_ground == BWAPI::UnitTypes::Zerg_Sunken_Colony)
+    //{
+    //    // For sunkens, also count creeps, which will probably turn into sunkens.
+    //    // NOTE We do this only for front base defenses. Others are OK because they are built more slowly.
+    //    nActual += front->getNumUnits(BWAPI::UnitTypes::Zerg_Creep_Colony);
+    //}
+    //// Also count queued buildings, without checking where they are set to be built.
+    //nActual += the.production.getQueue().numInNextN(_ground, 2 * _plan.atFront);
 
-    int nNeeded = _plan.atFront - nActual;      // new buildings to start
-    if (nNeeded <= 0)
-    {
-        return false;
-    }
+    //int nNeeded = _plan.atFront - nActual;      // new buildings to start
+    //if (nNeeded <= 0)
+    //{
+    //    return false;
+    //}
 
-    //BWAPI::Broodwar->printf("%d needed at front: plan %d - existing %d", nNeeded, _plan.atFront, nActual);
+    ////BWAPI::Broodwar->printf("%d needed at front: plan %d - existing %d", nNeeded, _plan.atFront, nActual);
 
-    while (nNeeded > 0)
-    {
-        startBuilding(_ground, front->getFrontTile());
-        --nNeeded;
-    }
+    //while (nNeeded > 0)
+    //{
+    //    startBuilding(_ground, front->getFrontTile());
+    //    --nNeeded;
+    //}
 
-    return true;
+    //return true;
 }
 
 // Take our time starting all ground defenses needed at bases other than the front base.
 // Don't build more at a base than there are workers there, so that new bases don't overdo it.
 bool StaticDefense::startOtherGroundBuildings()
 {
-    for (Base * base : the.bases.getAll())
-    {
-        if (base->isMyCompletedBase() &&
-            (the.selfRace() != BWAPI::Races::Zerg || base->getNumUnits(BWAPI::UnitTypes::Zerg_Creep_Colony) == 0))
-        {
-            int nUnits = base->getNumUnits(_ground);
-            if (base == the.bases.myFront())
-            {
-                // Handled by startFrontGroundBuildings().
-            }
-            else if (!base->isInnerBase())  // outer base
-            {
-                if (nUnits < _plan.atOuterBases && nUnits < base->getNumWorkers())
-                {
-                    startBuilding(_ground, base->getTilePosition());
-                    return true;
-                }
-            }
-            else if (base->isInnerBase())
-            {
-                if (nUnits < _plan.atInnerBases && nUnits < base->getNumWorkers())
-                {
-                    startBuilding(_ground, base->getTilePosition());
-                    return true;
-                }
-            }
-        }
-    }
+    //for (Base * base : the.bases.getAll())
+    //{
+    //    if (base->isMyCompletedBase() &&
+    //        (the.selfRace() != BWAPI::Races::Zerg || base->getNumUnits(BWAPI::UnitTypes::Zerg_Creep_Colony) == 0))
+    //    {
+    //        int nUnits = base->getNumUnits(_ground);
+    //        if (base == the.bases.myFront())
+    //        {
+    //            // Handled by startFrontGroundBuildings().
+    //        }
+    //        else if (!base->isInnerBase())  // outer base
+    //        {
+    //            if (nUnits < _plan.atOuterBases && nUnits < base->getNumWorkers())
+    //            {
+    //                startBuilding(_ground, base->getTilePosition());
+    //                return true;
+    //            }
+    //        }
+    //        else if (base->isInnerBase())
+    //        {
+    //            if (nUnits < _plan.atInnerBases && nUnits < base->getNumWorkers())
+    //            {
+    //                startBuilding(_ground, base->getTilePosition());
+    //                return true;
+    //            }
+    //        }
+    //    }
+    //}
 
     return false;
 }
@@ -664,7 +665,7 @@ void StaticDefense::chooseAirBases()
 // All checks passed. Find the next base that needs it, and start the building.
 void StaticDefense::startAirBuilding()
 {
-    const std::vector<Base *> & bases =
+    /*const std::vector<Base *> & bases =
         _plan.airIsPerBase ? the.bases.getAll() : _airBases;
     
     for (Base * base : bases)
@@ -677,7 +678,7 @@ void StaticDefense::startAirBuilding()
                 return;
             }
         }
-    }
+    }*/
 }
 
 // Order terran turrets or zerg spore colonies.

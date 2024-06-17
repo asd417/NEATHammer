@@ -68,11 +68,13 @@ void GameCommander::update()
 
     // -- Managers that act on information. --
 
-    _timerManager.startTimer(TimerManager::Search);
-    BOSSManager::Instance().update(35 - _timerManager.getMilliseconds());
-    _timerManager.stopTimer(TimerManager::Search);
+    //_timerManager.startTimer(TimerManager::Search);
+    //Performs buildorder search
+    //BOSSManager::Instance().update(35 - _timerManager.getMilliseconds());
+    //_timerManager.stopTimer(TimerManager::Search);
 
     // May steal workers from WorkerManager, so run it before WorkerManager.
+    // NEAT Network evaluation occurs inside ProductionManager
     _timerManager.startTimer(TimerManager::Production);
     ProductionManager::Instance().update();
     _timerManager.stopTimer(TimerManager::Production);
@@ -365,7 +367,7 @@ void GameCommander::handleUnitAssignments()
     setValidUnits();
 
     // set each type of unit
-    setScoutUnits();
+    //setScoutUnits();
     setCombatUnits();
 }
 

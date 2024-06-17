@@ -176,16 +176,6 @@ void BOSSManager::update(double timeLimit)
             // if our search resulted in a build order of size 0 then something failed
             if (!solved && _previousBuildOrder.size() == 0)
             {
-                // log the debug information since this shouldn't happen if everything goes to plan
-                /*std::stringstream ss;
-                ss << _smartSearch->getParameters().toString() << "\n";
-                ss << "searchTimeOut: " << (searchTimeOut ? "true" : "false") << "\n";
-                ss << "caughtException: " << (caughtException ? "true" : "false") << "\n";
-                ss << "getResults().solved: " << (_smartSearch->getResults().solved ? "true" : "false") << "\n";
-                ss << "getResults().solutionFound: " << (_smartSearch->getResults().solutionFound ? "true" : "false") << "\n";
-                ss << "nodes: " << _savedSearchResults.nodesExpanded << "\n";
-                ss << "time: " << _savedSearchResults.timeElapsed << "\n";
-                Logger::LogOverwriteToFile("bwapi-data/AI/LastBadBuildOrder.txt", ss.str());*/
                 
                 // so try another naive build order search as a last resort
                 BOSS::NaiveBuildOrderSearch nbos(_smartSearch->getParameters().initialState, _smartSearch->getParameters().goal);

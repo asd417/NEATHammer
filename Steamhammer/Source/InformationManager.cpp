@@ -644,6 +644,10 @@ void InformationManager::updateUnit(BWAPI::Unit unit)
     }
 }
 
+/// <summary>
+/// Record destroyed unit
+/// </summary>
+/// <param name="unit"></param>
 void InformationManager::onUnitDestroy(BWAPI::Unit unit) 
 { 
     if (unit->getPlayer() == _self || unit->getPlayer() == _enemy)

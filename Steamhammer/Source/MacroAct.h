@@ -22,14 +22,24 @@ enum class MacroLocation
     , Tile         // on or near a specific tile
     };
 
-namespace MacroActs
-{
-    enum {Unit, Tech, Upgrade, Command, Default};
-}
+//namespace MacroActs
+//{
+//    enum {Unit, Tech, Upgrade, Command, Default};
+//}
+
+enum MacroActs {
+    Unit,
+    Tech,
+    Upgrade,
+    Command,
+    Default
+};
 
 class MacroAct 
 {
-    size_t				_type;
+    //MacroActs::enum
+    //size_t				_type;
+    MacroActs           _type;
 
     BWAPI::UnitType		_unitType;
     BWAPI::TechType		_techType;
@@ -55,6 +65,7 @@ public:
     MacroAct(BWAPI::TechType t);
     MacroAct(BWAPI::UpgradeType t);
     MacroAct(MacroCommandType t);
+    MacroAct(MacroCommandType t, const BWAPI::TilePosition& tile);
     MacroAct(MacroCommandType t, int amount);
     MacroAct(MacroCommandType t, BWAPI::UnitType type);
 
