@@ -10,7 +10,6 @@
 #include "Random.h"
 #include "UnitUtil.h"
 
-
 using namespace UAlbertaBot;
 
 // Squad priorities: Which can steal units from others.
@@ -95,11 +94,7 @@ void CombatCommander::initializeSquads()
 
     // If we're expecting to drop, create a drop squad.
     // It is initially ordered to hold ground until it can load up and go.
-#ifndef NEATO_COMMANDER
     if (StrategyManager::Instance().dropIsPlanned())
-#else 
-    if (StrategyManagerNEAT::Instance().dropIsPlanned())
-#endif
     {
         _squadData.createSquad("Drop", DropPriority).
             setOrder(SquadOrder(SquadOrderTypes::Hold, ourBasePosition, AttackRadius, false, "Wait for transport"));

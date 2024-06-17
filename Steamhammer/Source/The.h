@@ -23,7 +23,7 @@ namespace UAlbertaBot
     class MapGrid;
     class InformationManager;
     class ProductionManager;
-    //class OpeningTiming;
+    class OpeningTiming;
     class Random;
     class StaticDefense;
 
@@ -77,7 +77,7 @@ namespace UAlbertaBot
         // Perform unit control actions ("unit micro").
         Micro micro;
         // Compare openings by the times of events in them.
-        //OpeningTiming & openingTiming;
+        OpeningTiming & openingTiming;
         // Place buildings. Find macro locations.
         BuildingPlacer placer;
         // Make stuff.

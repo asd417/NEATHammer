@@ -23,9 +23,6 @@ TimerManager::TimerManager()
     _timerNames.push_back("Combat");
     _timerNames.push_back("Micro");
     _timerNames.push_back("Scout");
-#ifdef NEATO_COMMANDER
-    _timerNames.push_back("NetworkEvaluation");
-#endif
 }
 
 void TimerManager::startTimer(const TimerManager::Type t)

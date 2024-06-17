@@ -4,7 +4,6 @@
 #include "Common.h"
 #include "../../BOSS/source/Timer.hpp"
 
-
 namespace UAlbertaBot
 {
 
@@ -21,23 +20,7 @@ class TimerManager
 
 public:
 
-    enum Type { 
-        Total, 
-        InformationManager, 
-        MapGrid, 
-        OpponentModel, 
-        Search, 
-        Worker, 
-        Production, 
-        Building, 
-        Combat, 
-        Micro, 
-        Scout, 
-#ifdef NEATO_COMMANDER
-        NetworkEvaluation,
-#endif
-        NumTypes
-    };
+    enum Type { Total, InformationManager, MapGrid, OpponentModel, Search, Worker, Production, Building, Combat, Micro, Scout, NumTypes };
 
     TimerManager();
 

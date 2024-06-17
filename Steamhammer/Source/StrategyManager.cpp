@@ -8,8 +8,6 @@
 #include "StrategyBossZerg.h"
 #include "UnitUtil.h"
 
-#include <exception>
-
 using namespace UAlbertaBot;
 
 StrategyManager::StrategyManager() 
@@ -25,9 +23,6 @@ StrategyManager::StrategyManager()
 
 StrategyManager & StrategyManager::Instance() 
 {
-#ifdef NEATO_COMMANDER
-    throw std::exception("StrategyManager is unused when compiled with NEATO_COMMANDER");
-#endif
     static StrategyManager instance;
     return instance;
 }
@@ -637,10 +632,8 @@ void StrategyManager::handleUrgentProductionIssues(BuildOrderQueue & queue)
 
     // All other considerations are handled separately by zerg.
     if (_selfRace == BWAPI::Races::Zerg)
-    {   
-#ifndef NEATO_COMMANDER
+    {
         StrategyBossZerg::Instance().handleUrgentProductionIssues(queue);
-#endif
     }
     else
     {

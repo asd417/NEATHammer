@@ -41,7 +41,6 @@ void ProductionManager::setBuildOrder(const BuildOrder & buildOrder)
 
 void ProductionManager::update() 
 {
-#ifndef NEATO_COMMANDER
     // TODO move this to worker manager and make it more precise; it normally goes a little over
     // If we have reached a target amount of gas, take workers off gas.
     if (_targetGasAmount && the.self()->gatheredGas() >= _targetGasAmount)
@@ -83,7 +82,7 @@ void ProductionManager::update()
         goOutOfBookAndClearQueue();
         StrategyManager::Instance().freshProductionPlan();
     }
-#endif
+
     // Build stuff from the production queue.
     manageBuildOrderQueue();
 }
@@ -780,7 +779,6 @@ BWAPI::Unit ProductionManager::getBestMorphCandidate(const std::vector<BWAPI::Un
 // We want to morph a lair. Try to do it in a safe place out of enemy vision.
 BWAPI::Unit ProductionManager::getBestHatcheryForLair(const std::vector<BWAPI::Unit> & hatcheries) const
 {
-#ifndef NEATO_COMMANDER
     int bestScore = INT_MIN;      // higher is better
     BWAPI::Unit bestHatch = nullptr;
 
@@ -806,9 +804,7 @@ BWAPI::Unit ProductionManager::getBestHatcheryForLair(const std::vector<BWAPI::U
             bestHatch = hatchery;
         }
     }
-#else
-    BWAPI::Unit bestHatch = hatcheries[0];
-#endif
+
     return bestHatch;
 }
 
@@ -936,7 +932,6 @@ int ProductionManager::getFreeGas() const
 
 void ProductionManager::executeCommand(const MacroAct & act)
 {
-#ifndef NEATO_COMMANDER
     UAB_ASSERT(act.isCommand(), "not a command");
 
     MacroCommandType cmd = act.getCommandType().getType();
@@ -1023,7 +1018,6 @@ void ProductionManager::executeCommand(const MacroAct & act)
     {
         UAB_ASSERT(false, "unknown MacroCommand");
     }
-#endif
 }
 
 void ProductionManager::updateGoals()
@@ -1132,11 +1126,7 @@ ProductionManager & ProductionManager::Instance()
 
 void ProductionManager::initialize()
 {
-#ifndef NEATO_COMMANDER
     setBuildOrder(StrategyManager::Instance().getOpeningBookBuildOrder());
-#else
-    //start NN
-#endif
 }
 
 // We're zerg and doing the extractor trick to get an extra drone or pair of zerglings,
@@ -1144,7 +1134,6 @@ void ProductionManager::initialize()
 // Set a flag to start the procedure, and handle various error cases.
 void ProductionManager::startExtractorTrick(BWAPI::UnitType type)
 {
-#ifndef NEATO_COMMANDER
     // Only zerg can do the extractor trick.
     if (the.self()->getRace() != BWAPI::Races::Zerg)
     {
@@ -1181,13 +1170,12 @@ void ProductionManager::startExtractorTrick(BWAPI::UnitType type)
     
     _extractorTrickState = ExtractorTrick::Start;
     _extractorTrickUnitType = type;
-#endif
 }
+
 // The extractor trick is in progress. Take the next step, when possible.
 // At most one step occurs per frame.
 void ProductionManager::doExtractorTrick()
 {
-#ifndef NEATO_COMMANDER
     if (_extractorTrickState == ExtractorTrick::Start)
     {
         UAB_ASSERT(!_extractorTrickBuilding, "already have an extractor trick building");
@@ -1281,7 +1269,6 @@ void ProductionManager::doExtractorTrick()
     {
         UAB_ASSERT(false, "unexpected extractor trick state (possibly None)");
     }
-#endif
 }
 
 void ProductionManager::liftBuildings(BWAPI::UnitType type) const
@@ -1297,19 +1284,13 @@ void ProductionManager::liftBuildings(BWAPI::UnitType type) const
 
 void ProductionManager::queueGasSteal()
 {
-#ifndef NEATO_COMMANDER
     _queue.queueAsHighestPriority(MacroAct(the.self()->getRace().getRefinery(), MacroLocation::GasSteal), true);
-#endif
 }
 
 // Has a gas steal has been queued?
 bool ProductionManager::isGasStealInQueue() const
 {
-#ifndef NEATO_COMMANDER
     return _queue.isGasStealInQueue() || BuildingManager::Instance().isGasStealInQueue();
-#else
-    return false;
-#endif
 }
 
 // The next item in the queue is a building that requires a worker to construct.

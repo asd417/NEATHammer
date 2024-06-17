@@ -27,11 +27,11 @@ void SkillKit::addSkill(Skill * skill)
 // This happens before skill data is read, necessarily.
 void SkillKit::initialize()
 {
-    //addSkill(new SkillBattles);
-    //addSkill(new SkillGasSteal);
-    //addSkill(new SkillLurkers);
-    //addSkill(new SkillOpeningTiming);
-    //addSkill(new SkillUnitTimings);
+    addSkill(new SkillBattles);
+    addSkill(new SkillGasSteal);
+    addSkill(new SkillLurkers);
+    addSkill(new SkillOpeningTiming);
+    addSkill(new SkillUnitTimings);
 }
 
 // Called from GameRecord, where skill data is persisted.

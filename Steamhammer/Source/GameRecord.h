@@ -111,6 +111,9 @@ protected:
     GameSnapshot * readGameSnapshot(std::istream & input);
     void skipToEnd(std::istream & input);
 
+    void read_v3_0(std::istream & input);
+    void read_v1_4(std::istream & input);
+    void read(std::istream & input);
 
     void writePlayerSnapshot(std::ostream & output, const PlayerSnapshot & snap);
     void writeGameSnapshot(std::ostream & output, const GameSnapshot * snap);
@@ -120,7 +123,7 @@ protected:
 
 public:
     // Store opening timing skill data specially.
-    //OpeningTimingRecord openingTimingRecord;
+    OpeningTimingRecord openingTimingRecord;
 
     GameRecord();
     GameRecord(std::istream & input);
@@ -138,7 +141,7 @@ public:
     bool getEnemyIsRandom() const { return enemyIsRandom; };
     const std::string & getMapName() const { return mapName; };
     const std::string & getOpeningName() const { return openingName; };
-
+    OpeningPlan getExpectedEnemyPlan() const { return expectedEnemyPlan; };
     OpeningPlan getEnemyPlan() const { return enemyPlan; };
     bool getWin() const { return win; };
     int getFrameScoutSentForGasSteal() const { return frameScoutSentForGasSteal; };

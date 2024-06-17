@@ -8,7 +8,6 @@
 
 #include <regex>
 
-
 using namespace UAlbertaBot;
 
 // Map unit type names to unit types.
@@ -428,12 +427,10 @@ MacroCommand MacroAct::getCommandType() const
 
 MacroLocation MacroAct::getMacroLocation() const
 {
-#ifndef NEATO_COMMANDER
     if (isBuilding() && getUnitType() == BWAPI::UnitTypes::Zerg_Hatchery && StrategyBossZerg::Instance().hiddenBaseNext())
     {
         return MacroLocation::Hidden;
     }
-#endif
     return _macroLocation;
 }
 

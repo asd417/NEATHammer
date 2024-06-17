@@ -34,21 +34,6 @@
     <Filter Include="util">
       <UniqueIdentifier>{59599488-4576-44ab-8522-7d65a6425e15}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Micro">
-      <UniqueIdentifier>{c6cba72a-3e25-44b9-a7d8-3fd4da767889}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Macro">
-      <UniqueIdentifier>{c23b07dd-100c-4d62-a667-1d9e011e689e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Grid">
-      <UniqueIdentifier>{67429a34-7c59-4329-af48-8c071e7826e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Skill">
-      <UniqueIdentifier>{1889950c-16e5-467f-a969-f244ccca4339}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Strategy">
-      <UniqueIdentifier>{1a1f34eb-7b10-48b6-83b1-b98a2f303a88}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\CombatCommander.cpp">
@@ -144,126 +129,62 @@
     <ClCompile Include="..\Source\Logger.cpp">
       <Filter>util</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\MacroAct.cpp" />
+    <ClCompile Include="..\Source\StrategyBossZerg.cpp" />
+    <ClCompile Include="..\Source\MicroTanks.cpp" />
+    <ClCompile Include="..\Source\MicroDetectors.cpp" />
+    <ClCompile Include="..\Source\MicroLurkers.cpp" />
+    <ClCompile Include="..\Source\MicroMedics.cpp" />
+    <ClCompile Include="..\Source\MicroMelee.cpp" />
+    <ClCompile Include="..\Source\MicroRanged.cpp" />
+    <ClCompile Include="..\Source\MicroTransports.cpp" />
+    <ClCompile Include="..\Source\MicroHighTemplar.cpp" />
+    <ClCompile Include="..\Source\Random.cpp" />
     <ClCompile Include="..\Source\Base.cpp" />
     <ClCompile Include="..\Source\FAP.cpp" />
+    <ClCompile Include="..\Source\GameRecord.cpp" />
     <ClCompile Include="..\Source\OpponentModel.cpp" />
     <ClCompile Include="..\Source\PlayerSnapshot.cpp" />
+    <ClCompile Include="..\Source\MicroAirToAir.cpp" />
     <ClCompile Include="..\Source\OpponentPlan.cpp" />
     <ClCompile Include="..\Source\Bases.cpp" />
     <ClCompile Include="..\Source\ProductionGoal.cpp" />
     <ClCompile Include="..\Source\MapPartitions.cpp" />
     <ClCompile Include="..\Source\The.cpp" />
+    <ClCompile Include="..\Source\Grid.cpp" />
+    <ClCompile Include="..\Source\GridDistances.cpp" />
+    <ClCompile Include="..\Source\GridAttacks.cpp" />
+    <ClCompile Include="..\Source\MicroOverlords.cpp" />
+    <ClCompile Include="..\Source\MicroMutas.cpp" />
+    <ClCompile Include="..\Source\MicroDefilers.cpp" />
+    <ClCompile Include="..\Source\OpsBoss.cpp" />
+    <ClCompile Include="..\Source\MicroScourge.cpp" />
+    <ClCompile Include="..\Source\GridWalk.cpp" />
+    <ClCompile Include="..\Source\GridRoom.cpp" />
+    <ClCompile Include="..\Source\GridTileRoom.cpp" />
+    <ClCompile Include="..\Source\GridInset.cpp" />
+    <ClCompile Include="..\Source\GridZone.cpp" />
+    <ClCompile Include="..\Source\MicroQueens.cpp" />
     <ClCompile Include="..\Source\BOSimulator.cpp" />
     <ClCompile Include="..\Source\GameRecordNow.cpp" />
+    <ClCompile Include="..\Source\GridSafeAirPath.cpp" />
+    <ClCompile Include="..\Source\GridCreep.cpp" />
     <ClCompile Include="..\Source\ResourceInfo.cpp" />
-    <ClCompile Include="..\Source\MicroAirToAir.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroDefilers.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroDetectors.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroHighTemplar.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroIrradiated.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroLurkers.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroMedics.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroMelee.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroMutas.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroOverlords.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroQueens.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroRanged.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroScourge.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroTanks.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MicroTransports.cpp">
-      <Filter>Micro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MacroAct.cpp">
-      <Filter>Macro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\MacroCommand.cpp">
-      <Filter>Macro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Grid.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridAttacks.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridBuildable.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridCreep.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridDistances.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridInset.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridRoom.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridSafeAirPath.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridTileRoom.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridWalk.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GridZone.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Skill.cpp">
-      <Filter>Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\SkillGasSteal.cpp">
-      <Filter>Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\SkillKit.cpp">
-      <Filter>Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\SkillLurkers.cpp">
-      <Filter>Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\SkillUnitTimings.cpp">
-      <Filter>Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\StrategyBossZerg.cpp">
-      <Filter>Strategy</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Random.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\SquadOrder.cpp">
-      <Filter>game\combat\squad</Filter>
-    </ClCompile>
+    <ClCompile Include="..\Source\Skill.cpp" />
+    <ClCompile Include="..\Source\SkillGasSteal.cpp" />
+    <ClCompile Include="..\Source\SkillKit.cpp" />
+    <ClCompile Include="..\Source\SkillUnitTimings.cpp" />
+    <ClCompile Include="..\Source\GridBuildable.cpp" />
+    <ClCompile Include="..\Source\MacroCommand.cpp" />
+    <ClCompile Include="..\Source\SkillBattles.cpp" />
+    <ClCompile Include="..\Source\OpeningTiming.cpp" />
+    <ClCompile Include="..\Source\SkillOpeningTiming.cpp" />
+    <ClCompile Include="..\Source\OpeningTimingRecord.cpp" />
+    <ClCompile Include="..\Source\SkillLurkers.cpp" />
+    <ClCompile Include="..\Source\MicroIrradiated.cpp" />
+    <ClCompile Include="..\Source\TacticsOrders.cpp" />
+    <ClCompile Include="..\Source\SquadOrder.cpp" />
+    <ClCompile Include="..\Source\StaticDefense.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\CombatCommander.h">
@@ -359,123 +280,61 @@
     <ClInclude Include="..\Source\Logger.h">
       <Filter>util</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\MacroAct.h" />
+    <ClInclude Include="..\Source\MacroCommand.h" />
     <ClInclude Include="..\Source\BuildingData.h" />
+    <ClInclude Include="..\Source\StrategyBossZerg.h" />
+    <ClInclude Include="..\Source\MicroTanks.h" />
+    <ClInclude Include="..\Source\MicroDetectors.h" />
+    <ClInclude Include="..\Source\MicroLurkers.h" />
+    <ClInclude Include="..\Source\MicroMedics.h" />
+    <ClInclude Include="..\Source\MicroMelee.h" />
+    <ClInclude Include="..\Source\MicroRanged.h" />
+    <ClInclude Include="..\Source\MicroTransports.h" />
+    <ClInclude Include="..\Source\MicroHighTemplar.h" />
+    <ClInclude Include="..\Source\Random.h" />
     <ClInclude Include="..\Source\Base.h" />
     <ClInclude Include="..\Source\FAP.h" />
+    <ClInclude Include="..\Source\GameRecord.h" />
     <ClInclude Include="..\Source\OpponentModel.h" />
     <ClInclude Include="..\Source\PlayerSnapshot.h" />
+    <ClInclude Include="..\Source\MicroAirToAir.h" />
     <ClInclude Include="..\Source\OpponentPlan.h" />
     <ClInclude Include="..\Source\Bases.h" />
     <ClInclude Include="..\Source\ProductionGoal.h" />
     <ClInclude Include="..\Source\MapPartitions.h" />
     <ClInclude Include="..\Source\The.h" />
+    <ClInclude Include="..\Source\Grid.h" />
+    <ClInclude Include="..\Source\GridDistances.h" />
+    <ClInclude Include="..\Source\GridAttacks.h" />
+    <ClInclude Include="..\Source\MicroOverlords.h" />
+    <ClInclude Include="..\Source\MicroMutas.h" />
+    <ClInclude Include="..\Source\MicroDefilers.h" />
+    <ClInclude Include="..\Source\OpsBoss.h" />
+    <ClInclude Include="..\Source\MicroScourge.h" />
+    <ClInclude Include="..\Source\GridWalk.h" />
+    <ClInclude Include="..\Source\GridRoom.h" />
+    <ClInclude Include="..\Source\GridTileRoom.h" />
+    <ClInclude Include="..\Source\GridInset.h" />
+    <ClInclude Include="..\Source\GridZone.h" />
+    <ClInclude Include="..\Source\MicroQueens.h" />
     <ClInclude Include="..\Source\BOSimulator.h" />
     <ClInclude Include="..\Source\GameRecordNow.h" />
+    <ClInclude Include="..\Source\GridSafeAirPath.h" />
+    <ClInclude Include="..\Source\GridCreep.h" />
     <ClInclude Include="..\Source\ResourceInfo.h" />
-    <ClInclude Include="..\Source\MicroAirToAir.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroDefilers.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroDetectors.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroHighTemplar.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroIrradiated.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroLurkers.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroMedics.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroMelee.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroMutas.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroOverlords.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroQueens.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroRanged.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroScourge.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroTanks.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MicroTransports.h">
-      <Filter>Micro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MacroAct.h">
-      <Filter>Macro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MacroCommand.h">
-      <Filter>Macro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Grid.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridAttacks.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridBuildable.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridCreep.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridDistances.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridInset.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridRoom.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridSafeAirPath.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridTileRoom.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridWalk.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GridZone.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Skill.h">
-      <Filter>Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\SkillGasSteal.h">
-      <Filter>Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\SkillKit.h">
-      <Filter>Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\SkillLurkers.h">
-      <Filter>Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\SkillUnitTimings.h">
-      <Filter>Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\StrategyBossZerg.h">
-      <Filter>Strategy</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Random.h">
-      <Filter>util</Filter>
-    </ClInclude>
+    <ClInclude Include="..\Source\Skill.h" />
+    <ClInclude Include="..\Source\SkillGasSteal.h" />
+    <ClInclude Include="..\Source\SkillKit.h" />
+    <ClInclude Include="..\Source\SkillUnitTimings.h" />
+    <ClInclude Include="..\Source\GridBuildable.h" />
+    <ClInclude Include="..\Source\SkillBattles.h" />
+    <ClInclude Include="..\Source\OpeningTiming.h" />
+    <ClInclude Include="..\Source\SkillOpeningTiming.h" />
+    <ClInclude Include="..\Source\OpeningTimingRecord.h" />
+    <ClInclude Include="..\Source\SkillLurkers.h" />
+    <ClInclude Include="..\Source\TacticsOrders.h" />
+    <ClInclude Include="..\Source\MicroIrradiated.h" />
+    <ClInclude Include="..\Source\StaticDefense.h" />
   </ItemGroup>
 </Project>

@@ -38,9 +38,8 @@ void UAlbertaBotModule::onStart()
     {
         BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
     }
-#ifndef NEATO_COMMANDER
+
     StrategyManager::Instance().setOpeningGroup();    // may depend on config and/or opponent model
-#endif
 
     if (Config::BotInfo::PrintInfoOnStart)
     {

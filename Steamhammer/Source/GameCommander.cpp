@@ -16,8 +16,6 @@
 #include "StrategyManager.h"
 #include "WorkerManager.h"
 
-//#define NEATO_COMMANDER
-
 using namespace UAlbertaBot;
 
 GameCommander::GameCommander() 
@@ -70,15 +68,9 @@ void GameCommander::update()
 
     // -- Managers that act on information. --
 
-#ifndef NEATO_COMMANDER
     _timerManager.startTimer(TimerManager::Search);
     BOSSManager::Instance().update(35 - _timerManager.getMilliseconds());
     _timerManager.stopTimer(TimerManager::Search);
-#else
-    _timerManager.startTimer(TimerManager::NetworkEvaluation);
-
-    _timerManager.stopTimer(TimerManager::NetworkEvaluation);
-#endif
 
     // May steal workers from WorkerManager, so run it before WorkerManager.
     _timerManager.startTimer(TimerManager::Production);
@@ -161,7 +153,6 @@ void GameCommander::drawGameInformation(int x, int y)
         BWAPI::Broodwar->enemy()->getTextColor(), BWAPI::Broodwar->enemy()->getName().c_str());
     y += 12;
     
-#ifndef NEATO_COMMANDER
     const std::string & openingGroup = StrategyManager::Instance().getOpeningGroup();
     const auto openingInfoIt = summary.openingInfo.find(Config::Strategy::StrategyName);
     const int wins = openingInfoIt == summary.openingInfo.end() ? 0 : openingInfoIt->second.sameWins + openingInfoIt->second.otherWins;
@@ -174,7 +165,6 @@ void GameCommander::drawGameInformation(int x, int y)
         Config::Strategy::FoundEnemySpecificStrategy ? " - enemy specific" : "",
         white, wins, games - wins);
     BWAPI::Broodwar->setTextSize();
-#endif
     y += 12;
 
     std::string expect;

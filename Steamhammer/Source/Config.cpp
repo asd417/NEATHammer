@@ -48,6 +48,18 @@ namespace Config
         int MaxDefilers                     = 0;
     }
 
+    namespace Strategy
+    {
+        bool Crazyhammer                    = false;
+        std::string ProtossStrategyName     = "1ZealotCore";			// default
+        std::string TerranStrategyName      = "11Rax";					// default
+        std::string ZergStrategyName        = "9PoolSpeed";				// default
+        std::string StrategyName            = "9PoolSpeed";
+        bool UsePlanRecognizer				= true;
+        bool UseEnemySpecificStrategy       = true;
+        bool FoundEnemySpecificStrategy     = false;
+    }
+
     namespace BotInfo
     {
         std::string BotName                 = "Steamhammer";
