@@ -587,8 +587,8 @@ void StrategyManager::performBuildOrderSearch()
     }
 
     //BuildOrder & buildOrder = BOSSManager::Instance().getBuildOrder();
-    BuildOrder& buildOrder = NEATCommander::Instance().getMacroCommands();
-    if (buildOrder.size() > 0)
+    BuildOrder& buildOrder = NEATCommander::Instance().getMacroCommands();//why is buildOrder size set to 0 become 89150862?
+    if (buildOrder.size() != 0)
     {
         ProductionManager::Instance().setBuildOrder(buildOrder);
         //BOSSManager::Instance().reset();

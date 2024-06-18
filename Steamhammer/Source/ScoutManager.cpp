@@ -115,12 +115,6 @@ bool ScoutManager::shouldScout()
         return false;
     }
 
-    // If we only want to find the enemy base location and we already know it, don't send a worker.
-    if (_scoutCommand == MacroCommandType::ScoutIfNeeded || _scoutCommand == MacroCommandType::ScoutLocation)
-    {
-        return !the.bases.enemyStart();
-    }
-
     return true;
 }
 
@@ -151,15 +145,6 @@ void ScoutManager::update()
     if (_overlordScout && (InformationManager::Instance().enemyHasAntiAir() || overlordBlockedByAirDefense()))
     {
         releaseOverlordScout();
-    }
-
-    // If we only want to locate the enemy base and we have, release the scout worker.
-    if (_scoutCommand == MacroCommandType::ScoutLocation &&
-        the.bases.enemyStart() &&
-        !wantGasSteal())
-    {
-        _scoutStatus = "enemy base located";
-        releaseWorkerScout();
     }
 
     // If we're done with a gas steal and we don't want to keep scouting, release the worker.
@@ -217,10 +202,7 @@ void ScoutManager::update()
         _gasStealStatus = "Finished or failed";
     }
 
-    if (_overlordScout)
-    {
-        moveAirScout();
-    }
+    
 
     drawScoutInformation(200, 320);
 }
@@ -488,21 +470,7 @@ bool ScoutManager::gasSteal()
     }
     else if (_enemyGeyser->isVisible() && _workerScout->getDistance(_enemyGeyser) < 300)
     {
-        // We see the geyser. Queue the refinery, if it's not already done.
-        // We can't rely on _queuedGasSteal to know, because the queue may be cleared
-        // if a surprise occurs.
-        // Therefore _queuedGasSteal affects mainly the debug display for the UI.
-        if (!ProductionManager::Instance().isGasStealInQueue())
-        {
-            // NOTE Queueing the gas steal orders the building constructed.
-            // Control of the worker passes to the BuildingManager until it releases the
-            // worker with a call to setGasStealOver().
-            ProductionManager::Instance().queueGasSteal();
-            _queuedGasSteal = true;
-            // Regardless, make sure we are moving toward the geyser.
-            // It makes life easier on the building manager.
-            the.micro.Move(_workerScout, _enemyGeyser->getInitialPosition());
-        }
+        
         _gasStealStatus = "Stealing gas";
     }
     else

@@ -6,6 +6,7 @@
 
 #include "UAlbertaBotModule.h"
 
+#include "NEATCommander.h"
 #include "../../BOSS/source/BOSS.h"
 #include "GameCommander.h"
 #include "OpeningTiming.h"
@@ -64,7 +65,7 @@ void UAlbertaBotModule::onEnd(bool isWinner)
 
 void UAlbertaBotModule::onFrame()
 {
-    if (!Config::ConfigFile::ConfigFileFound)
+    /*if (!Config::ConfigFile::ConfigFileFound)
     {
         BWAPI::Broodwar->drawBoxScreen(0,0,450,100, BWAPI::Colors::Black, true);
         BWAPI::Broodwar->setTextSize(BWAPI::Text::Size::Huge);
@@ -87,7 +88,7 @@ void UAlbertaBotModule::onFrame()
         BWAPI::Broodwar->drawTextScreen(10, 45, "%cThe configuration file was found, but could not be parsed. Check that it is valid JSON", white);
         BWAPI::Broodwar->drawTextScreen(10, 60, "%cFile Not Parsed: %c %s", white, green, Config::ConfigFile::ConfigFileLocation.c_str());
         return;
-    }
+    }*/
 
     GameCommander::Instance().update();
 }
@@ -95,11 +96,13 @@ void UAlbertaBotModule::onFrame()
 void UAlbertaBotModule::onUnitDestroy(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitDestroy(unit);
+    if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(5);
 }
 
 void UAlbertaBotModule::onUnitMorph(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitMorph(unit);
+    if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(1);
 }
 
 void UAlbertaBotModule::onSendText(std::string text) 
@@ -110,16 +113,19 @@ void UAlbertaBotModule::onSendText(std::string text)
 void UAlbertaBotModule::onUnitCreate(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitCreate(unit);
+    if(unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(1);
 }
 
 void UAlbertaBotModule::onUnitComplete(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitComplete(unit);
+    if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(1);
 }
 
 void UAlbertaBotModule::onUnitShow(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitShow(unit);
+    if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(1);
 }
 
 void UAlbertaBotModule::onUnitHide(BWAPI::Unit unit)

@@ -42,10 +42,12 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
 
     if (config.length() == 0)
     {
+        std::cout << "Config File Not Found\n";
         return;
     }
 
     Config::ConfigFile::ConfigFileFound = true;
+    
 
     bool parsingFailed = doc.Parse(config.c_str()).HasParseError();
     if (parsingFailed)

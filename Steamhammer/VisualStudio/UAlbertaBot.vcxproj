@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>Steamhammer</ProjectName>
+    <ProjectName>NEATHammer</ProjectName>
     <ProjectGuid>{2E63AE74-758A-4607-9DE4-D28E814A6E13}</ProjectGuid>
     <RootNamespace>ExampleAIModule</RootNamespace>
     <Keyword>Win32Proj</Keyword>
@@ -19,14 +19,14 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -60,10 +60,16 @@
     <CodeAnalysisIgnoreGeneratedCode Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CodeAnalysisIgnoreGeneratedCode>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>C:\local\curl-master\lib\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>C:\local\curl-master\lib\Release;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../BOSS/source;../SparCraft/source;../source;$(BWTA_DIR)/include;$(BWAPI_DIR)/include;C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../BOSS/source;../SparCraft/source;../source;$(BWTA_DIR)/include;$(BWAPI_DIR)/include;C:/Users/ylee5/Documents/Starcraft_Research/BWAPI4_4/include;C:\local\curl-8.8.0_1-win32-mingw\include;C:\local\json-master\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -74,11 +80,12 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(BWAPI_DIR)/lib/BWAPId.lib;$(Configuration)/SparCraft/SparCraft_d.lib;../../BOSS/bin/BOSS_d.lib;$(BWTA_DIR)/lib/BWTAd.lib;$(BWTA_DIR)/lib/libboost_system-vc120-mt-gd-1_56.lib;$(BWTA_DIR)/lib/libboost_thread-vc120-mt-gd-1_56.lib;$(BWTA_DIR)/lib/libCGAL-vc120-mt-gd-4.4.lib;$(BWTA_DIR)/lib/libgmp-10.lib;$(BWTA_DIR)/lib/libmpfr-4.lib;$(BWTA_DIR)/lib/libboost_filesystem-vc120-mt-gd-1_56.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(BWAPI_DIR)/lib/BWAPId.lib;../../BOSS/bin/BOSS_d.lib;libcurl-d_imp.lib;C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\Debug\BWAPIClient.lib;C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\Debug\BWAPILIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -86,7 +93,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../BOSS/source;../source;$(BWAPI440_DIR)/include;C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../BOSS/source;../source;$(BWAPI440_DIR)/include;C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\include;C:\local\curl-8.8.0_1-win32-mingw\include;C:\local\json-master\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -108,9 +115,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>../../BWAPILIB/bin/BWAPILIB.lib;../../BOSS/bin/BOSS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\Release\BWAPIClient.lib;C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\Release\BWAPILIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
@@ -129,6 +136,7 @@
     <ClCompile Include="..\Source\CombatSimulation.cpp" />
     <ClCompile Include="..\Source\CombatCommander.cpp" />
     <ClCompile Include="..\Source\Common.cpp" />
+    <ClCompile Include="..\Source\db.cpp" />
     <ClCompile Include="..\Source\Dll.cpp" />
     <ClCompile Include="..\Source\FAP.cpp" />
     <ClCompile Include="..\Source\GameCommander.cpp" />
@@ -150,6 +158,7 @@
     <ClCompile Include="..\Source\Logger.cpp" />
     <ClCompile Include="..\Source\MacroAct.cpp" />
     <ClCompile Include="..\Source\MacroCommand.cpp" />
+    <ClCompile Include="..\Source\main.cpp" />
     <ClCompile Include="..\Source\MapGrid.cpp" />
     <ClCompile Include="..\Source\MapPartitions.cpp" />
     <ClCompile Include="..\Source\MapTools.cpp" />
@@ -172,6 +181,7 @@
     <ClCompile Include="..\Source\MicroTanks.cpp" />
     <ClCompile Include="..\Source\MicroTransports.cpp" />
     <ClCompile Include="..\Source\NEATCommander.cpp" />
+    <ClCompile Include="..\Source\NodeEval.cpp" />
     <ClCompile Include="..\Source\OpeningTiming.cpp" />
     <ClCompile Include="..\Source\OpeningTimingRecord.cpp" />
     <ClCompile Include="..\Source\OpponentModel.cpp" />
@@ -182,6 +192,7 @@
     <ClCompile Include="..\Source\ProductionGoal.cpp" />
     <ClCompile Include="..\source\ProductionManager.cpp" />
     <ClCompile Include="..\Source\Random.cpp" />
+    <ClCompile Include="..\Source\ReplayParser.cpp" />
     <ClCompile Include="..\Source\ResourceInfo.cpp" />
     <ClCompile Include="..\source\ScoutManager.cpp" />
     <ClCompile Include="..\Source\Skill.cpp" />
@@ -219,6 +230,7 @@
     <ClInclude Include="..\Source\CombatSimulation.h" />
     <ClInclude Include="..\Source\CombatCommander.h" />
     <ClInclude Include="..\Source\Common.h" />
+    <ClInclude Include="..\Source\db.h" />
     <ClInclude Include="..\Source\FAP.h" />
     <ClInclude Include="..\Source\GameCommander.h" />
     <ClInclude Include="..\Source\GameRecord.h" />
@@ -261,6 +273,7 @@
     <ClInclude Include="..\Source\MicroTanks.h" />
     <ClInclude Include="..\Source\MicroTransports.h" />
     <ClInclude Include="..\Source\NEATCommander.h" />
+    <ClInclude Include="..\Source\NodeEval.h" />
     <ClInclude Include="..\Source\OpeningTiming.h" />
     <ClInclude Include="..\Source\OpeningTimingRecord.h" />
     <ClInclude Include="..\Source\OpponentModel.h" />
@@ -271,6 +284,7 @@
     <ClInclude Include="..\Source\ProductionGoal.h" />
     <ClInclude Include="..\source\ProductionManager.h" />
     <ClInclude Include="..\Source\Random.h" />
+    <ClInclude Include="..\Source\ReplayParser.h" />
     <ClInclude Include="..\Source\ResourceInfo.h" />
     <ClInclude Include="..\source\ScoutManager.h" />
     <ClInclude Include="..\Source\Skill.h" />

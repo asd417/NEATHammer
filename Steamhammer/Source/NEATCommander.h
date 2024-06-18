@@ -1,18 +1,12 @@
 #pragma once
 #include "BuildOrder.h"
+#include "db.h"
+#include "NodeEval.h"
+#include "time.h"
 #include <vector>
+#include <array>
 namespace UAlbertaBot
 {
-	class NEATCommander {
-	public:
-		static NEATCommander& Instance();
-		void update();
-		BuildOrder& getMacroCommands();
-		void resetActions();
-	private:
-		void evaluate();
-		std::vector<MacroAct> _actions;
-	};
 
 	enum class NetworkUnits {
 		Terran_SCV,
@@ -35,7 +29,6 @@ namespace UAlbertaBot
 		Terran_Supply_Depot,
 		Terran_Refinery,
 		Terran_Barracks,
-		Terran_Supply_Depot,
 		Terran_Engineering_Bay,
 		Terran_Missile_Turret,
 		Terran_Academy,
@@ -67,7 +60,7 @@ namespace UAlbertaBot
 		Zerg_Hive,
 		Zerg_Creep_Colony,
 		Zerg_Sunken_Colony,
-		Zerg_Creep_Colony,
+		Zerg_Spore_Colony,
 		Zerg_Extractor,
 		Zerg_Spawning_Pool,
 		Zerg_Evolution_Chamber,
@@ -195,4 +188,174 @@ namespace UAlbertaBot
 		Argus_Jewel,
 		Argus_Talisman
 	};
+
+	//Entries with higher number will override the data if the tile has multiple types of units
+	enum NEAT_TileType {
+		FOG = 0,
+		WALKABLE,
+		NOTWALKABLE,
+		//Mineral and Gas
+		Resource_Vespene_Geyser = 10,
+		Powerup_Mineral,
+		//Buildings sorted by importance
+		Terran_Supply_Depot = 30,
+		Protoss_Pylon,
+		Protoss_Assimilator,
+		Zerg_Extractor,
+		Terran_Refinery,
+		Protoss_Nexus,
+		Terran_Command_Center,
+		Terran_Comsat_Station,
+		Zerg_Hatchery,
+		Terran_Barracks,
+		Protoss_Gateway,
+		Terran_Academy,
+		Protoss_Cybernetics_Core,
+		Protoss_Forge,
+		Terran_Engineering_Bay,
+		Zerg_Evolution_Chamber,
+		Terran_Factory,
+		Terran_Armory,
+		Terran_Machine_Shop,
+		Zerg_Queens_Nest,
+		Terran_Starport,
+		Zerg_Lair,
+		Protoss_Citadel_of_Adun,
+		Protoss_Observatory,
+		Zerg_Spire,
+		Protoss_Robotics_Support_Bay,
+		Protoss_Arbiter_Tribunal,
+		Zerg_Greater_Spire,
+		Protoss_Templar_Archives,
+		Protoss_Robotics_Facility,
+		Terran_Control_Tower,
+		Protoss_Fleet_Beacon,
+		Protoss_Stargate,
+		Terran_Science_Facility,
+		Terran_Physics_Lab,
+		Terran_Covert_Ops,
+		Zerg_Hive,
+		Zerg_Ultralisk_Cavern,
+		Zerg_Spawning_Pool,
+		Terran_Nuclear_Silo,
+		Zerg_Hydralisk_Den,
+		Zerg_Defiler_Mound,
+
+		//Buildings that directly affect combat. More important than any other buildings
+		Zerg_Creep_Colony = 120,
+		Protoss_Shield_Battery,
+		Zerg_Nydus_Canal,
+		Zerg_Infested_Command_Center,
+		Zerg_Spore_Colony,
+		Protoss_Photon_Cannon,
+		Zerg_Sunken_Colony,
+		Terran_Bunker,
+		Terran_Missile_Turret,
+
+		//Units sorted by strength
+		Terran_SCV = 150,
+		Protoss_Probe,
+		Zerg_Drone,
+		Protoss_Interceptor,
+		Protoss_Scarab,
+		Zerg_Broodling,
+		Terran_Marine,
+		Zerg_Zergling,
+		Terran_Vulture,
+		Terran_Vulture_Spider_Mine,
+		Zerg_Overlord,
+		Terran_Medic,
+		Terran_Firebat,
+		Protoss_Zealot,
+		Protoss_Dragoon,
+		Protoss_Observer,
+		Terran_Ghost,
+		Protoss_Scout,
+		Zerg_Hydralisk,
+		Terran_Siege_Tank_Tank_Mode,
+		Terran_Siege_Tank_Siege_Mode,
+		Zerg_Lurker_Egg,
+		Zerg_Lurker,
+		Protoss_Archon,
+		Protoss_High_Templar,
+		Zerg_Infested_Terran,
+		Zerg_Queen,
+		Terran_Valkyrie,
+		Zerg_Devourer,
+		Protoss_Corsair,
+		Zerg_Scourge,
+		Protoss_Reaver,
+		Zerg_Ultralisk,
+		Protoss_Dark_Templar,
+		Protoss_Dark_Archon,
+		Terran_Wraith,
+		Terran_Goliath,
+		Protoss_Shuttle,
+		Terran_Dropship,
+		Zerg_Mutalisk,
+		Zerg_Guardian,
+		Protoss_Arbiter,
+		Zerg_Defiler,
+		Terran_Science_Vessel,
+		Protoss_Carrier,
+		Terran_Battlecruiser,
+		Terran_Nuclear_Missile, //This is the only thing that the bot will see when the nuke is fired (if fired within visible range?)
+	};
+	class NEATCommander {
+	public:
+		static NEATCommander& Instance();
+		void update();
+		BuildOrder& getMacroCommands();
+		void resetActions();
+		void incrementFrame();
+
+		double getFitness();
+		void scoreFitness(double add);
+		void sendFitnessToTrainServer();
+	private:
+		int lastMineral;
+		int lastGas;
+
+		//output vector
+		double macroActType; //Unit, Tech, Upgrade, Command, Default
+		double unitType;
+		double techType;
+		double upgradeType;
+		double macroCommandType;
+		double amount1;
+		double amount2;
+		double tilePosX; //0~256
+		double tilePosY; //0~256
+		double macroCommandUnitType;
+
+		void evaluate();
+		void InitializeNetwork();
+
+		bool isWorkerType(BWAPI::UnitType type);
+		int getWorkerCount(BWAPI::Unitset& allUnits);
+
+		void getVisibleFriendlyMap(int sectionNum);
+		void getVisibleEnemyMap(int sectionNum);
+		BWAPI::UnitType ToBWAPIUnit(NetworkUnits ut);
+		BWAPI::TechType ToBWAPITech(NetworkTech tt);
+		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkUpgrade ut);
+		NEAT_TileType getTileType(BWAPI::UnitType type);
+		std::vector<MacroAct> _actions{};
+
+		void createFeedForwardNetwork();
+
+		int frame = 0;
+		int maxSections;
+		int curSection = 0;
+		std::vector<std::array<int, 2>> sectionsCoords;
+		std::array<std::array<int, 16>, 16> enemyMapData;
+		std::array<std::array<int, 16>, 16> friendlyMapData;
+
+		FeedForwardNetwork* network;
+		std::vector<double> inputVector{};
+
+		int genomeID = 0;
+		double fitness = 0.0f;
+	};
+
 }

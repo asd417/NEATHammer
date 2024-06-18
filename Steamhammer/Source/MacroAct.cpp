@@ -295,9 +295,12 @@ MacroAct::MacroAct(MacroCommandType t)
 {
 }
 
-UAlbertaBot::MacroAct::MacroAct(MacroCommandType t, const BWAPI::TilePosition& tile)
+UAlbertaBot::MacroAct::MacroAct(MacroCommand t, BWAPI::UnitType ut, BWAPI::TechType tt, BWAPI::UpgradeType ugt, MacroActs mat, const BWAPI::TilePosition& tile)
     : _macroCommandType(t)
-    , _type(MacroActs::Command)
+    , _unitType(ut)
+    , _techType(tt)
+    , _upgradeType(ugt)
+    , _type(mat)
     , _macroLocation(MacroLocation::Anywhere)
     , _tileLocation(tile)
     , _parent(nullptr)

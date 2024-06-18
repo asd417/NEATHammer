@@ -1,11 +1,17 @@
 #include "NEATCommander.h"
 #include "MacroAct.h"
+#include "The.h"
 
 namespace UAlbertaBot
 {
     NEATCommander& NEATCommander::Instance()
     {
         static NEATCommander instance;
+        if (instance.network == nullptr) 
+        { 
+            instance.InitializeNetwork(); 
+        }
+        
         return instance;
     }
     BuildOrder& NEATCommander::getMacroCommands()
@@ -16,34 +22,264 @@ namespace UAlbertaBot
     {
         _actions.clear();
     }
+    void NEATCommander::incrementFrame()
+    {
+        frame++;
+        curSection++;
+    }
+    double NEATCommander::getFitness()
+    {
+        return fitness;
+    }
+    void NEATCommander::scoreFitness(double add)
+    {
+        fitness += add;
+    }
+    void NEATCommander::sendFitnessToTrainServer()
+    {
+        DBKeySpace dbkeys{};
+        dbkeys.push_back("Fitness");
+
+        DBConnector db{ "http://127.0.0.1:5000", dbkeys };
+
+        try {
+            db.addToData("Fitness", fitness);
+
+            std::string url = "/genome/" + std::to_string(genomeID) + "/fitness";
+            std::cout << url << "\n";
+            db.sendData(url.c_str());
+        }
+        catch (std::exception e) {
+            std::cout << "Error while sending fitness value to the training server: " << e.what() << "\n";
+        }
+    }
     void NEATCommander::evaluate()
     {
-        //MacroAct._parent is not necessary
-        //MacroAct._macroLocation is used to automatically calculate macro location
-        // it should instead be done by the network
-        int macroActType; //Unit, Tech, Upgrade, Command, Default
-        int unitType; 
-        int techType;
-        int upgradeType;
-        int macroCommandType;
-        int amount1;
-        int amount2;
-        int tilePosX; //0~256
-        int tilePosY; //0~256
-        int macroCommandUnitType;
-        NetworkUnits ut = (NetworkUnits)macroCommandUnitType;
-
-        if (macroActType == MacroActs::Command) {
-            MacroCommand mc = MacroCommand((MacroCommandType)macroCommandType, amount1,amount2, ToBWAPIUnit(ut));
-            //BWAPI::TilePosition tp = ;
-            MacroAct ma = MacroAct(mc, { tilePosX , tilePosY });
-        }
-        //MacroAct action{};
-        //_actions.push_back();
+        getVisibleFriendlyMap(curSection);
+        getVisibleEnemyMap(curSection);
+        curSection++;
         
+        int mSupply = BWAPI::Broodwar->self()->supplyTotal();
+        int cSupply = BWAPI::Broodwar->self()->supplyUsed();
+
+        int min = BWAPI::Broodwar->self()->minerals();
+        int gas = BWAPI::Broodwar->self()->gas();
+
+        int deltaMineral = min > lastMineral ? min - lastMineral : 0;
+        int deltaGas = gas > lastGas ? gas - lastGas : 0;
+
+        lastMineral = min;
+        lastGas = gas;
+
+        scoreFitness(deltaMineral);
+        scoreFitness(deltaGas);
+
+        int ctime = frame;
+        int sectionCoordW = sectionsCoords[curSection][0];
+        int sectionCoordH = sectionsCoords[curSection][1];
+        BWAPI::Unitset myUnits = the.self()->getUnits();
+        int workerCount = getWorkerCount(myUnits);
+        int enemyRace = BWAPI::Broodwar->enemy()->getRace();
+
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 16; j++) {
+                inputVector.push_back(friendlyMapData[i][j]);
+            }
+        }
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 16; j++) {
+                inputVector.push_back(enemyMapData[i][j]);
+            }
+        }
+
+        inputVector.push_back(mSupply);
+        inputVector.push_back(cSupply);
+        inputVector.push_back(min);
+        inputVector.push_back(gas);
+        inputVector.push_back(ctime);
+        inputVector.push_back(ctime);
+        inputVector.push_back(sectionCoordW);
+        inputVector.push_back(sectionCoordH);
+        inputVector.push_back(workerCount);
+        inputVector.push_back(enemyRace);
+
+        network->Activate(inputVector);
+        //output vector size is 10
+        macroActType += network->getOutputVector()[0];
+        unitType += network->getOutputVector()[1];
+        techType += network->getOutputVector()[2];
+        upgradeType += network->getOutputVector()[3];
+        macroCommandType += network->getOutputVector()[4];
+        amount1 += network->getOutputVector()[5];
+        amount2 += network->getOutputVector()[6];
+        tilePosX += network->getOutputVector()[7];
+        tilePosY += network->getOutputVector()[8];
+        macroCommandUnitType += network->getOutputVector()[9];
+
+        if (curSection == 0)
+        {
+            NetworkUnits macroUT = (NetworkUnits)macroCommandUnitType;
+            NetworkUnits ut = (NetworkUnits)unitType;
+            NetworkTech tt = (NetworkTech)techType;
+            NetworkUpgrade ugt = (NetworkUpgrade)upgradeType;
+        
+            MacroCommand mc = MacroCommand((MacroCommandType)macroCommandType, amount1,amount2, ToBWAPIUnit(macroUT));
+            //BWAPI::TilePosition tp = ;
+            MacroAct ma = MacroAct(
+                mc, 
+                ToBWAPIUnit(ut), 
+                ToBWAPITech(tt), 
+                ToBWAPIUpgrade(ugt), 
+                (MacroActs)macroActType, 
+                { (int) tilePosX , (int) tilePosY });
+        
+            //MacroAct action{};
+            _actions.push_back(ma);
+        
+            macroActType = 0.0f; //Unit, Tech, Upgrade, Command, Default
+            unitType = 0.0f;
+            techType = 0.0f;
+            upgradeType = 0.0f;
+            macroCommandType = 0.0f;
+            amount1 = 0.0f;
+            amount2 = 0.0f;
+            tilePosX = 0.0f; //0~256
+            tilePosY = 0.0f; //0~256
+            macroCommandUnitType = 0.0f;
+        }
     }
 
-    BWAPI::UnitType ToBWAPIUnit(NetworkUnits ut) {
+    void NEATCommander::InitializeNetwork()
+    {
+        json r{};
+        DBKeySpace dbkeys{};
+        dbkeys.push_back("Fitness");
+        DBConnector db{ "http://127.0.0.1:5000", dbkeys };
+        bool res = db.getData("/genome", r);
+        int id = -1;
+        try {
+            //network
+            id = r[0]["id"];
+            std::cout << id << std::endl;
+
+            if (id == -1 || !res) throw std::exception("id is -1");
+        }
+        catch (std::exception e) {
+            std::cout << "Error while retrieving new genome to evaluate: " << e.what() << "\n";
+            std::cout << "TODO: Attempt to retrieve network from text file\n";
+        }
+        
+        std::cout << "Evaluating Network " << id << "\n";
+
+        try {
+            json networkJson = json::parse(std::string(r[0]["Network"]));
+            network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+            for (const json& ne : networkJson["node_evals"]) {
+                network->AddNodeEval(ne);
+            }
+            if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Genome");
+            
+        }
+        catch (std::exception e) {
+            std::cout << "Error creating Network Structure: " << e.what() << "\n";
+        }
+        genomeID = id;
+    }
+
+    int NEATCommander::getWorkerCount(BWAPI::Unitset& allMyUnits)
+    {
+        int r = 0;
+        for (auto u : allMyUnits) {
+            if (isWorkerType(u->getType()))
+            {
+                r++;
+            }
+        }
+        return r;
+    }
+
+    bool NEATCommander::isWorkerType(BWAPI::UnitType type) {
+        if (type == BWAPI::UnitTypes::Terran_SCV || type == BWAPI::UnitTypes::Zerg_Drone || type == BWAPI::UnitTypes::Protoss_Probe) {
+            return true;
+        }
+    }
+
+
+    /// <summary>
+    /// Retrieves map data of the given section
+    /// Each section is 32x32 Tiles big
+    /// This function fills up the 16x16 mapData array
+    /// To do this, we half-resolution the given section
+    /// Units with highest importance will override the data on tile
+    /// </summary>
+    /// <param name="sectionNum"></param>
+    void NEATCommander::getVisibleFriendlyMap(int sectionNum)
+    {
+        if (sectionNum >= maxSections) throw std::overflow_error("sectionNum is bigger than maxSections");
+
+        int startW = sectionsCoords[sectionNum][0];
+        int startH = sectionsCoords[sectionNum][1];
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 16; j++) {
+                BWAPI::TilePosition tp = { startW + i * 2,startH + j * 2 };
+                BWAPI::WalkPosition wp = { (startW + i * 2) * 4,(startH + j * 2) * 4 }; //WalkPosition is 8 pixels big
+                if (!BWAPI::Broodwar->isVisible(tp)) {
+                    enemyMapData[i][j] = NEAT_TileType::FOG;
+                    break;
+                }
+                else {
+                    //BWAPI::UnitFilter uf = BWAPI::UnitFilter(the.self());
+                    BWAPI::Unitset unitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + i * 2, startH + j * 2, BWAPI::Filter::IsAlly);
+
+                    NEAT_TileType highestImportance = NEAT_TileType::NOTWALKABLE;
+                    if (BWAPI::Broodwar->isWalkable(wp)) {
+                        highestImportance = NEAT_TileType::WALKABLE;
+                    }
+
+                    for (BWAPI::Unit u : unitsOnTile) {
+                        NEAT_TileType unitTileType = getTileType(u->getType());
+                        highestImportance = unitTileType > highestImportance ? unitTileType : highestImportance;
+                    }
+                    friendlyMapData[i][j] = highestImportance;
+                }
+            }
+        }
+    }
+
+    void NEATCommander::getVisibleEnemyMap(int sectionNum)
+    {
+        if (sectionNum >= maxSections) throw std::overflow_error("sectionNum is bigger than maxSections");
+
+        int startW = sectionsCoords[sectionNum][0];
+        int startH = sectionsCoords[sectionNum][1];
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 16; j++) {
+                BWAPI::TilePosition tp = { startW + i * 2,startH + j * 2 };
+                BWAPI::WalkPosition wp = { (startW + i * 2) * 4,(startH + j * 2) * 4 }; //WalkPosition is 8 pixels big
+                if (!BWAPI::Broodwar->isVisible(tp)) {
+                    enemyMapData[i][j] = NEAT_TileType::FOG;
+                    break;
+                }
+                else {
+                    //BWAPI::UnitFilter uf = BWAPI::UnitFilter(BWAPI::Filter::IsEnemy);
+                    BWAPI::Unitset unitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + i * 2, startH + j * 2, BWAPI::Filter::IsEnemy);
+
+                    NEAT_TileType highestImportance = NEAT_TileType::NOTWALKABLE;
+                    if (BWAPI::Broodwar->isWalkable(wp)) {
+                        highestImportance = NEAT_TileType::WALKABLE;
+                    }
+
+                    for (BWAPI::Unit u : unitsOnTile) {
+                        NEAT_TileType unitTileType = getTileType(u->getType());
+                        highestImportance = unitTileType > highestImportance ? unitTileType : highestImportance;
+                    }
+                    enemyMapData[i][j] = highestImportance;
+                }
+            }
+        }
+    }
+
+    BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkUnits ut) {
         switch (ut) {
         case NetworkUnits::Terran_SCV:
             return BWAPI::UnitTypes::Terran_SCV;
@@ -141,6 +377,8 @@ namespace UAlbertaBot
             return BWAPI::UnitTypes::Zerg_Creep_Colony;
         case NetworkUnits::Zerg_Sunken_Colony:
             return BWAPI::UnitTypes::Zerg_Sunken_Colony;
+        case NetworkUnits::Zerg_Spore_Colony:
+            return BWAPI::UnitTypes::Zerg_Spore_Colony;
         case NetworkUnits::Zerg_Extractor:
             return BWAPI::UnitTypes::Zerg_Extractor;
         case NetworkUnits::Zerg_Spawning_Pool:
@@ -226,7 +464,8 @@ namespace UAlbertaBot
         }
     }
 
-    BWAPI::TechType ToBWAPITech(NetworkTech tt) {
+    BWAPI::TechType NEATCommander::ToBWAPITech(NetworkTech tt) 
+    {
         switch (tt) {
         case NetworkTech::Stim_Packs:
             return BWAPI::TechTypes::Stim_Packs;
@@ -280,8 +519,8 @@ namespace UAlbertaBot
             throw std::invalid_argument("Unknown NetworkTech");
         }
     }
-    
-    BWAPI::UpgradeType ToBWAPIUpgrade(NetworkUpgrade ut) {
+    BWAPI::UpgradeType NEATCommander::ToBWAPIUpgrade(NetworkUpgrade ut) 
+    {
         switch (ut) {
         case NetworkUpgrade::U_238_Shells:
             return BWAPI::UpgradeTypes::U_238_Shells;
@@ -388,5 +627,205 @@ namespace UAlbertaBot
         }
     }
 
+    NEAT_TileType NEATCommander::getTileType(BWAPI::UnitType type) 
+    {
+        switch (type) {
+            //Terran Buildings
+        case BWAPI::UnitTypes::Terran_Academy:
+            return NEAT_TileType::Terran_Academy;
+        case BWAPI::UnitTypes::Terran_Armory:
+            return NEAT_TileType::Terran_Armory;
+        case BWAPI::UnitTypes::Terran_Barracks:
+            return NEAT_TileType::Terran_Barracks;
+        case BWAPI::UnitTypes::Terran_Bunker:
+            return NEAT_TileType::Terran_Bunker;
+        case BWAPI::UnitTypes::Terran_Command_Center:
+            return NEAT_TileType::Terran_Command_Center;
+        case BWAPI::UnitTypes::Terran_Engineering_Bay:
+            return NEAT_TileType::Terran_Engineering_Bay;
+        case BWAPI::UnitTypes::Terran_Factory:
+            return NEAT_TileType::Terran_Factory;
+        case BWAPI::UnitTypes::Terran_Starport:
+            return NEAT_TileType::Terran_Starport;
+        case BWAPI::UnitTypes::Terran_Supply_Depot:
+            return NEAT_TileType::Terran_Supply_Depot;
+        case BWAPI::UnitTypes::Terran_Refinery:
+            return NEAT_TileType::Terran_Refinery;
+        case BWAPI::UnitTypes::Terran_Science_Facility:
+            return NEAT_TileType::Terran_Science_Facility;
+        case BWAPI::UnitTypes::Terran_Comsat_Station:
+            return NEAT_TileType::Terran_Comsat_Station;
+        case BWAPI::UnitTypes::Terran_Nuclear_Silo:
+            return NEAT_TileType::Terran_Nuclear_Silo;
+        case BWAPI::UnitTypes::Terran_Control_Tower:
+            return NEAT_TileType::Terran_Control_Tower;
+        case BWAPI::UnitTypes::Terran_Covert_Ops:
+            return NEAT_TileType::Terran_Covert_Ops;
+        case BWAPI::UnitTypes::Terran_Physics_Lab:
+            return NEAT_TileType::Terran_Physics_Lab;
+        case BWAPI::UnitTypes::Terran_Machine_Shop:
+            return NEAT_TileType::Terran_Machine_Shop;
+        case BWAPI::UnitTypes::Terran_Missile_Turret:
+            return NEAT_TileType::Terran_Missile_Turret;
 
+            //Zerg buildings
+        case BWAPI::UnitTypes::Zerg_Hatchery:
+            return NEAT_TileType::Zerg_Hatchery;
+        case BWAPI::UnitTypes::Zerg_Lair:
+            return NEAT_TileType::Zerg_Lair;
+        case BWAPI::UnitTypes::Zerg_Hive:
+            return NEAT_TileType::Zerg_Hive;
+        case BWAPI::UnitTypes::Zerg_Nydus_Canal:
+            return NEAT_TileType::Zerg_Nydus_Canal;
+        case BWAPI::UnitTypes::Zerg_Hydralisk_Den:
+            return NEAT_TileType::Zerg_Hydralisk_Den;
+        case BWAPI::UnitTypes::Zerg_Defiler_Mound:
+            return NEAT_TileType::Zerg_Defiler_Mound;
+        case BWAPI::UnitTypes::Zerg_Greater_Spire:
+            return NEAT_TileType::Zerg_Greater_Spire;
+        case BWAPI::UnitTypes::Zerg_Queens_Nest:
+            return NEAT_TileType::Zerg_Queens_Nest;
+        case BWAPI::UnitTypes::Zerg_Evolution_Chamber:
+            return NEAT_TileType::Zerg_Evolution_Chamber;
+        case BWAPI::UnitTypes::Zerg_Ultralisk_Cavern:
+            return NEAT_TileType::Zerg_Ultralisk_Cavern;
+        case BWAPI::UnitTypes::Zerg_Spire:
+            return NEAT_TileType::Zerg_Spire;
+        case BWAPI::UnitTypes::Zerg_Spawning_Pool:
+            return NEAT_TileType::Zerg_Spawning_Pool;
+        case BWAPI::UnitTypes::Zerg_Creep_Colony:
+            return NEAT_TileType::Zerg_Creep_Colony;
+        case BWAPI::UnitTypes::Zerg_Spore_Colony:
+            return NEAT_TileType::Zerg_Spore_Colony;
+        case BWAPI::UnitTypes::Zerg_Sunken_Colony:
+            return NEAT_TileType::Zerg_Sunken_Colony;
+        case BWAPI::UnitTypes::Zerg_Extractor:
+            return NEAT_TileType::Zerg_Extractor;
+
+            //Protoss buildings
+        case BWAPI::UnitTypes::Protoss_Nexus:
+            return NEAT_TileType::Protoss_Nexus;
+        case BWAPI::UnitTypes::Protoss_Robotics_Facility:
+            return NEAT_TileType::Protoss_Robotics_Facility;
+        case BWAPI::UnitTypes::Protoss_Pylon:
+            return NEAT_TileType::Protoss_Pylon;
+        case BWAPI::UnitTypes::Protoss_Assimilator:
+            return NEAT_TileType::Protoss_Assimilator;
+        case BWAPI::UnitTypes::Protoss_Observatory:
+            return NEAT_TileType::Protoss_Observatory;
+        case BWAPI::UnitTypes::Protoss_Gateway:
+            return NEAT_TileType::Protoss_Gateway;
+        case BWAPI::UnitTypes::Protoss_Photon_Cannon:
+            return NEAT_TileType::Protoss_Photon_Cannon;
+        case BWAPI::UnitTypes::Protoss_Citadel_of_Adun:
+            return NEAT_TileType::Protoss_Citadel_of_Adun;
+        case BWAPI::UnitTypes::Protoss_Cybernetics_Core:
+            return NEAT_TileType::Protoss_Cybernetics_Core;
+        case BWAPI::UnitTypes::Protoss_Templar_Archives:
+            return NEAT_TileType::Protoss_Templar_Archives;
+        case BWAPI::UnitTypes::Protoss_Forge:
+            return NEAT_TileType::Protoss_Forge;
+        case BWAPI::UnitTypes::Protoss_Stargate:
+            return NEAT_TileType::Protoss_Stargate;
+        case BWAPI::UnitTypes::Protoss_Fleet_Beacon:
+            return NEAT_TileType::Protoss_Fleet_Beacon;
+        case BWAPI::UnitTypes::Protoss_Arbiter_Tribunal:
+            return NEAT_TileType::Protoss_Arbiter_Tribunal;
+        case BWAPI::UnitTypes::Protoss_Robotics_Support_Bay:
+            return NEAT_TileType::Protoss_Robotics_Support_Bay;
+        case BWAPI::UnitTypes::Protoss_Shield_Battery:
+            return NEAT_TileType::Protoss_Shield_Battery;
+
+            // Terran Units
+        case BWAPI::UnitTypes::Terran_Marine:
+            return NEAT_TileType::Terran_Marine;
+        case BWAPI::UnitTypes::Terran_Firebat:
+            return NEAT_TileType::Terran_Firebat;
+        case BWAPI::UnitTypes::Terran_Medic:
+            return NEAT_TileType::Terran_Medic;
+        case BWAPI::UnitTypes::Terran_Ghost:
+            return NEAT_TileType::Terran_Ghost;
+        case BWAPI::UnitTypes::Terran_Vulture:
+            return NEAT_TileType::Terran_Vulture;
+        case BWAPI::UnitTypes::Terran_Goliath:
+            return NEAT_TileType::Terran_Goliath;
+        case BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode:
+            return NEAT_TileType::Terran_Siege_Tank_Tank_Mode;
+        case BWAPI::UnitTypes::Terran_Wraith:
+            return NEAT_TileType::Terran_Wraith;
+        case BWAPI::UnitTypes::Terran_Dropship:
+            return NEAT_TileType::Terran_Dropship;
+        case BWAPI::UnitTypes::Terran_Science_Vessel:
+            return NEAT_TileType::Terran_Science_Vessel;
+        case BWAPI::UnitTypes::Terran_Battlecruiser:
+            return NEAT_TileType::Terran_Battlecruiser;
+        case BWAPI::UnitTypes::Terran_Valkyrie:
+            return NEAT_TileType::Terran_Valkyrie;
+        case BWAPI::UnitTypes::Terran_SCV:
+            return NEAT_TileType::Terran_SCV;
+
+            // Zerg Units
+        case BWAPI::UnitTypes::Zerg_Zergling:
+            return NEAT_TileType::Zerg_Zergling;
+        case BWAPI::UnitTypes::Zerg_Hydralisk:
+            return NEAT_TileType::Zerg_Hydralisk;
+        case BWAPI::UnitTypes::Zerg_Ultralisk:
+            return NEAT_TileType::Zerg_Ultralisk;
+        case BWAPI::UnitTypes::Zerg_Broodling:
+            return NEAT_TileType::Zerg_Broodling;
+        case BWAPI::UnitTypes::Zerg_Drone:
+            return NEAT_TileType::Zerg_Drone;
+        case BWAPI::UnitTypes::Zerg_Defiler:
+            return NEAT_TileType::Zerg_Defiler;
+        case BWAPI::UnitTypes::Zerg_Infested_Terran:
+            return NEAT_TileType::Zerg_Infested_Terran;
+        case BWAPI::UnitTypes::Zerg_Lurker:
+            return NEAT_TileType::Zerg_Lurker;
+        case BWAPI::UnitTypes::Zerg_Overlord:
+            return NEAT_TileType::Zerg_Overlord;
+        case BWAPI::UnitTypes::Zerg_Mutalisk:
+            return NEAT_TileType::Zerg_Mutalisk;
+        case BWAPI::UnitTypes::Zerg_Guardian:
+            return NEAT_TileType::Zerg_Guardian;
+        case BWAPI::UnitTypes::Zerg_Queen:
+            return NEAT_TileType::Zerg_Queen;
+        case BWAPI::UnitTypes::Zerg_Scourge:
+            return NEAT_TileType::Zerg_Scourge;
+        case BWAPI::UnitTypes::Zerg_Devourer:
+            return NEAT_TileType::Zerg_Devourer;
+
+            // Protoss Units
+        case BWAPI::UnitTypes::Protoss_Dark_Templar:
+            return NEAT_TileType::Protoss_Dark_Templar;
+        case BWAPI::UnitTypes::Protoss_Dark_Archon:
+            return NEAT_TileType::Protoss_Dark_Archon;
+        case BWAPI::UnitTypes::Protoss_Probe:
+            return NEAT_TileType::Protoss_Probe;
+        case BWAPI::UnitTypes::Protoss_Zealot:
+            return NEAT_TileType::Protoss_Zealot;
+        case BWAPI::UnitTypes::Protoss_Dragoon:
+            return NEAT_TileType::Protoss_Dragoon;
+        case BWAPI::UnitTypes::Protoss_High_Templar:
+            return NEAT_TileType::Protoss_High_Templar;
+        case BWAPI::UnitTypes::Protoss_Archon:
+            return NEAT_TileType::Protoss_Archon;
+        case BWAPI::UnitTypes::Protoss_Reaver:
+            return NEAT_TileType::Protoss_Reaver;
+        case BWAPI::UnitTypes::Protoss_Corsair:
+            return NEAT_TileType::Protoss_Corsair;
+        case BWAPI::UnitTypes::Protoss_Shuttle:
+            return NEAT_TileType::Protoss_Shuttle;
+        case BWAPI::UnitTypes::Protoss_Scout:
+            return NEAT_TileType::Protoss_Scout;
+        case BWAPI::UnitTypes::Protoss_Arbiter:
+            return NEAT_TileType::Protoss_Arbiter;
+        case BWAPI::UnitTypes::Protoss_Carrier:
+            return NEAT_TileType::Protoss_Carrier;
+        case BWAPI::UnitTypes::Protoss_Observer:
+            return NEAT_TileType::Protoss_Observer;
+
+        default:
+            return NEAT_TileType::WALKABLE;
+        }
+    }
 }

@@ -15,6 +15,7 @@
 #include "ScoutManager.h"
 #include "StrategyManager.h"
 #include "WorkerManager.h"
+#include "NEATCommander.h"
 
 using namespace UAlbertaBot;
 
@@ -101,8 +102,9 @@ void GameCommander::update()
     the.micro.update();
     _timerManager.stopTimer(TimerManager::Micro);
 
+    NEATCommander::Instance().incrementFrame();
     _timerManager.stopTimer(TimerManager::Total);
-
+    
     drawDebugInterface();
 }
 
@@ -110,6 +112,8 @@ void GameCommander::onEnd(bool isWinner)
 {
     OpponentModel::Instance().setWin(isWinner);
     OpponentModel::Instance().write();
+
+    NEATCommander::Instance().sendFitnessToTrainServer();
 
     // Clean up any data structures that may otherwise not be unwound in the correct order.
     // This fixes an end-of-game bug diagnosed by Bruce Nielsen.

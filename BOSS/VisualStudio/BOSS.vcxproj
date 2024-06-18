@@ -139,7 +139,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\locti\OneDrive\Documents\cs_projects\NEATHAMMER\BWAPI\include;$(BWAPI_DIR)/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\locti\OneDrive\Documents\cs_projects\NEATHAMMER\BWAPI\include;$(BWAPI_DIR)/include/;C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -158,7 +158,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\locti\OneDrive\Documents\cs_projects\NEATHAMMER\BWAPI\include;$(BWAPI_DIR)/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\locti\OneDrive\Documents\cs_projects\NEATHAMMER\BWAPI\include;$(BWAPI_DIR)/include/;C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

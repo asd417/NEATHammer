@@ -65,7 +65,7 @@ public:
     MacroAct(BWAPI::TechType t);
     MacroAct(BWAPI::UpgradeType t);
     MacroAct(MacroCommandType t);
-    MacroAct(MacroCommandType t, const BWAPI::TilePosition& tile);
+    MacroAct(MacroCommand t, BWAPI::UnitType ut, BWAPI::TechType tt, BWAPI::UpgradeType ugt, MacroActs mat, const BWAPI::TilePosition& tile);
     MacroAct(MacroCommandType t, int amount);
     MacroAct(MacroCommandType t, BWAPI::UnitType type);
 

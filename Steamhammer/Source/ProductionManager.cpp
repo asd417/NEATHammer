@@ -598,12 +598,16 @@ void ProductionManager::executeCommand(const MacroAct & act)
     //Put all units of type within given radius of given tile position into squad with squadindex
     else if (cmd == MacroCommandType::AssignToSquad)
     {
-        BWAPI::UnitFilter filter = BWAPI::UnitFilter(act.getUnitType());
         int radius = act.getCommandType().getAmount2();
         //Clamp radius between 3 and 256
         radius = radius < 3 ? 3 : radius;
         radius = radius > 256 ? 256 : radius;
-        BWAPI::Unitset foundUnits = BWAPI::Broodwar->getUnitsInRadius(act.getTileLocation().x * 32, act.getTileLocation().y * 32, radius * 32, filter);
+        BWAPI::Unitset foundUnits = BWAPI::Broodwar->getUnitsInRadius(
+            act.getTileLocation().x * 32, 
+            act.getTileLocation().y * 32, 
+            radius * 32, 
+            BWAPI::Filter::GetType == act.getUnitType());
+
         int squadIndex = act.getCommandType().getAmount();
         // There are only 5 squads with index 0 1 2 3 4
         squadIndex = squadIndex < 0 ? 0 : squadIndex;
@@ -613,12 +617,16 @@ void ProductionManager::executeCommand(const MacroAct & act)
     //Remove all units of type within given radius of given tile position into squad with squadindex
     else if (cmd == MacroCommandType::RemoveFromSquad)
     {
-        BWAPI::UnitFilter filter = BWAPI::UnitFilter(act.getUnitType());
         int radius = act.getCommandType().getAmount2();
         //Clamp radius between 3 and 256
         radius = radius < 3 ? 3 : radius;
         radius = radius > 256 ? 256 : radius;
-        BWAPI::Unitset foundUnits = BWAPI::Broodwar->getUnitsInRadius(act.getTileLocation().x * 32, act.getTileLocation().y * 32, radius * 32, filter);
+        BWAPI::Unitset foundUnits = BWAPI::Broodwar->getUnitsInRadius(
+            act.getTileLocation().x * 32, 
+            act.getTileLocation().y * 32, 
+            radius * 32, 
+            BWAPI::Filter::GetType == act.getUnitType());
+
         int squadIndex = act.getCommandType().getAmount();
         // There are only 5 squads with index 0 1 2 3 4
         squadIndex = squadIndex < 0 ? 0 : squadIndex;
@@ -636,10 +644,6 @@ void ProductionManager::executeCommand(const MacroAct & act)
         orderType = orderType < 0 ? 0 : orderType;
         orderType = orderType > 9 ? 9 : orderType;
         CombatCommander::Instance().NEAT_SetSquadOrder((SquadOrderTypes)orderType, squadIndex, { act.getTileLocation().x, act.getTileLocation().y });
-    }
-    else if (cmd == MacroCommandType::Lift)
-    {
-        liftBuildings(act.getCommandType().getUnitType());
     }
     else if (cmd == MacroCommandType::QueueBarrier)
     {

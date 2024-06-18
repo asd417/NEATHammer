@@ -12,7 +12,7 @@ namespace Config
     {
         bool ConfigFileFound                = false;
         bool ConfigFileParsed               = false;
-        std::string ConfigFileLocation      = "bwapi-data/AI/Steamhammer_3.5.10.json";
+        std::string ConfigFileLocation      = "NEATHammer.json";
     }
 
     namespace IO

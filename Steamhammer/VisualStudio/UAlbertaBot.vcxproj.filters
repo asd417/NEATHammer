@@ -187,8 +187,18 @@
     <ClCompile Include="..\Source\TacticsOrders.cpp" />
     <ClCompile Include="..\Source\SquadOrder.cpp" />
     <ClCompile Include="..\Source\StaticDefense.cpp" />
+    <ClCompile Include="..\Source\NodeEval.cpp">
+      <Filter>NEAT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\db.cpp">
+      <Filter>NEAT</Filter>
+    </ClCompile>
     <ClCompile Include="..\Source\NEATCommander.cpp">
       <Filter>NEAT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\main.cpp" />
+    <ClCompile Include="..\Source\ReplayParser.cpp">
+      <Filter>util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -340,8 +350,17 @@
     <ClInclude Include="..\Source\TacticsOrders.h" />
     <ClInclude Include="..\Source\MicroIrradiated.h" />
     <ClInclude Include="..\Source\StaticDefense.h" />
+    <ClInclude Include="..\Source\db.h">
+      <Filter>NEAT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\NodeEval.h">
+      <Filter>NEAT</Filter>
+    </ClInclude>
     <ClInclude Include="..\Source\NEATCommander.h">
       <Filter>NEAT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\ReplayParser.h">
+      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
