@@ -8,7 +8,7 @@
 
 void PlayGame();
 void ParseReplay();
-
+#ifdef _DEBUG
 int main(int argc, char * argv[])
 {
     size_t gameCount = 0;
@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
 
 	return 0;
 }
-
+#endif
 void PlayGame()
 {
     UAlbertaBot::UAlbertaBotModule bot;

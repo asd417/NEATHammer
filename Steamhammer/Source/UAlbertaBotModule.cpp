@@ -113,13 +113,13 @@ void UAlbertaBotModule::onSendText(std::string text)
 void UAlbertaBotModule::onUnitCreate(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitCreate(unit);
-    if(unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(1);
+    if(unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
 }
 
 void UAlbertaBotModule::onUnitComplete(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitComplete(unit);
-    if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(1);
+    if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
 }
 
 void UAlbertaBotModule::onUnitShow(BWAPI::Unit unit)

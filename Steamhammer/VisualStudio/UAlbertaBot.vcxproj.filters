@@ -35,7 +35,7 @@
       <UniqueIdentifier>{59599488-4576-44ab-8522-7d65a6425e15}</UniqueIdentifier>
     </Filter>
     <Filter Include="NEAT">
-      <UniqueIdentifier>{59e722aa-599a-4892-8ed6-0b3dba82c768}</UniqueIdentifier>
+      <UniqueIdentifier>{a59eb0e9-e456-415a-aceb-da6e55a93425}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +133,7 @@
       <Filter>util</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\MacroAct.cpp" />
+    <ClCompile Include="..\Source\StrategyBossZerg.cpp" />
     <ClCompile Include="..\Source\MicroTanks.cpp" />
     <ClCompile Include="..\Source\MicroDetectors.cpp" />
     <ClCompile Include="..\Source\MicroLurkers.cpp" />
@@ -187,18 +188,14 @@
     <ClCompile Include="..\Source\TacticsOrders.cpp" />
     <ClCompile Include="..\Source\SquadOrder.cpp" />
     <ClCompile Include="..\Source\StaticDefense.cpp" />
+    <ClCompile Include="..\Source\NEATCommander.cpp">
+      <Filter>NEAT</Filter>
+    </ClCompile>
     <ClCompile Include="..\Source\NodeEval.cpp">
       <Filter>NEAT</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\db.cpp">
       <Filter>NEAT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\NEATCommander.cpp">
-      <Filter>NEAT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\main.cpp" />
-    <ClCompile Include="..\Source\ReplayParser.cpp">
-      <Filter>util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -298,6 +295,7 @@
     <ClInclude Include="..\Source\MacroAct.h" />
     <ClInclude Include="..\Source\MacroCommand.h" />
     <ClInclude Include="..\Source\BuildingData.h" />
+    <ClInclude Include="..\Source\StrategyBossZerg.h" />
     <ClInclude Include="..\Source\MicroTanks.h" />
     <ClInclude Include="..\Source\MicroDetectors.h" />
     <ClInclude Include="..\Source\MicroLurkers.h" />
@@ -350,17 +348,14 @@
     <ClInclude Include="..\Source\TacticsOrders.h" />
     <ClInclude Include="..\Source\MicroIrradiated.h" />
     <ClInclude Include="..\Source\StaticDefense.h" />
-    <ClInclude Include="..\Source\db.h">
+    <ClInclude Include="..\Source\NEATCommander.h">
       <Filter>NEAT</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\NodeEval.h">
       <Filter>NEAT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\NEATCommander.h">
+    <ClInclude Include="..\Source\db.h">
       <Filter>NEAT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\ReplayParser.h">
-      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

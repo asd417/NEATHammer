@@ -43,6 +43,7 @@ void PlayerSnapshot::reset(BWAPI::Player side)
 //      different data structures.
 void PlayerSnapshot::inferUnseenRequirements(const PlayerSnapshot & ever, BWAPI::UnitType t)
 {
+    return;
     if (t == BWAPI::UnitTypes::Zerg_Larva || t == BWAPI::UnitTypes::Zerg_Egg)
     {
         // Required because BWAPI believes that a larva or egg costs 1 gas.

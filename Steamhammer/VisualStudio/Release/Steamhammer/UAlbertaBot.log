@@ -1,0 +1,120 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Preview\MSBuild\Microsoft\VC\v150\Platforms\Win32\PlatformToolsets\v141_xp\Toolset.targets(39,5): warning MSB8051: Support for targeting Windows XP is deprecated and will not be present in future releases of Visual Studio. Please see https://go.microsoft.com/fwlink/?linkid=2023588 for more information.
+  Base.cpp
+  Bases.cpp
+  BOSimulator.cpp
+  BOSSManager.cpp
+  BuildingManager.cpp
+  BuildingPlacer.cpp
+  BuildOrder.cpp
+  BuildOrderQueue.cpp
+  CombatSimulation.cpp
+  CombatCommander.cpp
+  Common.cpp
+  db.cpp
+  Dll.cpp
+  FAP.cpp
+  GameCommander.cpp
+c:\users\ylee5\documents\starcraft_research\neathammer\steamhammer\source\bossmanager.cpp(230): warning C4267: 'argument': conversion from 'size_t' to 'const BOSS::UnitCountType', possible loss of data
+  GameRecord.cpp
+  GameRecordNow.cpp
+  Grid.cpp
+  GridAttacks.cpp
+  GridBuildable.cpp
+  GridCreep.cpp
+  GridDistances.cpp
+  GridInset.cpp
+  GridRoom.cpp
+  GridSafeAirPath.cpp
+  GridTileRoom.cpp
+  GridWalk.cpp
+  GridZone.cpp
+  InformationManager.cpp
+  JSONTools.cpp
+  Logger.cpp
+  MacroAct.cpp
+  MacroCommand.cpp
+  MapGrid.cpp
+  MapPartitions.cpp
+  MapTools.cpp
+  MicroAirToAir.cpp
+  MicroDefilers.cpp
+  MicroDetectors.cpp
+  MicroHighTemplar.cpp
+  MicroIrradiated.cpp
+  MicroLurkers.cpp
+  MicroManager.cpp
+  Config.cpp
+  Micro.cpp
+  MicroMedics.cpp
+  MicroMelee.cpp
+  MicroMutas.cpp
+  MicroOverlords.cpp
+  MicroQueens.cpp
+  MicroRanged.cpp
+  MicroScourge.cpp
+  MicroTanks.cpp
+  MicroTransports.cpp
+  NEATCommander.cpp
+  NodeEval.cpp
+  OpeningTiming.cpp
+  OpeningTimingRecord.cpp
+  OpponentModel.cpp
+  OpponentPlan.cpp
+  OpsBoss.cpp
+  ParseUtils.cpp
+  PlayerSnapshot.cpp
+  ProductionGoal.cpp
+  ProductionManager.cpp
+  Random.cpp
+  ResourceInfo.cpp
+c:\users\ylee5\documents\starcraft_research\neathammer\steamhammer\source\neatcommander.cpp(170): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  ScoutManager.cpp
+  Skill.cpp
+  SkillBattles.cpp
+  SkillGasSteal.cpp
+c:\users\ylee5\documents\starcraft_research\neathammer\steamhammer\source\nodeeval.h(49): warning C4018: '<': signed/unsigned mismatch (compiling source file ..\Source\NEATCommander.cpp)
+  c:\users\ylee5\documents\starcraft_research\neathammer\steamhammer\source\neatcommander.cpp(130): note: see reference to function template instantiation 'void FeedForwardNetwork::Activate<double>(std::vector<double,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=double
+          ]
+  c:\program files\microsoft visual studio\2022\preview\vc\tools\msvc\14.16.27023\include\filesystem(2392): note: see reference to class template instantiation 'std::chrono::time_point<std::filesystem::_File_time_clock,std::filesystem::_File_time_clock::duration>' being compiled (compiling source file ..\Source\NEATCommander.cpp)
+  c:\program files\microsoft visual studio\2022\preview\vc\tools\msvc\14.16.27023\include\type_traits(616): note: see reference to class template instantiation 'std::basic_string_view<wchar_t,std::char_traits<wchar_t>>' being compiled (compiling source file ..\Source\NEATCommander.cpp)
+  c:\program files\microsoft visual studio\2022\preview\vc\tools\msvc\14.16.27023\include\xstring(2124): note: see reference to class template instantiation 'std::is_convertible<const _StringViewIsh &,std::basic_string_view<wchar_t,std::char_traits<wchar_t>>>' being compiled
+          with
+          [
+              _StringViewIsh=const wchar_t *
+          ] (compiling source file ..\Source\NEATCommander.cpp)
+  c:\program files\microsoft visual studio\2022\preview\vc\tools\msvc\14.16.27023\include\xstring(2122): note: see reference to variable template 'const bool conjunction_v<std::is_convertible<wchar_t const * const &,std::basic_string_view<wchar_t,std::char_traits<wchar_t> > >,std::negation<std::is_convertible<wchar_t const * const &,wchar_t const *> > >' being compiled (compiling source file ..\Source\NEATCommander.cpp)
+  c:\program files\microsoft visual studio\2022\preview\vc\tools\msvc\14.16.27023\include\xstring(2281): note: see reference to alias template instantiation 'std::basic_string<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t>>::_Is_string_view_ish<_StringViewIsh>' being compiled
+          with
+          [
+              _StringViewIsh=const wchar_t *
+          ] (compiling source file ..\Source\NEATCommander.cpp)
+  SkillKit.cpp
+  SkillLurkers.cpp
+  SkillOpeningTiming.cpp
+  SkillUnitTimings.cpp
+  Squad.cpp
+  SquadData.cpp
+  SquadOrder.cpp
+  StaticDefense.cpp
+  StrategyBossZerg.cpp
+  StrategyManager.cpp
+  TacticsOrders.cpp
+  The.cpp
+  TimerManager.cpp
+  UABAssert.cpp
+  UAlbertaBotModule.cpp
+  UnitData.cpp
+  UnitUtil.cpp
+  WorkerData.cpp
+  WorkerManager.cpp
+     Creating library C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\Steamhammer.lib and object C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\Steamhammer.exp
+  Generating code
+c:\users\ylee5\documents\starcraft_research\neathammer\steamhammer\source\neatcommander.cpp(250): warning C4715: 'UAlbertaBot::NEATCommander::isWorkerType': not all control paths return a value
+  13846 of 15913 functions (87.0%) were compiled, the rest were copied from previous compilation.
+    1573 functions were new in current compilation
+    379 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  UAlbertaBot.vcxproj -> C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\Steamhammer.dll

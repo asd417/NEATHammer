@@ -1,0 +1,11 @@
+﻿  GameCommander.cpp
+  NEATCommander.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\Source\NEATCommander.cpp(170,57): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\Source\NEATCommander.cpp(170,49): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\Source\NodeEval.h(49,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\Source\NEATCommander.cpp(250,1): warning C4715: 'UAlbertaBot::NEATCommander::isWorkerType': not all control paths return a value
+LINK : warning LNK4044: unrecognized option '/lib/BWAPId.lib'; ignored
+LINK : warning LNK4044: unrecognized option '/lib/BWAPId.lib'; ignored
+Base.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+     Creating library C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\NEATHammer_d.lib and object C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\NEATHammer_d.exp
+  UAlbertaBot.vcxproj -> C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\bin\NEATHammer_d.exe

@@ -1,0 +1,6 @@
+﻿  ProductionManager.cpp
+  ScoutManager.cpp
+LINK : warning LNK4044: unrecognized option '/lib/BWAPId.lib'; ignored
+Base.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+     Creating library C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\Steamhammer_d.lib and object C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\Steamhammer_d.exp
+  UAlbertaBot.vcxproj -> C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\bin\Steamhammer_d.dll

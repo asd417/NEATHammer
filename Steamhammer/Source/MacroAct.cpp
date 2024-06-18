@@ -852,3 +852,8 @@ void MacroAct::produce(BWAPI::Unit producer) const
         UAB_ASSERT(false, "bad MacroAct");
     }
 }
+
+std::string UAlbertaBot::MacroAct::toString()
+{
+    return std::string("");
+}

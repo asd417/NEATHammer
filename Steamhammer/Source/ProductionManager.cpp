@@ -651,7 +651,7 @@ void ProductionManager::executeCommand(const MacroAct & act)
     }
     else
     {
-        UAB_ASSERT(false, "unknown MacroCommand");
+        //UAB_ASSERT(false, "unknown MacroCommand");
     }
 }
 

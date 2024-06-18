@@ -13,6 +13,9 @@
     <ClCompile Include="..\source\GameState.cpp">
       <Filter>engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\CombatSearch.cpp">
+      <Filter>search\CombatSearch</Filter>
+    </ClCompile>
     <ClCompile Include="..\source\UnitData.cpp">
       <Filter>engine</Filter>
     </ClCompile>
@@ -100,7 +103,6 @@
     <ClCompile Include="..\source\BOSSException.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\CombatSearch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Timer.hpp">

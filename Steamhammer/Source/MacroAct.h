@@ -53,7 +53,7 @@ class MacroAct
     void                initializeUnitTypesByName();
     MacroLocation		getMacroLocationFromString(const std::string & s) const;
     BWAPI::UnitType     getUnitTypeFromString(const std::string & s) const;
-
+    
 public:
 
     MacroAct();
@@ -106,5 +106,7 @@ public:
 
     bool canProduce(BWAPI::Unit producer) const;
     void produce(BWAPI::Unit producer) const;
+
+    std::string toString();
 };
 }

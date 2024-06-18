@@ -77,7 +77,7 @@ void WorkerManager::updateWorkerStatus()
             !worker->exists() ||
             worker->getPlayer() != the.self())
         {
-            UAB_ASSERT(false, "bad worker");
+            //UAB_ASSERT(false, "bad worker");
             continue;
         }
 

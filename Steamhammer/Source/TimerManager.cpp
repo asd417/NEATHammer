@@ -23,6 +23,7 @@ TimerManager::TimerManager()
     _timerNames.push_back("Combat");
     _timerNames.push_back("Micro");
     _timerNames.push_back("Scout");
+    _timerNames.push_back("Network Evaluation");
 }
 
 void TimerManager::startTimer(const TimerManager::Type t)

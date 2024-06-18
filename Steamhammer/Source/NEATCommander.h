@@ -103,6 +103,7 @@ namespace UAlbertaBot
 		Protoss_Stargate,
 		Protoss_Fleet_Beacon,
 		Protoss_Arbiter_Tribunal,
+		NETWORK_UNIT_COUNT
 	};
 	//Only include researchable techs	
 	enum class NetworkTech {
@@ -131,7 +132,8 @@ namespace UAlbertaBot
 		Stasis_Field,
 		Disruption_Web,
 		Mind_Control,
-		Maelstrom
+		Maelstrom,
+		NETWORK_TECH_COUNT
 	};
 
 	enum class NetworkUpgrade {
@@ -186,7 +188,8 @@ namespace UAlbertaBot
 		Carrier_Capacity,
 		Khaydarin_Core,
 		Argus_Jewel,
-		Argus_Talisman
+		Argus_Talisman,
+		NETWORK_UPGRADE_COUNT
 	};
 
 	//Entries with higher number will override the data if the tile has multiple types of units
@@ -305,7 +308,7 @@ namespace UAlbertaBot
 	public:
 		static NEATCommander& Instance();
 		void update();
-		BuildOrder& getMacroCommands();
+		BuildOrder getMacroCommands();
 		void resetActions();
 		void incrementFrame();
 
@@ -313,6 +316,9 @@ namespace UAlbertaBot
 		void scoreFitness(double add);
 		void sendFitnessToTrainServer();
 	private:
+		NEATCommander();
+		int mapWidth;
+		int mapHeight;
 		int lastMineral;
 		int lastGas;
 
@@ -328,28 +334,25 @@ namespace UAlbertaBot
 		double tilePosY; //0~256
 		double macroCommandUnitType;
 
-		void evaluate();
 		void InitializeNetwork();
 
 		bool isWorkerType(BWAPI::UnitType type);
 		int getWorkerCount(BWAPI::Unitset& allUnits);
 
-		void getVisibleFriendlyMap(int sectionNum);
-		void getVisibleEnemyMap(int sectionNum);
+		void evaluate();
+		void getVisibleMap(int sectionNum);
 		BWAPI::UnitType ToBWAPIUnit(NetworkUnits ut);
 		BWAPI::TechType ToBWAPITech(NetworkTech tt);
 		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkUpgrade ut);
 		NEAT_TileType getTileType(BWAPI::UnitType type);
 		std::vector<MacroAct> _actions{};
 
-		void createFeedForwardNetwork();
-
 		int frame = 0;
 		int maxSections;
 		int curSection = 0;
-		std::vector<std::array<int, 2>> sectionsCoords;
-		std::array<std::array<int, 16>, 16> enemyMapData;
-		std::array<std::array<int, 16>, 16> friendlyMapData;
+		std::vector<std::array<int, 2>> sectionsCoords{};
+		std::array<std::array<int, 16>, 16> enemyMapData{};
+		std::array<std::array<int, 16>, 16> friendlyMapData{};
 
 		FeedForwardNetwork* network;
 		std::vector<double> inputVector{};

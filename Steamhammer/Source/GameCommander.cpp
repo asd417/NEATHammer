@@ -69,10 +69,11 @@ void GameCommander::update()
 
     // -- Managers that act on information. --
 
-    //_timerManager.startTimer(TimerManager::Search);
+    _timerManager.startTimer(TimerManager::NetworkEvaluation);
     //Performs buildorder search
+    NEATCommander::Instance().update();
     //BOSSManager::Instance().update(35 - _timerManager.getMilliseconds());
-    //_timerManager.stopTimer(TimerManager::Search);
+    _timerManager.stopTimer(TimerManager::Search);
 
     // May steal workers from WorkerManager, so run it before WorkerManager.
     // NEAT Network evaluation occurs inside ProductionManager
@@ -93,9 +94,9 @@ void GameCommander::update()
     _combatCommander.update(_combatUnits);
     _timerManager.stopTimer(TimerManager::Combat);
 
-    _timerManager.startTimer(TimerManager::Scout);
-    ScoutManager::Instance().update();
-    _timerManager.stopTimer(TimerManager::Scout);
+    //_timerManager.startTimer(TimerManager::Scout);
+    //ScoutManager::Instance().update();
+    //_timerManager.stopTimer(TimerManager::Scout);
 
     // Execute micro commands gathered above. Do this at the end of the frame.
     _timerManager.startTimer(TimerManager::Micro);
@@ -383,74 +384,19 @@ bool GameCommander::isAssigned(BWAPI::Unit unit) const
 // validates units as usable for distribution to various managers
 void GameCommander::setValidUnits()
 {
-    /*
-    // TODO testing
-    std::string timingFile = Config::IO::WriteDir + "timing.csv";
-    static bool speed = false;
-    if (!speed && BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Metabolic_Boost) > 0)
-    {
-        BWAPI::Broodwar->printf("zergling speed %d", BWAPI::Broodwar->getFrameCount());
-        Logger::LogAppendToFile(timingFile, "%d,%s\n", BWAPI::Broodwar->getFrameCount(), "speed");
-        speed = true;
-    }
-    static BWAPI::Unitset lings;
-    size_t nLings = lings.size();
-    */
-
     for (BWAPI::Unit unit : BWAPI::Broodwar->self()->getUnits())
     {
         if (UnitUtil::IsValidUnit(unit))
         {	
             _validUnits.insert(unit);
 
-            /*
-            // TODO testing
-            static bool firstTime1 = false;
-            if (unit->getType() == BWAPI::UnitTypes::Zerg_Lair && !firstTime1)
-            {
-                BWAPI::Broodwar->printf("lair timing %d", BWAPI::Broodwar->getFrameCount());
-                firstTime1 = true;
-            }
-            // TODO testing
-            //if (unit->getType() == BWAPI::UnitTypes::Zerg_Zergling)
-            //{
-            //    lings.insert(unit);
-            //}
-            */
-
-            /*
-            // TODO testing
-            static bool firstTime1 = false;
-            static BWAPI::Unitset reported;
-            if (unit->getType() == BWAPI::UnitTypes::Protoss_Gateway && !reported.contains(unit))
-            {
-                BWAPI::Broodwar->printf("unit timing %d", BWAPI::Broodwar->getFrameCount());
-                firstTime1 = true;
-                reported.insert(unit);
-            }
-            */
         }
         else
         {
-            /*
-            static bool firstTime2 = false;
-            if (!firstTime2 && unit->getType() == BWAPI::UnitTypes::Zerg_Hatchery && !unit->isCompleted())
-            {
-                BWAPI::Broodwar->printf("hatchery timing %d", BWAPI::Broodwar->getFrameCount());
-                firstTime2 = true;
-            }
-            */
+            
         }
     }
 
-    /*
-    // TODO testing
-    if (lings.size() > nLings)
-    {
-        BWAPI::Broodwar->printf("%d lings @ %d", lings.size(), BWAPI::Broodwar->getFrameCount());
-        Logger::LogAppendToFile(timingFile, "%d,%d,%d\n", BWAPI::Broodwar->getFrameCount(), lings.size(), BWAPI::Broodwar->self()->minerals());
-    }
-    */
 }
 
 void GameCommander::setScoutUnits()

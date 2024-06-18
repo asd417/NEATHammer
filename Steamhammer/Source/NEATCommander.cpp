@@ -14,7 +14,30 @@ namespace UAlbertaBot
         
         return instance;
     }
-    BuildOrder& NEATCommander::getMacroCommands()
+    NEATCommander::NEATCommander() {
+        mapWidth = BWAPI::Broodwar->mapWidth();
+        mapHeight = BWAPI::Broodwar->mapHeight();
+        //We'll look 32x32 section
+        // try dividing
+        //for example 256x256
+        int dividedWidth = mapWidth / 32; //get 8
+        int dividedHeight = mapHeight / 32;
+
+        //Get number of sections in the map
+        maxSections = dividedWidth * dividedHeight;
+        for (int i = 0; i < dividedWidth; i++)
+        {
+            for (int j = 0; j < dividedHeight; j++)
+            {
+                sectionsCoords.push_back({ i * 32, j * 32 });
+            }
+        }
+    }
+    void NEATCommander::update()
+    {
+        evaluate();
+    }
+    BuildOrder NEATCommander::getMacroCommands()
     {
         return BuildOrder(BWAPI::Broodwar->self()->getRace(), _actions);
     }
@@ -25,7 +48,6 @@ namespace UAlbertaBot
     void NEATCommander::incrementFrame()
     {
         frame++;
-        curSection++;
     }
     double NEATCommander::getFitness()
     {
@@ -33,6 +55,7 @@ namespace UAlbertaBot
     }
     void NEATCommander::scoreFitness(double add)
     {
+        //if(add > 0.0f) std::cout << "Scored " << std::to_string(add) << "! Total: " << std::to_string(fitness) << "\n";
         fitness += add;
     }
     void NEATCommander::sendFitnessToTrainServer()
@@ -55,9 +78,10 @@ namespace UAlbertaBot
     }
     void NEATCommander::evaluate()
     {
-        getVisibleFriendlyMap(curSection);
-        getVisibleEnemyMap(curSection);
-        curSection++;
+        inputVector.clear();
+        
+        getVisibleMap(curSection);
+        
         
         int mSupply = BWAPI::Broodwar->self()->supplyTotal();
         int cSupply = BWAPI::Broodwar->self()->supplyUsed();
@@ -65,14 +89,14 @@ namespace UAlbertaBot
         int min = BWAPI::Broodwar->self()->minerals();
         int gas = BWAPI::Broodwar->self()->gas();
 
-        int deltaMineral = min > lastMineral ? min - lastMineral : 0;
-        int deltaGas = gas > lastGas ? gas - lastGas : 0;
+        double deltaMineral = min > lastMineral ? min - lastMineral : 0;
+        double deltaGas = gas > lastGas ? gas - lastGas : 0;
 
         lastMineral = min;
         lastGas = gas;
 
-        scoreFitness(deltaMineral);
-        scoreFitness(deltaGas);
+        scoreFitness(deltaMineral / 100.0f);
+        scoreFitness(deltaGas / 100.0f);
 
         int ctime = frame;
         int sectionCoordW = sectionsCoords[curSection][0];
@@ -116,25 +140,46 @@ namespace UAlbertaBot
         tilePosY += network->getOutputVector()[8];
         macroCommandUnitType += network->getOutputVector()[9];
 
+        curSection++;
+        curSection = curSection % maxSections;
         if (curSection == 0)
         {
-            NetworkUnits macroUT = (NetworkUnits)macroCommandUnitType;
-            NetworkUnits ut = (NetworkUnits)unitType;
-            NetworkTech tt = (NetworkTech)techType;
-            NetworkUpgrade ugt = (NetworkUpgrade)upgradeType;
-        
-            MacroCommand mc = MacroCommand((MacroCommandType)macroCommandType, amount1,amount2, ToBWAPIUnit(macroUT));
+            int a = macroCommandUnitType > 0 ? (int)macroCommandUnitType : 0;
+            a = a >= (int)NetworkUnits::NETWORK_UNIT_COUNT ? (int)NetworkUnits::NETWORK_UNIT_COUNT - 1 : a;
+            NetworkUnits macroUT = (NetworkUnits)a;
+
+            int b = unitType > 0 ? (int)unitType : 0;
+            b = b >= (int)NetworkUnits::NETWORK_UNIT_COUNT ? (int)NetworkUnits::NETWORK_UNIT_COUNT - 1 : b;
+            NetworkUnits ut = (NetworkUnits)b;
+
+            int c = techType > 0 ? (int)techType : 0;
+            c = c >= (int)NetworkTech::NETWORK_TECH_COUNT ? (int)NetworkTech::NETWORK_TECH_COUNT - 1 : c;
+            NetworkTech tt = (NetworkTech)c;
+
+            int d = upgradeType > 0 ? (int)upgradeType : 0;
+            d = d >= (int)NetworkUpgrade::NETWORK_UPGRADE_COUNT ? (int)NetworkUpgrade::NETWORK_UPGRADE_COUNT - 1 : d;
+            NetworkUpgrade ugt = (NetworkUpgrade)d;
+
+            int e = macroCommandType > 0 ? (int)macroCommandType : 0;
+            e = e >= (int)MacroCommandType::QueueBarrier ? (int)MacroCommandType::QueueBarrier - 1 : e;
+            MacroCommandType mct = (MacroCommandType)e;
+
+            int mat = macroActType > 0 ? (int)macroActType : 0;
+            mat = mat >= (int)MacroActs::Default ? (int)MacroActs::Default - 1 : mat;
+
+            MacroCommand mc = MacroCommand(mct, amount1,amount2, ToBWAPIUnit(macroUT));
             //BWAPI::TilePosition tp = ;
             MacroAct ma = MacroAct(
                 mc, 
                 ToBWAPIUnit(ut), 
                 ToBWAPITech(tt), 
                 ToBWAPIUpgrade(ugt), 
-                (MacroActs)macroActType, 
+                (MacroActs)mat, 
                 { (int) tilePosX , (int) tilePosY });
         
             //MacroAct action{};
             _actions.push_back(ma);
+            //std::cout << "Network Evaluated " << std::to_string(_actions.size()) << " actions\n";
         
             macroActType = 0.0f; //Unit, Tech, Upgrade, Command, Default
             unitType = 0.0f;
@@ -169,7 +214,7 @@ namespace UAlbertaBot
             std::cout << "TODO: Attempt to retrieve network from text file\n";
         }
         
-        std::cout << "Evaluating Network " << id << "\n";
+        std::cout << "Creating Network Structure" << id << "\n";
 
         try {
             json networkJson = json::parse(std::string(r[0]["Network"]));
@@ -213,8 +258,9 @@ namespace UAlbertaBot
     /// Units with highest importance will override the data on tile
     /// </summary>
     /// <param name="sectionNum"></param>
-    void NEATCommander::getVisibleFriendlyMap(int sectionNum)
+    void NEATCommander::getVisibleMap(int sectionNum)
     {
+        int a = sectionNum;
         if (sectionNum >= maxSections) throw std::overflow_error("sectionNum is bigger than maxSections");
 
         int startW = sectionsCoords[sectionNum][0];
@@ -224,56 +270,32 @@ namespace UAlbertaBot
                 BWAPI::TilePosition tp = { startW + i * 2,startH + j * 2 };
                 BWAPI::WalkPosition wp = { (startW + i * 2) * 4,(startH + j * 2) * 4 }; //WalkPosition is 8 pixels big
                 if (!BWAPI::Broodwar->isVisible(tp)) {
+                    friendlyMapData[i][j] = NEAT_TileType::FOG;
                     enemyMapData[i][j] = NEAT_TileType::FOG;
                     break;
                 }
                 else {
                     //BWAPI::UnitFilter uf = BWAPI::UnitFilter(the.self());
-                    BWAPI::Unitset unitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + i * 2, startH + j * 2, BWAPI::Filter::IsAlly);
+                    BWAPI::Unitset allyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + i * 2, startH + j * 2, BWAPI::Filter::IsAlly);
+                    BWAPI::Unitset enemyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + i * 2, startH + j * 2, BWAPI::Filter::IsEnemy);
 
-                    NEAT_TileType highestImportance = NEAT_TileType::NOTWALKABLE;
+                    NEAT_TileType highestImportanceAlly = NEAT_TileType::NOTWALKABLE;
+                    NEAT_TileType highestImportanceEnemy = NEAT_TileType::NOTWALKABLE;
                     if (BWAPI::Broodwar->isWalkable(wp)) {
-                        highestImportance = NEAT_TileType::WALKABLE;
+                        highestImportanceAlly = NEAT_TileType::WALKABLE;
+                        highestImportanceEnemy = NEAT_TileType::WALKABLE;
                     }
 
-                    for (BWAPI::Unit u : unitsOnTile) {
+                    for (BWAPI::Unit u : allyUnitsOnTile) {
                         NEAT_TileType unitTileType = getTileType(u->getType());
-                        highestImportance = unitTileType > highestImportance ? unitTileType : highestImportance;
+                        highestImportanceAlly = unitTileType > highestImportanceAlly ? unitTileType : highestImportanceAlly;
                     }
-                    friendlyMapData[i][j] = highestImportance;
-                }
-            }
-        }
-    }
-
-    void NEATCommander::getVisibleEnemyMap(int sectionNum)
-    {
-        if (sectionNum >= maxSections) throw std::overflow_error("sectionNum is bigger than maxSections");
-
-        int startW = sectionsCoords[sectionNum][0];
-        int startH = sectionsCoords[sectionNum][1];
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                BWAPI::TilePosition tp = { startW + i * 2,startH + j * 2 };
-                BWAPI::WalkPosition wp = { (startW + i * 2) * 4,(startH + j * 2) * 4 }; //WalkPosition is 8 pixels big
-                if (!BWAPI::Broodwar->isVisible(tp)) {
-                    enemyMapData[i][j] = NEAT_TileType::FOG;
-                    break;
-                }
-                else {
-                    //BWAPI::UnitFilter uf = BWAPI::UnitFilter(BWAPI::Filter::IsEnemy);
-                    BWAPI::Unitset unitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + i * 2, startH + j * 2, BWAPI::Filter::IsEnemy);
-
-                    NEAT_TileType highestImportance = NEAT_TileType::NOTWALKABLE;
-                    if (BWAPI::Broodwar->isWalkable(wp)) {
-                        highestImportance = NEAT_TileType::WALKABLE;
-                    }
-
-                    for (BWAPI::Unit u : unitsOnTile) {
+                    for (BWAPI::Unit u : enemyUnitsOnTile) {
                         NEAT_TileType unitTileType = getTileType(u->getType());
-                        highestImportance = unitTileType > highestImportance ? unitTileType : highestImportance;
+                        highestImportanceEnemy = unitTileType > highestImportanceEnemy ? unitTileType : highestImportanceEnemy;
                     }
-                    enemyMapData[i][j] = highestImportance;
+                    friendlyMapData[i][j] = highestImportanceAlly;
+                    enemyMapData[i][j] = highestImportanceEnemy;
                 }
             }
         }

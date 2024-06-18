@@ -1,0 +1,61 @@
+﻿  AIModule.cpp
+  BroodwarOutputDevice.cpp
+  BulletType.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\AIModule.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/AIModule.h': No such file or directory
+  BWAPI.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\BWAPI.cpp(1,10): error C1083: Cannot open include file: 'BWAPI.h': No such file or directory
+  Color.cpp
+  DamageType.cpp
+  Error.cpp
+  Event.cpp
+  ExplosionType.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Color.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Color.h': No such file or directory
+  Filters.cpp
+  Forceset.cpp
+  Game.cpp
+  GameType.cpp
+  Order.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Event.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Event.h': No such file or directory
+  Player.cpp
+  Playerset.cpp
+  PlayerType.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Forceset.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Forceset.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Game.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Game.h': No such file or directory
+  Position.cpp
+  Race.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Filters.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Filters.h': No such file or directory
+  Region.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Player.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Player.h': No such file or directory
+  Regionset.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Playerset.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Playerset.h': No such file or directory
+  Streams.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Region.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Region.h': No such file or directory
+  TechType.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Position.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Position.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Streams.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Streams.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Regionset.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Regionset.h': No such file or directory
+  Unit.cpp
+  Unitset.cpp
+  UnitCommand.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Unit.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Unit.h': No such file or directory
+  UnitCommandType.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\BulletType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/BulletType.h': No such file or directory
+  UnitSizeType.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\UnitCommand.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/UnitCommand.h': No such file or directory
+  UnitType.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Unitset.cpp(1,10): error C1083: Cannot open include file: 'BWAPI/Unitset.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Error.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/Error.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\DamageType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/DamageType.h': No such file or directory
+  UpgradeType.cpp
+  WeaponType.cpp
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\ExplosionType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/ExplosionType.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\GameType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/GameType.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Order.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/Order.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\PlayerType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/PlayerType.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\TechType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/TechType.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\Race.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/Race.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\UnitCommandType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/UnitCommandType.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\UnitSizeType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/UnitSizeType.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\WeaponType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/UnitType.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\UpgradeType.cpp(2,10): error C1083: Cannot open include file: 'BWAPI/UpgradeType.h': No such file or directory
+C:\Users\ylee5\Documents\Starcraft_Research\steamhammer-master\BWAPILIB\Source\UnitType.cpp(6,10): error C1083: Cannot open include file: 'BWAPI/UnitType.h': No such file or directory

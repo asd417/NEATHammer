@@ -69,8 +69,8 @@ namespace Config
 
     namespace BWAPIOptions
     {
-        int SetLocalSpeed                   = 42;
-        int SetFrameSkip                    = 0;
+        int SetLocalSpeed                   = 0;
+        int SetFrameSkip                    = 3000;
         bool EnableUserInput                = true;
         bool EnableCompleteMapInformation   = false;
     }
