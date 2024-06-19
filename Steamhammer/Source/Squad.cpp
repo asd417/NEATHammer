@@ -130,7 +130,7 @@ void Squad::update()
     _microDetectors.go(_units);
 
     // High templar stay home until they merge to archons, all that's supported so far.
-    _microHighTemplar.update();
+    //_microHighTemplars.update();
 
     // Queens don't go into clusters, but act independently.
     _microQueens.update(_vanguard);
@@ -141,7 +141,6 @@ void Squad::update()
     {
         if (unit->getType().isDetector() ||
             unit->getType().spaceProvided() > 0 ||
-            unit->getType() == BWAPI::UnitTypes::Protoss_High_Templar ||
             unit->getType() == BWAPI::UnitTypes::Zerg_Queen)
         {
             // Don't cluster detectors, transports, high templar, queens.
@@ -298,12 +297,16 @@ void Squad::microSpecialUnits(const UnitCluster & cluster)
         {
             vanguard = _vanguard;									// squad vanguard
         }
-        
+        _microArbiter.updateMovement(cluster, vanguard);
+        _microHighTemplars.updateMovement(cluster, vanguard);
         _microDefilers.updateMovement(cluster, vanguard);
         _microMedics.update(cluster, vanguard);
     }
     else if (spellPhase == 2)
     {
+        _microArbiter.updateSpell(cluster);
+        _microCorsair.updateSpell(cluster);
+        _microHighTemplars.updateSpell(cluster);
         _microDefilers.updateSwarm(cluster);
     }
     else if (spellPhase == 4)
@@ -581,7 +584,7 @@ void Squad::setOrderForMicroManagers()
     _microMelee.setOrder(_order);
     _microRanged.setOrder(_order);
     _microDetectors.setOrder(_order);
-    _microHighTemplar.setOrder(_order);
+    _microHighTemplars.setOrder(_order);
     _microLurkers.setOrder(_order);
     _microMedics.setOrder(_order);
     //_microMutas.setOrder(_order);

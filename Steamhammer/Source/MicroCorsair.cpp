@@ -12,9 +12,9 @@ MicroCorsair::MicroCorsair()
 { 
 }
 
-void MicroCorsair::executeMicro(const BWAPI::Unitset & targets, const UnitCluster & cluster)
+void UAlbertaBot::MicroCorsair::executeMicro(const BWAPI::Unitset& targets, const UnitCluster& cluster)
 {
-    BWAPI::Unitset units = Intersection(getUnits(), cluster.units);
+    BWAPI::Unitset units = getUnits();
     if (units.empty())
     {
         return;
@@ -128,31 +128,30 @@ BWAPI::Unit MicroCorsair::getTarget(BWAPI::Unit airUnit, const BWAPI::Unitset & 
     return bestTarget;
 }
 
+int MicroCorsair::disruptionScore(BWAPI::Unit u) const
+{
+    if (u->getType().isFlyer()) return 0;
+    if (u->getType().airWeapon().targetsAir()) return 100;
+    if (u->getType().groundWeapon().maxRange()>32) return 40;
+    return 30;
+}
+
+bool MicroCorsair::aboutToDie(const BWAPI::Unit u) const
+{
+    return
+        // It has low hit points and somebody is shooting at it.
+        ((u->getHitPoints() < 30 || u->isPlagued()) && !the.info.getEnemyFireteam(u).empty()) ||
+
+        u->getShields() < 30 && u->getHitPoints() < 30 ||
+        // It is in a deadly situation.
+        u->isUnderStorm();
+}
+
 // get the attack priority of a target unit
 int MicroCorsair::getAttackPriority(BWAPI::Unit airUnit, BWAPI::Unit target)
 {
     const BWAPI::UnitType rangedType = airUnit->getType();
     const BWAPI::UnitType targetType = target->getType();
-
-    // Devourers are different from the others.
-    if (rangedType == BWAPI::UnitTypes::Zerg_Devourer)
-    {
-        if (targetType.isBuilding())
-        {
-            // A lifted building is less important.
-            return 1;
-        }
-        if (targetType == BWAPI::UnitTypes::Zerg_Scourge)
-        {
-            // Devourers are not good at attacking scourge.
-            return 9;
-        }
-
-        // Everything else is the same.
-        return 10;
-    }
-    
-    // The rest is for valkyries and corsairs.
 
     // Scourge are dangerous and are the worst.
     if (targetType == BWAPI::UnitTypes::Zerg_Scourge)
@@ -188,4 +187,101 @@ int MicroCorsair::getAttackPriority(BWAPI::Unit airUnit, BWAPI::Unit target)
 
     // Other air units are a little less important.
     return 7;
+}
+
+
+
+#define UNITTYPE BWAPI::UnitTypes::Protoss_Corsair
+#define SPELLTECHTYPE BWAPI::TechTypes::Disruption_Web
+#define CASTERSPELLTYPE CasterSpell::DisruptionWeb
+#define SCOREFUNCNAME disruptionScore
+#define SPELLENERGY 125
+#define SPELLRANGE 9
+#define SPELLRADIUS 2
+BWAPI::Unitset MicroCorsair::getCaster(const UnitCluster& cluster) const
+{
+    BWAPI::Unitset casterSet;
+    for (BWAPI::Unit unit : getUnits())
+    {
+        if (unit->getType() == UNITTYPE &&
+            cluster.units.contains(unit))
+        {
+            casterSet.insert(unit);
+        }
+    }
+    return casterSet;
+}
+
+bool MicroCorsair::maybeSpell(BWAPI::Unit templar)
+{
+    int limit = SPELLRANGE + SPELLRADIUS;
+
+    const bool dying = aboutToDie(templar);
+
+    // Don't bother to look for units to plague if no enemy is close enough.
+    BWAPI::Unit closest = BWAPI::Broodwar->getClosestUnit(templar->getPosition(),
+        BWAPI::Filter::IsEnemy && !BWAPI::Filter::IsStasised,
+        limit * 32);
+
+    if (!dying && !closest)
+    {
+        return false;
+    }
+
+    // Look for the box with the best effect.
+    int bestScore = 0;
+    BWAPI::Position bestPlace;
+    for (int tileX = std::max(2, templar->getTilePosition().x - limit); tileX <= std::min(BWAPI::Broodwar->mapWidth() - 3, templar->getTilePosition().x + limit); ++tileX)
+    {
+        for (int tileY = std::max(2, templar->getTilePosition().y - limit); tileY <= std::min(BWAPI::Broodwar->mapHeight() - 3, templar->getTilePosition().y + limit); ++tileY)
+        {
+            int score = 0;
+            BWAPI::Position place(BWAPI::TilePosition(tileX, tileY));
+            const BWAPI::Position offset(SPELLRADIUS * 32, SPELLRADIUS * 32);
+            BWAPI::Unitset affected = BWAPI::Broodwar->getUnitsInRectangle(place - offset, place + offset);
+            for (BWAPI::Unit u : affected)
+            {
+                if (u->getPlayer() == BWAPI::Broodwar->self())
+                {
+                    score -= SCOREFUNCNAME(u);
+                }
+                else if (u->getPlayer() == BWAPI::Broodwar->enemy())
+                {
+                    score += SCOREFUNCNAME(u);
+                }
+            }
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestPlace = place;
+            }
+        }
+    }
+    if (bestScore > 100 || dying && bestScore > 0)
+    {
+        setReadyToCast(templar, CASTERSPELLTYPE);
+        return spell(templar, SPELLTECHTYPE, bestPlace);
+    }
+    return false;
+}
+void MicroCorsair::updateSpell(const UnitCluster& cluster)
+{
+    BWAPI::Unitset casters = getCaster(cluster);
+    if (casters.empty()) return;
+    updateCasters(casters);
+
+    for (BWAPI::Unit caster : casters)
+    {
+        if (caster->getEnergy() >= SPELLENERGY &&
+            BWAPI::Broodwar->self()->hasResearched(SPELLTECHTYPE) &&
+            caster->canUseTech(SPELLTECHTYPE, caster->getPosition()) &&
+            !isReadyToCastOtherThan(caster, CASTERSPELLTYPE))
+        {
+            if (!maybeSpell(caster) && isReadyToCast(caster))
+            {
+                clearReadyToCast(caster);
+                return;     // only one defiler may cast per call, to reduce duplication
+            }
+        }
+    }
 }

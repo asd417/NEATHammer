@@ -4,87 +4,94 @@
 
 namespace UAlbertaBot
 {
-class UnitCluster;
+    class UnitCluster;
 
-enum class CasterSpell
-    { None
-    , Parasite
-    , Ensnare
-    , Broodling
-    , DarkSwarm
-    , Plague
+    enum class CasterSpell
+        { None
+        //Protoss
+        , DisruptionWeb
+        , PsionicStorm
+        , StasisField
+        , MaelStrom
+        , Feedback
+        //Zerg
+        , Parasite
+        , Ensnare
+        , Broodling
+        , DarkSwarm
+        , Plague
+        };
+
+    // Used by some micro managers to keep track of what spell casters are intending.
+    // It prevents other operations from interrupting.
+    class CasterState
+    {
+    private:
+
+        CasterSpell spell;		// preparing to cast, don't interrupt
+        int lastEnergy;
+        int lastCastFrame;		// prevent double casting on the same target
+
+        static const int framesBetweenCasts = 24;
+
+    public:
+
+        CasterState();
+        CasterState(BWAPI::Unit caster);
+
+        void update(BWAPI::Unit caster);
+
+        CasterSpell getSpell() const	{ return spell; };
+        void setSpell(CasterSpell s)	{ spell = s; };
+        bool waitToCast() const;
     };
 
-// Used by some micro managers to keep track of what spell casters are intending.
-// It prevents other operations from interrupting.
-class CasterState
-{
-private:
+    class MicroManager
+    {
+        BWAPI::Unitset						_units;
+        std::map<BWAPI::Unit, CasterState>	_casterState;
 
-    CasterSpell spell;		// preparing to cast, don't interrupt
-    int lastEnergy;
-    int lastCastFrame;		// prevent double casting on the same target
+    protected:
 
-    static const int framesBetweenCasts = 24;
+        virtual void	executeMicro(const BWAPI::Unitset & targets, const UnitCluster & cluster) = 0;
+        int             getBackstopAttackPriority(BWAPI::Unit target) const;
 
-public:
+        void			destroyNeutralTargets(const BWAPI::Unitset & targets);
+        bool            checkPositionWalkable(BWAPI::Position pos);
+        bool            unitNearEnemy(BWAPI::Unit unit);
+        bool            unitNearChokepoint(BWAPI::Unit unit) const;
 
-    CasterState();
-    CasterState(BWAPI::Unit caster);
+        bool			dodgeMine(BWAPI::Unit u) const;
 
-    void update(BWAPI::Unit caster);
+        void			useShieldBattery(BWAPI::Unit unit, BWAPI::Unit shieldBattery);
+        bool			spell(BWAPI::Unit caster, BWAPI::TechType techType, BWAPI::Position target) const;
+        bool			spell(BWAPI::Unit caster, BWAPI::TechType techType, BWAPI::Unit target) const;
 
-    CasterSpell getSpell() const	{ return spell; };
-    void setSpell(CasterSpell s)	{ spell = s; };
-    bool waitToCast() const;
-};
+        void			setReadyToCast(BWAPI::Unit caster, CasterSpell spell);
+        void            clearReadyToCast(BWAPI::Unit caster);
+        bool			isReadyToCast(BWAPI::Unit caster);
+        bool			isReadyToCastOtherThan(BWAPI::Unit caster, CasterSpell spellToAvoid);
+        void			updateCasters(const BWAPI::Unitset & casters);
 
-class MicroManager
-{
-    BWAPI::Unitset						_units;
-    std::map<BWAPI::Unit, CasterState>	_casterState;
+        bool            infestable(BWAPI::Unit target) const;
 
-protected:
+        void			drawOrderText();
 
-    virtual void	executeMicro(const BWAPI::Unitset & targets, const UnitCluster & cluster) = 0;
-    int             getBackstopAttackPriority(BWAPI::Unit target) const;
+    public:
+        const SquadOrder *  order;      // always set before use, may change often
 
-    void			destroyNeutralTargets(const BWAPI::Unitset & targets);
-    bool            checkPositionWalkable(BWAPI::Position pos);
-    bool            unitNearEnemy(BWAPI::Unit unit);
-    bool            unitNearChokepoint(BWAPI::Unit unit) const;
+                            MicroManager();
+        virtual				~MicroManager(){}
 
-    bool			dodgeMine(BWAPI::Unit u) const;
+        const BWAPI::Unitset & getUnits() const;
+        bool				containsType(BWAPI::UnitType type) const;
 
-    void			useShieldBattery(BWAPI::Unit unit, BWAPI::Unit shieldBattery);
-    bool			spell(BWAPI::Unit caster, BWAPI::TechType techType, BWAPI::Position target) const;
-    bool			spell(BWAPI::Unit caster, BWAPI::TechType techType, BWAPI::Unit target) const;
+        void				setUnits(const BWAPI::Unitset & u);
+        void				setOrder(const SquadOrder & inputOrder);
+        void				execute(const UnitCluster & cluster);
+        void				regroup(const BWAPI::Position & regroupPosition, const UnitCluster & cluster) const;
 
-    void			setReadyToCast(BWAPI::Unit caster, CasterSpell spell);
-    void            clearReadyToCast(BWAPI::Unit caster);
-    bool			isReadyToCast(BWAPI::Unit caster);
-    bool			isReadyToCastOtherThan(BWAPI::Unit caster, CasterSpell spellToAvoid);
-    void			updateCasters(const BWAPI::Unitset & casters);
+        bool                anyUnderThreat(const BWAPI::Unitset & units) const;
 
-    bool            infestable(BWAPI::Unit target) const;
-
-    void			drawOrderText();
-
-public:
-    const SquadOrder *  order;      // always set before use, may change often
-
-                        MicroManager();
-    virtual				~MicroManager(){}
-
-    const BWAPI::Unitset & getUnits() const;
-    bool				containsType(BWAPI::UnitType type) const;
-
-    void				setUnits(const BWAPI::Unitset & u);
-    void				setOrder(const SquadOrder & inputOrder);
-    void				execute(const UnitCluster & cluster);
-    void				regroup(const BWAPI::Position & regroupPosition, const UnitCluster & cluster) const;
-
-    bool                anyUnderThreat(const BWAPI::Unitset & units) const;
-
-};
+    };
 }

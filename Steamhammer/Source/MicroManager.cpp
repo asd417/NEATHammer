@@ -559,8 +559,15 @@ void MicroManager::useShieldBattery(BWAPI::Unit unit, BWAPI::Unit shieldBattery)
     }
 }
 
-// The decision is made. Move closer if necessary, then cast the spell.
-// The target is a map position.
+/// <summary>
+/// The decision is made. Move closer if necessary, then cast the spell.
+/// The target is a map position.
+/// Archon and Dark Archon merge is not done through this call
+/// </summary>
+/// <param name="caster"></param>
+/// <param name="techType"></param>
+/// <param name="target"></param>
+/// <returns></returns>
 bool MicroManager::spell(BWAPI::Unit caster, BWAPI::TechType techType, BWAPI::Position target) const
 {
     UAB_ASSERT(techType.targetsPosition() && target.isValid(), "can't target that");

@@ -153,7 +153,6 @@
     <ClCompile Include="..\Source\GameRecord.cpp" />
     <ClCompile Include="..\Source\OpponentModel.cpp" />
     <ClCompile Include="..\Source\PlayerSnapshot.cpp" />
-    <ClCompile Include="..\Source\MicroAirToAir.cpp" />
     <ClCompile Include="..\Source\OpponentPlan.cpp" />
     <ClCompile Include="..\Source\Bases.cpp" />
     <ClCompile Include="..\Source\ProductionGoal.cpp" />
@@ -213,6 +212,9 @@
     </ClCompile>
     <ClCompile Include="..\Source\MicroCorsair.cpp">
       <Filter>Micro\Protoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroAirToAir.cpp">
+      <Filter>Micro</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -326,7 +328,6 @@
     <ClInclude Include="..\Source\GameRecord.h" />
     <ClInclude Include="..\Source\OpponentModel.h" />
     <ClInclude Include="..\Source\PlayerSnapshot.h" />
-    <ClInclude Include="..\Source\MicroAirToAir.h" />
     <ClInclude Include="..\Source\OpponentPlan.h" />
     <ClInclude Include="..\Source\Bases.h" />
     <ClInclude Include="..\Source\ProductionGoal.h" />
@@ -384,6 +385,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\MicroCorsair.h">
       <Filter>Micro\Protoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroAirToAir.h">
+      <Filter>Micro</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1415,6 +1415,40 @@ bool Micro::UseTech(BWAPI::Unit unit, BWAPI::TechType tech, const BWAPI::Positio
     }
 
     BWAPI::Order o;
+
+    if (tech == BWAPI::TechTypes::Recall)
+    {
+
+    }
+    if (tech == BWAPI::TechTypes::Stasis_Field)
+    {
+
+    }
+    if (tech == BWAPI::TechTypes::Disruption_Web)
+    {
+
+    }
+    if (tech == BWAPI::TechTypes::Feedback)
+    {
+
+    }
+    if (tech == BWAPI::TechTypes::Mind_Control)
+    {
+
+    }
+    if (tech == BWAPI::TechTypes::Maelstrom)
+    {
+
+    }
+    if (tech == BWAPI::TechTypes::Psionic_Storm)
+    {
+
+    }
+    if (tech == BWAPI::TechTypes::Hallucination)
+    {
+
+    }
+
     if (tech == BWAPI::TechTypes::Ensnare)
     {
         o = BWAPI::Orders::CastEnsnare;
@@ -1430,7 +1464,7 @@ bool Micro::UseTech(BWAPI::Unit unit, BWAPI::TechType tech, const BWAPI::Positio
     else
     {
         o = BWAPI::Orders::UnusedNothing;
-        UAB_ASSERT(false, "unsupported tech");
+        UAB_ASSERT(false, "unsupported tech. Add more in micro.cpp");
     }
     orders[unit].setOrder(unit, o);
 

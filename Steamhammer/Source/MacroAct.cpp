@@ -849,22 +849,42 @@ void MacroAct::produce(BWAPI::Unit producer) const
     // A non-building unit, or a morphed zerg building.
     else if (isUnit())
     {
+        //Produce Archon
         if (getUnitType() == BWAPI::UnitTypes::Protoss_Archon)
         {
             //Searches 5 tile radius
             BWAPI::Unitset htNearBy = BWAPI::Broodwar->getUnitsInRadius({ _tileLocation.x * 32, _tileLocation.y * 32 }, 5 * 32, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_High_Templar);
+            
             if (htNearBy.size() >= 2) {
-                htNearBy.
-                useTech(TechType tech, Unit * target);
+                int i = 0;
+                BWAPI::Unit left, right;
+                for (BWAPI::Unit u : htNearBy)
+                {
+                    if (i == 0) left = u;
+                    if (i == 1) right = u;
+                    i++;
+                    if (i == 2) break;
+                }
+                the.micro.MergeArchon(left,right);
             }
             return;
         }
+        //Produce Dark Archon
         if (getUnitType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
         {
             //Searches 5 tile radius
-            BWAPI::Unitset htNearBy = BWAPI::Broodwar->getUnitsInRadius({ _tileLocation.x * 32, _tileLocation.y * 32 }, 5 * 32, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_Dark_Templar);
-            if (htNearBy.size() >= 2) {
-
+            BWAPI::Unitset dtNearBy = BWAPI::Broodwar->getUnitsInRadius({ _tileLocation.x * 32, _tileLocation.y * 32 }, 5 * 32, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_Dark_Templar);
+            if (dtNearBy.size() >= 2) {
+                int i = 0;
+                BWAPI::Unit left, right;
+                for (BWAPI::Unit u : dtNearBy)
+                {
+                    if (i == 0) left = u;
+                    if (i == 1) right = u;
+                    i++;
+                    if (i == 2) break;
+                }
+                the.micro.MergeArchon(left, right);
             }
             return;
         }

@@ -1,5 +1,5 @@
 #include "MicroManager.h"
-#include "MicroHighTemplar.h"
+#include "MicroDarkArchon.h"
 
 #include "Bases.h"
 #include "The.h"
@@ -7,92 +7,200 @@
 
 using namespace UAlbertaBot;
 
-// For now, all this does is immediately merge high templar into archons.
+#define UNITTYPE BWAPI::UnitTypes::Protoss_Dark_Archon
+#define SPELL1TECHTYPE BWAPI::TechTypes::Maelstrom
+#define SPELL2TECHTYPE BWAPI::TechTypes::Feedback
 
-MicroHighTemplar::MicroHighTemplar()
-{ 
-}
+#define CASTERSPELLTYPE1 CasterSpell::MaelStrom
+#define CASTERSPELLTYPE2 CasterSpell::Feedback
 
-void MicroHighTemplar::executeMicro(const BWAPI::Unitset & targets, const UnitCluster & cluster)
+#define MAELSTROMENERGY 100
+#define FEEDBACKENERGY 50
+#define SPELLRANGE 10
+#define SPELLRADIUS 1
+
+void MicroDarkArchon::updateMovement(const UnitCluster& cluster, BWAPI::Unit vanguard)
 {
-}
-
-void MicroHighTemplar::update()
-{
-    if (getUnits().size() < 2)
+    // Collect the defilers and update their states.
+    BWAPI::Unitset templars = getCaster(cluster);
+    if (templars.empty())
     {
-        // Takes 2 high templar to merge one archon.
         return;
     }
+    updateCasters(templars);
 
-    // No base should be tight against an edge, so this position should always be reachable.
-    const BWAPI::Position gatherPoint =
-        the.bases.myMain()->getPosition() - BWAPI::Position(32, 32);
-    UAB_ASSERT(gatherPoint.isValid(), "bad gather point");
-
-    BWAPI::Unitset mergeGroup;
-
-    for (const auto templar : getUnits())
+    // Control the defilers.
+    for (BWAPI::Unit templar : templars)
     {
-        const int framesSinceCommand = BWAPI::Broodwar->getFrameCount() - templar->getLastCommandFrame();
-        const bool longEnough = framesSinceCommand >= 12;
+        bool canMove = !isReadyToCast(templar);
 
-        if (templar->getLastCommand().getType() == BWAPI::UnitCommandTypes::Use_Tech_Unit && !longEnough)
+        if (canMove)
         {
-            // Wait. There's latency before the command takes effect.
-        }
-        else if (templar->getOrder() == BWAPI::Orders::ArchonWarp && framesSinceCommand > 5 * 24)
-        {
-            // The merge has been going on too long. It may be stuck. Stop and try again.
-            the.micro.Move(templar, gatherPoint);
-        }
-        else if (templar->getLastCommand().getType() == BWAPI::UnitCommandTypes::Use_Tech_Unit && !longEnough)
-        {
-            // Keep waiting.
-        }
-        else if (templar->getOrder() == BWAPI::Orders::PlayerGuard)
-        {
-            mergeGroup.insert(templar);
-        }
-        else if (templar->getOrder() != BWAPI::Orders::ArchonWarp)
-        {
-            if (templar->getDistance(gatherPoint) >= 3 * 32)
+            BWAPI::Position destination;
+
+            // Figure out where the templar should move to.
+            if (vanguard)
             {
-                // Join up before trying to merge.
-                the.micro.Move(templar, gatherPoint);
+                if ((templar->getEnergy() < MAELSTROMENERGY || templar->getEnergy() < FEEDBACKENERGY)&& cluster.size() > getUnits().size())
+                {
+                    destination = cluster.center;
+                }
+                else
+                {
+                    destination = vanguard->getPosition();
+                }
             }
             else
             {
-                the.micro.Stop(templar);
+                // Default destination if all else fails: The front defense line.
+                destination = the.bases.front();
+            }
+
+            if (destination.isValid())
+            {
+                // BWAPI::Broodwar->printf("defiler %d at %d,%d will move near %d,%d",
+                //	defiler->getID(), defiler->getPosition().x, defiler->getPosition().y, destination.x, destination.y);
+                the.micro.MoveNear(templar, destination);
             }
         }
     }
+}
 
-    // We will merge 1 pair per call, the pair closest together.
-    int closestDist = MAX_DISTANCE;
-    BWAPI::Unit closest1 = nullptr;
-    BWAPI::Unit closest2 = nullptr;
+int MicroDarkArchon::maelstromScore(BWAPI::Unit u) const
+{
+    if (!u->getType().isOrganic() || u->isBurrowed()) return 0;
+    return 100;
+}
 
-    for (const auto ht1 : mergeGroup)
+int MicroDarkArchon::feedbackScore(BWAPI::Unit u) const
+{
+    if (u->isStasised() || u->getType() == BWAPI::UnitTypes::Zerg_Broodling) return 0;
+    return u->getEnergy();
+}
+
+// The defiler is probably about to die. It should cast immediately if it is ever going to.
+bool MicroDarkArchon::aboutToDie(const BWAPI::Unit templar) const
+{
+    return templar->getShields() < 30;
+}
+
+void UAlbertaBot::MicroDarkArchon::executeMicro(const BWAPI::Unitset& targets, const UnitCluster& cluster)
+{
+}
+
+UAlbertaBot::MicroDarkArchon::MicroDarkArchon()
+{
+}
+BWAPI::Unitset MicroDarkArchon::getCaster(const UnitCluster& cluster) const
+{
+    BWAPI::Unitset casterSet;
+    for (BWAPI::Unit unit : getUnits())
     {
-        for (const auto ht2 : mergeGroup)
+        if (unit->getType() == UNITTYPE &&
+            cluster.units.contains(unit))
         {
-            if (ht2 == ht1)    // loop through all ht2 until we reach ht1
+            casterSet.insert(unit);
+        }
+    }
+    return casterSet;
+}
+
+bool MicroDarkArchon::maybeSpell(BWAPI::Unit templar)
+{
+    int limit = SPELLRANGE + SPELLRADIUS;
+
+    const bool dying = aboutToDie(templar);
+
+    // Don't bother to look for units to plague if no enemy is close enough.
+    BWAPI::Unit closest = BWAPI::Broodwar->getClosestUnit(templar->getPosition(),
+        BWAPI::Filter::IsEnemy && !BWAPI::Filter::IsOrganic,
+        limit * 32);
+
+    if (!dying && !closest)
+    {
+        return false;
+    }
+
+    // Look for the box with the best effect.
+    int bestMaelstromScore = 0;
+    BWAPI::Position bestMaelstromPlace;
+
+    int bestFeedBackScore = 0;
+    BWAPI::Unit bestFeedbackTarget;
+
+    for (int tileX = std::max(2, templar->getTilePosition().x - limit); tileX <= std::min(BWAPI::Broodwar->mapWidth() - 3, templar->getTilePosition().x + limit); ++tileX)
+    {
+        for (int tileY = std::max(2, templar->getTilePosition().y - limit); tileY <= std::min(BWAPI::Broodwar->mapHeight() - 3, templar->getTilePosition().y + limit); ++tileY)
+        {
+            int m_score = 0;
+            int f_score = 0;
+            BWAPI::Position place(BWAPI::TilePosition(tileX, tileY));
+            const BWAPI::Position offset(SPELLRADIUS * 32, SPELLRADIUS * 32);
+            BWAPI::Unitset affected = BWAPI::Broodwar->getUnitsInRectangle(place - offset, place + offset);
+            for (BWAPI::Unit u : affected)
             {
-                break;
+                if (u->getPlayer() == BWAPI::Broodwar->self())
+                {
+                    m_score -= maelstromScore(u);
+                }
+                else if (u->getPlayer() == BWAPI::Broodwar->enemy())
+                {
+                    m_score += maelstromScore(u);
+                }
+                if (feedbackScore(u) > bestFeedBackScore)
+                {
+                    bestFeedBackScore = f_score;
+                    bestFeedbackTarget = u;
+                }
             }
-            int dist = ht1->getDistance(ht2);
-            if (dist < closestDist)
+            if (m_score > bestMaelstromScore)
             {
-                closestDist = dist;
-                closest1 = ht1;
-                closest2 = ht2;
+                bestMaelstromScore = m_score;
+                bestMaelstromPlace = place;
             }
         }
     }
-
-    if (closest1)
+    if (bestFeedBackScore > bestMaelstromScore && bestFeedBackScore > 20)
     {
-        (void) the.micro.MergeArchon(closest1, closest2);
+        setReadyToCast(templar, CasterSpell::Feedback);
+        return spell(templar, BWAPI::TechTypes::Feedback, bestFeedbackTarget);
+    }
+    else if (bestMaelstromScore > 100 || dying && bestMaelstromScore > 0)
+    {
+        setReadyToCast(templar, CasterSpell::MaelStrom);
+        return spell(templar, BWAPI::TechTypes::Maelstrom, bestMaelstromPlace);
+    }
+    return false;
+}
+void MicroDarkArchon::updateSpell(const UnitCluster& cluster)
+{
+    BWAPI::Unitset casters = getCaster(cluster);
+    if (casters.empty()) return;
+    updateCasters(casters);
+
+    for (BWAPI::Unit caster : casters)
+    {
+        if (caster->getEnergy() >= MAELSTROMENERGY &&
+            BWAPI::Broodwar->self()->hasResearched(SPELL1TECHTYPE) &&
+            caster->canUseTech(SPELL1TECHTYPE, caster->getPosition()) &&
+            !isReadyToCastOtherThan(caster, CASTERSPELLTYPE1))
+        {
+            if (!maybeSpell(caster) && isReadyToCast(caster))
+            {
+                clearReadyToCast(caster);
+                return;     // only one defiler may cast per call, to reduce duplication
+            }
+        }
+
+        if (caster->getEnergy() >= FEEDBACKENERGY &&
+            caster->canUseTech(SPELL2TECHTYPE, caster->getPosition()) &&
+            !isReadyToCastOtherThan(caster, CASTERSPELLTYPE2))
+        {
+            if (!maybeSpell(caster) && isReadyToCast(caster))
+            {
+                clearReadyToCast(caster);
+                return;     // only one defiler may cast per call, to reduce duplication
+            }
+        }
     }
 }
