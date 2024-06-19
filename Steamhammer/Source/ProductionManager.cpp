@@ -178,7 +178,6 @@ void ProductionManager::manageBuildOrderQueue()
             // construct a temporary building object
             Building b(currentItem.macroAct.getUnitType(), the.placer.getMacroLocationTile(currentItem.macroAct.getMacroLocation()));
             b.macroLocation = currentItem.macroAct.getMacroLocation();
-            b.isGasSteal = currentItem.isGasSteal;
 
             // predict the worker movement to that building location
             // NOTE If the worker is set moving, this sets flag _movingToThisBuildingLocation = true
@@ -644,14 +643,6 @@ void ProductionManager::executeCommand(const MacroAct & act)
         orderType = orderType < 0 ? 0 : orderType;
         orderType = orderType > 9 ? 9 : orderType;
         CombatCommander::Instance().NEAT_SetSquadOrder((SquadOrderTypes)orderType, squadIndex, { act.getTileLocation().x, act.getTileLocation().y });
-    }
-    else if (cmd == MacroCommandType::QueueBarrier)
-    {
-        // It does nothing! Every command is a queue barrier.
-    }
-    else
-    {
-        //UAB_ASSERT(false, "unknown MacroCommand");
     }
 }
 

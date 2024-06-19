@@ -58,7 +58,12 @@ class Squad
     MicroRanged			_microRanged;
     MicroDefilers		_microDefilers;
     MicroDetectors		_microDetectors;
+
+    //Protoss
     MicroHighTemplar	_microHighTemplar;
+    MicroCorsair        _microCorsair;
+    MicroDarkArchon     _microDarkArchon;
+
     MicroLurkers		_microLurkers;
     MicroMedics			_microMedics;
     //MicroMutas          _microMutas;

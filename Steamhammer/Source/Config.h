@@ -56,12 +56,21 @@ namespace Config
     namespace Strategy
     {
         extern bool Crazyhammer;
-        extern std::string StrategyName;
         extern bool UsePlanRecognizer;
-        extern bool UseEnemySpecificStrategy;
-        extern bool FoundEnemySpecificStrategy;
     }
-
+    namespace NEAT
+    {
+        extern bool Train;
+        extern std::string TrainingServerIP;
+        extern bool LoadNetworkFromJSON;
+        extern std::string NetworkJSON;
+        extern int WinScore;
+        extern int EnemyShowScore;
+        extern int FitnessScore_Mineral_Divider;
+        extern int FitnessScore_Gas_Divider;
+        extern int SubtractFitnessScore;
+        extern bool AutoSurrender;
+    }
     namespace BWAPIOptions
     {
         extern int SetLocalSpeed;

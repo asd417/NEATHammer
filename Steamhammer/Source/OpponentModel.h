@@ -77,8 +77,6 @@ namespace UAlbertaBot
 
     public:
         OpponentModel();
-
-        void setOpening() { _gameRecord.setOpening(Config::Strategy::StrategyName); };
         void setWin(bool isWinner) { _gameRecord.setWin(isWinner); };
 
         void read();

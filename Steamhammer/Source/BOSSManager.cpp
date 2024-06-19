@@ -108,6 +108,8 @@ void BOSSManager::drawSearchInformation(int x, int y)
 // tell the search to keep going for however long we have this frame
 void BOSSManager::update(double timeLimit)
 {
+    //Completely disabling BOSSManager
+    return;
     // if there's a search in progress, resume it
     if (isSearchInProgress())
     {

@@ -161,17 +161,7 @@ void GameCommander::drawGameInformation(int x, int y)
     y += 12;
     
     const std::string & openingGroup = StrategyManager::Instance().getOpeningGroup();
-    const auto openingInfoIt = summary.openingInfo.find(Config::Strategy::StrategyName);
-    const int wins = openingInfoIt == summary.openingInfo.end() ? 0 : openingInfoIt->second.sameWins + openingInfoIt->second.otherWins;
-    const int games = openingInfoIt == summary.openingInfo.end() ? 0 : openingInfoIt->second.sameGames + openingInfoIt->second.otherGames;
-    bool gasSteal = ScoutManager::Instance().wantGasSteal();
-    BWAPI::Broodwar->drawTextScreen(x, y, "\x03%s%s%s%s %c%d-%d",
-        Config::Strategy::StrategyName.c_str(),
-        openingGroup != "" ? (" (" + openingGroup + ")").c_str() : "",
-        gasSteal ? " + steal gas" : "",
-        Config::Strategy::FoundEnemySpecificStrategy ? " - enemy specific" : "",
-        white, wins, games - wins);
-    BWAPI::Broodwar->setTextSize();
+
     y += 12;
 
     std::string expect;

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>Steamhammer</ProjectName>
+    <ProjectName>NEATHammer</ProjectName>
     <ProjectGuid>{2E63AE74-758A-4607-9DE4-D28E814A6E13}</ProjectGuid>
     <RootNamespace>ExampleAIModule</RootNamespace>
     <Keyword>Win32Proj</Keyword>
@@ -158,6 +158,9 @@
     <ClCompile Include="..\Source\MapPartitions.cpp" />
     <ClCompile Include="..\Source\MapTools.cpp" />
     <ClCompile Include="..\Source\MicroAirToAir.cpp" />
+    <ClCompile Include="..\Source\MicroArbiter.cpp" />
+    <ClCompile Include="..\Source\MicroCorsair.cpp" />
+    <ClCompile Include="..\Source\MicroDarkArchon.cpp" />
     <ClCompile Include="..\Source\MicroDefilers.cpp" />
     <ClCompile Include="..\Source\MicroDetectors.cpp" />
     <ClCompile Include="..\Source\MicroHighTemplar.cpp" />
@@ -250,6 +253,9 @@
     <ClInclude Include="..\Source\MapPartitions.h" />
     <ClInclude Include="..\Source\MapTools.h" />
     <ClInclude Include="..\Source\MicroAirToAir.h" />
+    <ClInclude Include="..\Source\MicroArbiter.h" />
+    <ClInclude Include="..\Source\MicroCorsair.h" />
+    <ClInclude Include="..\Source\MicroDarkArchon.h" />
     <ClInclude Include="..\Source\MicroDefilers.h" />
     <ClInclude Include="..\Source\MicroDetectors.h" />
     <ClInclude Include="..\Source\MicroHighTemplar.h" />

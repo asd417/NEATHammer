@@ -47,8 +47,8 @@ class MacroAct
     MacroCommand		_macroCommandType;
     BWAPI::Unit         _parent;
 
-    MacroLocation		_macroLocation;
-    BWAPI::TilePosition _tileLocation;      // only set when macroLocation is Tile
+    MacroLocation		_macroLocation;     //Rarely if not never used by NEATCommander
+    BWAPI::TilePosition _tileLocation;      // Used widely by NEATCommander
 
     void                initializeUnitTypesByName();
     MacroLocation		getMacroLocationFromString(const std::string & s) const;

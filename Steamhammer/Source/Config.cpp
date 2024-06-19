@@ -12,7 +12,7 @@ namespace Config
     {
         bool ConfigFileFound                = false;
         bool ConfigFileParsed               = false;
-        std::string ConfigFileLocation      = "NEATHammer.json";
+        std::string ConfigFileLocation      = "bwapi-data/AI/NEATHammer.json";
     }
 
     namespace IO
@@ -51,20 +51,28 @@ namespace Config
     namespace Strategy
     {
         bool Crazyhammer                    = false;
-        std::string ProtossStrategyName     = "1ZealotCore";			// default
-        std::string TerranStrategyName      = "11Rax";					// default
-        std::string ZergStrategyName        = "9PoolSpeed";				// default
-        std::string StrategyName            = "9PoolSpeed";
-        bool UsePlanRecognizer				= true;
-        bool UseEnemySpecificStrategy       = true;
-        bool FoundEnemySpecificStrategy     = false;
+        bool UsePlanRecognizer				= false;
+    }
+
+    namespace NEAT
+    {
+        bool Train = true;
+        std::string TrainingServerIP = "http://127.0.0.1:5000";
+        bool LoadNetworkFromJSON = false;
+        std::string NetworkJSON = "";
+        int WinScore = 1000;
+        int EnemyShowScore = 100;
+        int FitnessScore_Mineral_Divider = 100;
+        int FitnessScore_Gas_Divider = 100;
+        int SubtractFitnessScore = 1600;
+        bool AutoSurrender = true;
     }
 
     namespace BotInfo
     {
-        std::string BotName                 = "Steamhammer";
-        std::string Authors                 = "Jay Scott";
-        bool PrintInfoOnStart               = false;
+        std::string BotName                 = "NEATHammer";
+        std::string Authors                 = "Yeonghun Lee";
+        bool PrintInfoOnStart               = true;
     }
 
     namespace BWAPIOptions

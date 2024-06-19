@@ -64,10 +64,8 @@ public:
     static	StrategyManager &	    Instance();
 
             void                    addStrategy(const std::string & name, Strategy & strategy);
-            void					setOpeningGroup();
     const	std::string &			getOpeningGroup() const;
     const	MetaPairVector		    getBuildOrderGoal();
-    const	BuildOrder &            getOpeningBookBuildOrder() const;
 
             void					handleUrgentProductionIssues(BuildOrderQueue & queue);
             void					freshProductionPlan();

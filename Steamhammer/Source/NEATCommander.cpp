@@ -1,16 +1,14 @@
 #include "NEATCommander.h"
+#include "Config.h"
 #include "MacroAct.h"
 #include "The.h"
+#include <windows.h> 
 
 namespace UAlbertaBot
 {
     NEATCommander& NEATCommander::Instance()
     {
         static NEATCommander instance;
-        if (instance.network == nullptr) 
-        { 
-            instance.InitializeNetwork(); 
-        }
         
         return instance;
     }
@@ -23,6 +21,8 @@ namespace UAlbertaBot
         int dividedWidth = mapWidth / 32; //get 8
         int dividedHeight = mapHeight / 32;
 
+        fitness = -Config::NEAT::SubtractFitnessScore;
+
         //Get number of sections in the map
         maxSections = dividedWidth * dividedHeight;
         for (int i = 0; i < dividedWidth; i++)
@@ -32,6 +32,7 @@ namespace UAlbertaBot
                 sectionsCoords.push_back({ i * 32, j * 32 });
             }
         }
+        InitializeNetwork();
     }
     void NEATCommander::update()
     {
@@ -48,6 +49,16 @@ namespace UAlbertaBot
     void NEATCommander::incrementFrame()
     {
         frame++;
+        if (frame > 30000)
+        {
+            if (BWAPI::Broodwar->self()->supplyTotal() < 10 && Config::NEAT::AutoSurrender)
+            {
+                //16 mins into game and less than 10 max supply -> enemy bot probably bugged out
+                //surrender
+                //GameMessage("gg");
+                BWAPI::Broodwar->leaveGame();
+            }
+        }
     }
     double NEATCommander::getFitness()
     {
@@ -55,29 +66,36 @@ namespace UAlbertaBot
     }
     void NEATCommander::scoreFitness(double add)
     {
-        //if(add > 0.0f) std::cout << "Scored " << std::to_string(add) << "! Total: " << std::to_string(fitness) << "\n";
+
+        //UAB_ASSERT(add > 100.0f, "Large Fitness Gain: %s", std::to_string(add).c_str());
         fitness += add;
     }
     void NEATCommander::sendFitnessToTrainServer()
     {
-        DBKeySpace dbkeys{};
-        dbkeys.push_back("Fitness");
+        if (Config::NEAT::Train)
+        {
+            std::cout << "Genome ID " << genomeID << " ";
+            std::cout << "Fitness Calculated: " << fitness << "\n";
+            DBKeySpace dbkeys{};
+            dbkeys.push_back("Fitness");
 
-        DBConnector db{ "http://127.0.0.1:5000", dbkeys };
+            DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys };
 
-        try {
-            db.addToData("Fitness", fitness);
+            try {
+                db.addToData("Fitness", fitness);
 
-            std::string url = "/genome/" + std::to_string(genomeID) + "/fitness";
-            std::cout << url << "\n";
-            db.sendData(url.c_str());
-        }
-        catch (std::exception e) {
-            std::cout << "Error while sending fitness value to the training server: " << e.what() << "\n";
+                std::string url = "/genome/" + std::to_string(genomeID) + "/fitness";
+                std::cout << url << "\n";
+                db.sendData(url.c_str());
+            }
+            catch (std::exception e) {
+                std::cout << "Error while sending fitness value to the training server: " << e.what() << "\n";
+            }
         }
     }
     void NEATCommander::evaluate()
     {
+        if (!network) return;
         inputVector.clear();
         
         getVisibleMap(curSection);
@@ -95,8 +113,8 @@ namespace UAlbertaBot
         lastMineral = min;
         lastGas = gas;
 
-        scoreFitness(deltaMineral / 100.0f);
-        scoreFitness(deltaGas / 100.0f);
+        scoreFitness(deltaMineral / Config::NEAT::FitnessScore_Gas_Divider);
+        scoreFitness(deltaGas / Config::NEAT::FitnessScore_Gas_Divider);
 
         int ctime = frame;
         int sectionCoordW = sectionsCoords[curSection][0];
@@ -196,39 +214,51 @@ namespace UAlbertaBot
 
     void NEATCommander::InitializeNetwork()
     {
-        json r{};
-        DBKeySpace dbkeys{};
-        dbkeys.push_back("Fitness");
-        DBConnector db{ "http://127.0.0.1:5000", dbkeys };
-        bool res = db.getData("/genome", r);
-        int id = -1;
-        try {
-            //network
-            id = r[0]["id"];
-            std::cout << id << std::endl;
+        if (!Config::NEAT::LoadNetworkFromJSON)
+        {
+            bool retry = true;
+            int id = -1;
+            json r{};
+            while (retry) {
+                DBKeySpace dbkeys{};
+                dbkeys.push_back("Fitness");
+                DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys};
+                bool res = db.getData("/genome", r);
+                try {
+                    //network
+                    id = r[0]["id"];
+                    std::cout << id << std::endl;
 
-            if (id == -1 || !res) throw std::exception("id is -1");
-        }
-        catch (std::exception e) {
-            std::cout << "Error while retrieving new genome to evaluate: " << e.what() << "\n";
-            std::cout << "TODO: Attempt to retrieve network from text file\n";
-        }
-        
-        std::cout << "Creating Network Structure" << id << "\n";
-
-        try {
-            json networkJson = json::parse(std::string(r[0]["Network"]));
-            network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
-            for (const json& ne : networkJson["node_evals"]) {
-                network->AddNodeEval(ne);
+                    if (id == -1 || !res) throw std::exception("id is -1");
+                    retry = false;
+                }
+                catch (std::exception e) {
+                    //std::cout << "Error while retrieving new genome to evaluate: " << e.what() << "\n";
+                    //std::cout << "\tWaiting for 3000 miliseconds\n";
+                    r.clear();
+                    id = -1;
+                    Sleep(2000);
+                }
             }
-            if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Genome");
-            
+        
+            std::cout << "Creating Network Structure" << id << "\n";
+
+            try {
+                json networkJson = json::parse(std::string(r[0]["Network"]));
+                //Delete existing network
+                if (!network) delete network;
+                network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+                for (const json& ne : networkJson["node_evals"]) {
+                    network->AddNodeEval(ne);
+                }
+                if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Gene");//Faulty Gene. Surrender immediately;
+            }
+            catch (std::exception e) {
+                std::cout << "Error creating Network Structure: " << e.what() << "\n";
+                BWAPI::Broodwar->leaveGame();
+            }
+            genomeID = id;
         }
-        catch (std::exception e) {
-            std::cout << "Error creating Network Structure: " << e.what() << "\n";
-        }
-        genomeID = id;
     }
 
     int NEATCommander::getWorkerCount(BWAPI::Unitset& allMyUnits)
@@ -248,7 +278,6 @@ namespace UAlbertaBot
             return true;
         }
     }
-
 
     /// <summary>
     /// Retrieves map data of the given section
@@ -482,7 +511,7 @@ namespace UAlbertaBot
         case NetworkUnits::Protoss_Arbiter_Tribunal:
             return BWAPI::UnitTypes::Protoss_Arbiter_Tribunal;
         default:
-            throw std::invalid_argument("Unknown NetworkUnit");
+            return BWAPI::UnitTypes::Terran_SCV;
         }
     }
 
@@ -538,7 +567,7 @@ namespace UAlbertaBot
         case NetworkTech::Maelstrom:
             return BWAPI::TechTypes::Maelstrom;
         default:
-            throw std::invalid_argument("Unknown NetworkTech");
+            return BWAPI::TechTypes::Stim_Packs;
         }
     }
     BWAPI::UpgradeType NEATCommander::ToBWAPIUpgrade(NetworkUpgrade ut) 
@@ -645,7 +674,7 @@ namespace UAlbertaBot
         case NetworkUpgrade::Argus_Talisman:
             return BWAPI::UpgradeTypes::Argus_Talisman;
         default:
-            throw std::invalid_argument("Unknown NetworkUpgrade");
+            return BWAPI::UpgradeTypes::U_238_Shells;
         }
     }
 

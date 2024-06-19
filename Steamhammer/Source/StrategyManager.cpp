@@ -27,22 +27,6 @@ StrategyManager & StrategyManager::Instance()
     return instance;
 }
 
-const BuildOrder & StrategyManager::getOpeningBookBuildOrder() const
-{
-    auto buildOrderIt = _strategies.find(Config::Strategy::StrategyName);
-
-    // look for the build order in the build order map
-    if (buildOrderIt != std::end(_strategies))
-    {
-        return (*buildOrderIt).second._buildOrder;
-    }
-    else
-    {
-        UAB_ASSERT_WARNING(false, "Strategy not found: %s, returning empty initial build order", Config::Strategy::StrategyName.c_str());
-        return _emptyBuildOrder;
-    }
-}
-
 // This is used for terran and protoss.
 const bool StrategyManager::shouldExpandNow() const
 {
@@ -87,19 +71,6 @@ const bool StrategyManager::shouldExpandNow() const
 void StrategyManager::addStrategy(const std::string & name, Strategy & strategy)
 {
     _strategies[name] = strategy;
-}
-
-// Set _openingGroup depending on the current strategy, which in principle
-// might be from the config file or from opening learning.
-// This is part of initialization; it happens early on.
-void StrategyManager::setOpeningGroup()
-{
-    auto buildOrderItr = _strategies.find(Config::Strategy::StrategyName);
-
-    if (buildOrderItr != std::end(_strategies))
-    {
-        _openingGroup = (*buildOrderItr).second._openingGroup;
-    }
 }
 
 const std::string & StrategyManager::getOpeningGroup() const

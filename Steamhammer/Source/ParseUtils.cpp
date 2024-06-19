@@ -89,7 +89,7 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
     }
 
     // Parse the Macro Options
-    if (doc.HasMember("Macro") && doc["Macro"].IsObject())
+    /*if (doc.HasMember("Macro") && doc["Macro"].IsObject())
     {
         const rapidjson::Value & macro = doc["Macro"];
         JSONTools::ReadInt("BOSSFrameLimit", macro, Config::Macro::BOSSFrameLimit);
@@ -99,6 +99,20 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
         Config::Macro::AbsoluteMaxWorkers = GetIntByRace("AbsoluteMaxWorkers", macro);
         Config::Macro::BuildingSpacing = GetIntByRace("BuildingSpacing", macro);
         JSONTools::ReadInt("PylonSpacing", macro, Config::Macro::PylonSpacing);
+    }*/
+    if (doc.HasMember("NEAT") && doc["NEAT"].IsObject())
+    {
+        const rapidjson::Value& neat = doc["NEAT"];
+        JSONTools::ReadBool("Train", neat, Config::NEAT::Train);
+        JSONTools::ReadString("TrainingServerIP", neat, Config::NEAT::TrainingServerIP);
+        JSONTools::ReadBool("LoadNetworkFromJSON", neat, Config::NEAT::LoadNetworkFromJSON);
+        JSONTools::ReadString("NetworkJSON", neat, Config::NEAT::NetworkJSON);
+        JSONTools::ReadInt("WinScore", neat, Config::NEAT::WinScore);
+        JSONTools::ReadInt("EnemyShowScore", neat, Config::NEAT::EnemyShowScore);
+        JSONTools::ReadInt("FitnessScore_Mineral_Divider", neat, Config::NEAT::FitnessScore_Mineral_Divider);
+        JSONTools::ReadInt("FitnessScore_Gas_Divider", neat, Config::NEAT::FitnessScore_Gas_Divider);
+        JSONTools::ReadInt("SubtractFitnessScore", neat, Config::NEAT::SubtractFitnessScore);
+        JSONTools::ReadBool("AutoSurrender", neat, Config::NEAT::AutoSurrender);
     }
 
     // Parse the Debug Options
@@ -203,239 +217,8 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
     // This depends on whether the opponent is a human, decided above.
     // Opening selection below may depend on the results.
     // File reading only happens if Config::IO::ReadOpponentModel is true.
-    OpponentModel::Instance().read();
+    //OpponentModel::Instance().read();
 
-    // Parse the Strategy options.
-    if (doc.HasMember("Strategy") && doc["Strategy"].IsObject())
-    {
-        const rapidjson::Value & strategy = doc["Strategy"];
-
-        Config::Strategy::Crazyhammer = GetBoolByRace("Crazyhammer", strategy);
-        
-        const rapidjson::Value * strategyCombos = nullptr;
-        if (strategy.HasMember("StrategyCombos") && strategy["StrategyCombos"].IsObject())
-        {
-            strategyCombos = &strategy["StrategyCombos"];
-        }
-
-        Config::Strategy::UsePlanRecognizer = GetBoolByRace("UsePlanRecognizer", strategy);
-
-        bool openingStrategyDecided = false;
-
-        // 0. Parse all the openings.
-        // Besides making them all available, this checks that they are syntatically valid.
-        //std::vector<std::string> openingNames;		// in case we want to make a random choice
-        //if (strategy.HasMember("Strategies") && strategy["Strategies"].IsObject())
-        //{
-        //    const rapidjson::Value & strategies = strategy["Strategies"];
-        //    for (rapidjson::Value::ConstMemberIterator itr = strategies.MemberBegin(); itr != strategies.MemberEnd(); ++itr)
-        //    {
-        //        const std::string &		 name = itr->name.GetString();
-        //        const rapidjson::Value & val = itr->value;
-
-        //        BWAPI::Race strategyRace;
-        //        if (val.HasMember("Race") && val["Race"].IsString())
-        //        {
-        //            strategyRace = GetRace(val["Race"].GetString());
-        //        }
-        //        else
-        //        {
-        //            UAB_ASSERT_WARNING(false, "Strategy must have a Race string. Skipping %s", name.c_str());
-        //            continue;
-        //        }
-
-        //        std::string openingGroup("");
-        //        if (val.HasMember("OpeningGroup") && val["OpeningGroup"].IsString())
-        //        {
-        //            openingGroup = val["OpeningGroup"].GetString();
-        //        }
-
-        //        BuildOrder buildOrder(strategyRace);
-        //        if (val.HasMember("OpeningBuildOrder") && val["OpeningBuildOrder"].IsArray())
-        //        {
-        //            const rapidjson::Value & build = val["OpeningBuildOrder"];
-
-        //            for (size_t b(0); b < build.Size(); ++b)
-        //            {
-        //                if (build[b].IsString())
-        //                {
-        //                    std::string itemName = build[b].GetString();
-
-        //                    int unitCount = 1;    // the default count
-
-        //                    // You can specify a count, like "6 x mutalisk". The spaces are required.
-        //                    // Mostly useful for units, but "2 x creep colony @ natural" also works.
-        //                    std::regex countRegex("([0-9]+)\\s+x\\s+([a-zA-Z_ ]+(\\s+@\\s+[a-zA-Z_ ]+)?)");
-        //                    std::smatch m;
-        //                    if (std::regex_match(itemName, m, countRegex)) {
-        //                        unitCount = GetIntFromString(m[1].str());
-        //                        itemName = m[2].str();
-        //                    }
-
-        //                    MacroAct act(itemName);
-        //                    for (int i = 0; i < unitCount; ++i)
-        //                    {
-        //                        buildOrder.add(act);
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    UAB_ASSERT_WARNING(false, "Build order item must be a string %s", name.c_str());
-        //                    continue;
-        //                }
-        //            }
-        //        }
-
-        //        // Only remember the ones that are for our current race.
-        //        if (strategyRace == BWAPI::Broodwar->self()->getRace())
-        //        {
-        //            StrategyManager::Instance().addStrategy(name, Strategy(name, strategyRace, openingGroup, buildOrder));
-        //            openingNames.push_back(name);
-        //        }
-        //    }
-        //}
-
-        // Crazyhammer turns off the opponent model.
-        if (Config::Strategy::Crazyhammer)
-        {
-            Config::IO::ReadOpponentModel = false;
-            Config::IO::WriteOpponentModel = false;
-        }
-
-        // 0. If we are Crazyhammer, choose an opening at random.
-        /*if (Config::Strategy::Crazyhammer && !openingNames.empty())
-        {
-            Config::Strategy::StrategyName = openingNames.at(Random::Instance().index(openingNames.size()));
-            openingStrategyDecided = true;
-        }*/
-
-        // 0.5 SPECIAL CASE FOR AIST S1
-        // On the map Sparkle, play a Sparkle opening.
-        /*if (!openingStrategyDecided &&
-            BWAPI::Broodwar->mapFileName().find("Sparkle") != std::string::npos)
-        {
-            std::string strategyName;
-
-            if (strategy.HasMember("Sparkle") && _ParseStrategy(strategy["Sparkle"], strategyName, mapWeightString, ourRaceStr, strategyCombos))
-            {
-                Config::Strategy::StrategyName = strategyName;
-                openingStrategyDecided = true;
-            }
-        }*/
-
-        // 1. Should we use a special strategy against this specific enemy?
-        //JSONTools::ReadBool("UseEnemySpecificStrategy", strategy, Config::Strategy::UseEnemySpecificStrategy);
-        //if (!openingStrategyDecided &&
-        //    Config::Strategy::UseEnemySpecificStrategy &&
-        //    strategy.HasMember("EnemySpecificStrategy") &&
-        //    strategy["EnemySpecificStrategy"].IsObject())
-        //{
-        //    const rapidjson::Value & specific = strategy["EnemySpecificStrategy"];
-        //    const std::string enemyName = BWAPI::Broodwar->enemy()->getName();
-
-        //    // Check to see if our current enemy name is listed in the specific strategies.
-        //    if (specific.HasMember(enemyName.c_str()))
-        //    {
-        //        std::string strategyName;
-
-        //        // if that enemy has a strategy listed for our current race, use it                                              
-        //        if (_ParseStrategy(specific[enemyName.c_str()], strategyName, mapWeightString, ourRaceStr, strategyCombos))
-        //        {
-        //            Config::Strategy::StrategyName = strategyName;
-        //            Config::Strategy::FoundEnemySpecificStrategy = true;   // defaults to false; see Config.cpp
-        //            openingStrategyDecided = true;
-        //        }
-        //    }
-        //}
-
-        // 2. Does the opponent model tell us what opening to play?
-        //if (!openingStrategyDecided && OpponentModel::Instance().getRecommendedOpening() != "")
-        //{
-        //    const std::string & opening = OpponentModel::Instance().getRecommendedOpening();
-
-        //    if (opening == "matchup")
-        //    {
-        //        std::string strategyName;
-
-        //        // If we have set a strategy mix for the current matchup, evaluate it.
-        //        if (strategy.HasMember(matchup) && _ParseStrategy(strategy[matchup], strategyName, mapWeightString, ourRaceStr, strategyCombos))
-        //        {
-        //            Config::Strategy::StrategyName = strategyName;
-        //            openingStrategyDecided = true;
-        //        }
-        //    }
-        //    else if (opening == "random")
-        //    {
-        //        if (openingNames.size() > 0)
-        //        {
-        //            Config::Strategy::StrategyName = openingNames.at(Random::Instance().index(openingNames.size()));
-        //            openingStrategyDecided = true;
-        //        }
-        //    }
-        //    else if (opening.substr(0, 7) == "Counter")
-        //    {
-        //        if (!openingStrategyDecided &&
-        //            OpponentModel::Instance().getRecommendedOpening() != "" &&
-        //            strategy.HasMember("CounterStrategies") &&
-        //            strategy["CounterStrategies"].IsObject())
-        //        {
-        //            const rapidjson::Value & counters = strategy["CounterStrategies"];
-        //            const std::string & recommendation = OpponentModel::Instance().getRecommendedOpening();
-
-        //            // 1. Is there a counter specific to the opponent's race, P T Z U?
-        //            std::string recommendationVersus = recommendation + " v" + RaceChar(BWAPI::Broodwar->enemy()->getRace());
-        //            if (counters.HasMember(recommendationVersus.c_str()))
-        //            {
-        //                std::string strategyName;
-        //                if (_ParseStrategy(counters[recommendationVersus.c_str()], strategyName, mapWeightString, ourRaceStr, strategyCombos))
-        //                {
-        //                    Config::Strategy::StrategyName = strategyName;
-        //                    openingStrategyDecided = true;
-        //                }
-        //            }
-
-        //            // 2. Is there a general counter?
-        //            else if (counters.HasMember(recommendation.c_str()))
-        //            {
-        //                std::string strategyName;
-        //                if (_ParseStrategy(counters[recommendation.c_str()], strategyName, mapWeightString, ourRaceStr, strategyCombos))
-        //                {
-        //                    Config::Strategy::StrategyName = strategyName;
-        //                    openingStrategyDecided = true;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    else if (strategy.HasMember("Strategies") &&
-        //        strategy["Strategies"].IsObject() &&
-        //        strategy["Strategies"].HasMember(opening.c_str()) &&
-        //        strategy["Strategies"][opening.c_str()].IsObject())
-        //    {
-        //        // NOTE We don't double-check the race or other info about the opening.
-        //        Config::Strategy::StrategyName = opening;
-        //        openingStrategyDecided = true;
-        //    }
-        //}
-
-        // 3. If we don't have a strategy yet, fall back on a more general strategy.
-        if (!openingStrategyDecided)
-        {
-            //std::string strategyName;
-
-            //// If we have set a strategy mix for the current matchup, evaluate it.
-            //if (strategy.HasMember(matchup) && _ParseStrategy(strategy[matchup], strategyName, mapWeightString, ourRaceStr, strategyCombos))
-            //{
-            //    Config::Strategy::StrategyName = strategyName;
-            //}
-            //// Failing that, look for a strategy for the current race.
-            //else if (strategy.HasMember(ourRace) && _ParseStrategy(strategy[ourRace], strategyName, mapWeightString, ourRaceStr, strategyCombos))
-            //{
-            //    Config::Strategy::StrategyName = strategyName;
-            //}
-        }
-
-        OpponentModel::Instance().setOpening();
-    }
 
     Config::ConfigFile::ConfigFileParsed = true;
 }

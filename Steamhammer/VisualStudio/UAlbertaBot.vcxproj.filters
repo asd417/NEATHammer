@@ -37,6 +37,12 @@
     <Filter Include="NEAT">
       <UniqueIdentifier>{a59eb0e9-e456-415a-aceb-da6e55a93425}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Micro">
+      <UniqueIdentifier>{032f1f5a-3c42-485b-90da-fa0277d9164e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Micro\Protoss">
+      <UniqueIdentifier>{f8feb9b5-13d3-4026-ac1b-53a5279b6f09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\CombatCommander.cpp">
@@ -141,7 +147,6 @@
     <ClCompile Include="..\Source\MicroMelee.cpp" />
     <ClCompile Include="..\Source\MicroRanged.cpp" />
     <ClCompile Include="..\Source\MicroTransports.cpp" />
-    <ClCompile Include="..\Source\MicroHighTemplar.cpp" />
     <ClCompile Include="..\Source\Random.cpp" />
     <ClCompile Include="..\Source\Base.cpp" />
     <ClCompile Include="..\Source\FAP.cpp" />
@@ -196,6 +201,18 @@
     </ClCompile>
     <ClCompile Include="..\Source\db.cpp">
       <Filter>NEAT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroArbiter.cpp">
+      <Filter>Micro\Protoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroDarkArchon.cpp">
+      <Filter>Micro\Protoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroHighTemplar.cpp">
+      <Filter>Micro\Protoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroCorsair.cpp">
+      <Filter>Micro\Protoss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -303,7 +320,6 @@
     <ClInclude Include="..\Source\MicroMelee.h" />
     <ClInclude Include="..\Source\MicroRanged.h" />
     <ClInclude Include="..\Source\MicroTransports.h" />
-    <ClInclude Include="..\Source\MicroHighTemplar.h" />
     <ClInclude Include="..\Source\Random.h" />
     <ClInclude Include="..\Source\Base.h" />
     <ClInclude Include="..\Source\FAP.h" />
@@ -356,6 +372,18 @@
     </ClInclude>
     <ClInclude Include="..\Source\db.h">
       <Filter>NEAT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroArbiter.h">
+      <Filter>Micro\Protoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroDarkArchon.h">
+      <Filter>Micro\Protoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroHighTemplar.h">
+      <Filter>Micro\Protoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroCorsair.h">
+      <Filter>Micro\Protoss</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

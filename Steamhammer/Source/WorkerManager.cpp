@@ -1189,15 +1189,22 @@ void WorkerManager::setCombatWorker(BWAPI::Unit worker)
     workerData.setWorkerJob(worker, WorkerData::Combat, nullptr);
 }
 
-// Post the given worker to the given macro location.
+/// <summary>
+/// Post the given worker to the given macro location.
+/// </summary>
+/// <param name="worker"></param>
+/// <param name="loc"></param>
 void WorkerManager::postGivenWorker(BWAPI::Unit worker, MacroLocation loc)
 {
-    //BWAPI::Broodwar->printf("posting worker %d", worker->getID());
     workerData.setWorkerPost(worker, loc);
 }
 
-// Post the closest free worker to the given macro location.
-// In case of failure (which should be rare), do nothing and return null.
+/// <summary>
+/// Post the closest free worker to the given macro location.
+/// In case of failure (which should be rare), do nothing and return null.
+/// </summary>
+/// <param name="loc"></param>
+/// <returns></returns>
 BWAPI::Unit WorkerManager::postWorker(MacroLocation loc)
 {
     BWAPI::Position pos = the.placer.getMacroLocationPos(loc);

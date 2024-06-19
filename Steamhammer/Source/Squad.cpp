@@ -599,7 +599,6 @@ void Squad::addUnitsToMicroManagers()
     BWAPI::Unitset rangedUnits;
     BWAPI::Unitset defilerUnits;
     BWAPI::Unitset detectorUnits;
-    BWAPI::Unitset highTemplarUnits;
     BWAPI::Unitset scourgeUnits;
     BWAPI::Unitset transportUnits;
     BWAPI::Unitset lurkerUnits;
@@ -607,6 +606,9 @@ void Squad::addUnitsToMicroManagers()
     BWAPI::Unitset queenUnits;
     BWAPI::Unitset tankUnits;
     BWAPI::Unitset medicUnits;
+    //Protoss Micro Units
+    BWAPI::Unitset highTemplarUnits;
+    BWAPI::Unitset corsairUnits;
 
     // We will assign zerglings as defiler food. The defiler micro manager will control them.
     int defilerFoodWanted = 0;
@@ -643,10 +645,13 @@ void Squad::addUnitsToMicroManagers()
                 overlordUnits.insert(unit);
             }
             else if (unit->getType() == BWAPI::UnitTypes::Terran_Valkyrie ||
-                unit->getType() == BWAPI::UnitTypes::Protoss_Corsair ||
                 unit->getType() == BWAPI::UnitTypes::Zerg_Devourer)
             {
                 airToAirUnits.insert(unit);
+            }
+            else if (unit->getType() == BWAPI::UnitTypes::Protoss_Corsair)
+            {
+                corsairUnits.insert(unit);
             }
             else if (unit->getType() == BWAPI::UnitTypes::Protoss_High_Templar)
             {
@@ -728,7 +733,7 @@ void Squad::addUnitsToMicroManagers()
             break;
         }
     }
-
+    //Add all special micro units here
     _microIrradiated.setUnits(irradiatedUnits);
     _microOverlords.setUnits(overlordUnits);
     _microAirToAir.setUnits(airToAirUnits);
@@ -736,7 +741,10 @@ void Squad::addUnitsToMicroManagers()
     _microRanged.setUnits(rangedUnits);
     _microDefilers.setUnits(defilerUnits);
     _microDetectors.setUnits(detectorUnits);
+
     _microHighTemplar.setUnits(highTemplarUnits);
+    _microCorsair.setUnits(corsairUnits);
+
     _microLurkers.setUnits(lurkerUnits);
     _microMedics.setUnits(medicUnits);
     //_microMutas.setUnits(mutaUnits);

@@ -798,6 +798,18 @@ bool MacroAct::canProduce(BWAPI::Unit producer) const
             {
                 return BWAPI::Broodwar->canMake(BWAPI::UnitTypes::Zerg_Creep_Colony, producer);
             }
+            if (getUnitType() == BWAPI::UnitTypes::Protoss_Archon)
+            {
+                //Searches 5 tile radius
+                BWAPI::Unitset htNearBy = BWAPI::Broodwar->getUnitsInRadius({ _tileLocation.x * 32, _tileLocation.y * 32 }, 5 * 32, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_High_Templar);
+                return htNearBy.size() >= 2;
+            }
+            if (getUnitType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
+            {
+                //Searches 5 tile radius
+                BWAPI::Unitset htNearBy = BWAPI::Broodwar->getUnitsInRadius({ _tileLocation.x * 32, _tileLocation.y * 32 }, 5 * 32, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_Dark_Templar);
+                return htNearBy.size() >= 2;
+            }
 
             return BWAPI::Broodwar->canMake(getUnitType(), producer);
         }
@@ -810,7 +822,7 @@ bool MacroAct::canProduce(BWAPI::Unit producer) const
             return BWAPI::Broodwar->canUpgrade(getUpgradeType(), producer);
         }
 
-        UAB_ASSERT(false, "bad MacroAct");
+        //UAB_ASSERT(false, "bad MacroAct");
     }
 
     return false;
@@ -837,6 +849,25 @@ void MacroAct::produce(BWAPI::Unit producer) const
     // A non-building unit, or a morphed zerg building.
     else if (isUnit())
     {
+        if (getUnitType() == BWAPI::UnitTypes::Protoss_Archon)
+        {
+            //Searches 5 tile radius
+            BWAPI::Unitset htNearBy = BWAPI::Broodwar->getUnitsInRadius({ _tileLocation.x * 32, _tileLocation.y * 32 }, 5 * 32, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_High_Templar);
+            if (htNearBy.size() >= 2) {
+                htNearBy.
+                useTech(TechType tech, Unit * target);
+            }
+            return;
+        }
+        if (getUnitType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
+        {
+            //Searches 5 tile radius
+            BWAPI::Unitset htNearBy = BWAPI::Broodwar->getUnitsInRadius({ _tileLocation.x * 32, _tileLocation.y * 32 }, 5 * 32, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_Dark_Templar);
+            if (htNearBy.size() >= 2) {
+
+            }
+            return;
+        }
         the.micro.Make(producer, getUnitType());
     }
     else if (isTech())

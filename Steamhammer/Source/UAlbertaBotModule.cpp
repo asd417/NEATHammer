@@ -40,11 +40,9 @@ void UAlbertaBotModule::onStart()
         BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
     }
 
-    StrategyManager::Instance().setOpeningGroup();    // may depend on config and/or opponent model
-
     if (Config::BotInfo::PrintInfoOnStart)
     {
-        BWAPI::Broodwar->printf("%s by %s, based on UAlbertaBot.", Config::BotInfo::BotName.c_str(), Config::BotInfo::Authors.c_str());
+        BWAPI::Broodwar->printf("%s by %s, based on SteamHammer.", Config::BotInfo::BotName.c_str(), Config::BotInfo::Authors.c_str());
         if (Config::Skills::HumanOpponent)
         {
             GameMessage("gl hf");
@@ -60,12 +58,13 @@ void UAlbertaBotModule::onStart()
 
 void UAlbertaBotModule::onEnd(bool isWinner)
 {
+    NEATCommander::Instance().scoreFitness(Config::NEAT::WinScore);
     GameCommander::Instance().onEnd(isWinner);
 }
 
 void UAlbertaBotModule::onFrame()
 {
-    /*if (!Config::ConfigFile::ConfigFileFound)
+    if (!Config::ConfigFile::ConfigFileFound)
     {
         BWAPI::Broodwar->drawBoxScreen(0,0,450,100, BWAPI::Colors::Black, true);
         BWAPI::Broodwar->setTextSize(BWAPI::Text::Size::Huge);
@@ -88,7 +87,7 @@ void UAlbertaBotModule::onFrame()
         BWAPI::Broodwar->drawTextScreen(10, 45, "%cThe configuration file was found, but could not be parsed. Check that it is valid JSON", white);
         BWAPI::Broodwar->drawTextScreen(10, 60, "%cFile Not Parsed: %c %s", white, green, Config::ConfigFile::ConfigFileLocation.c_str());
         return;
-    }*/
+    }
 
     GameCommander::Instance().update();
 }
@@ -96,13 +95,18 @@ void UAlbertaBotModule::onFrame()
 void UAlbertaBotModule::onUnitDestroy(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitDestroy(unit);
-    if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(5);
+    if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
 }
 
 void UAlbertaBotModule::onUnitMorph(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitMorph(unit);
-    if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(1);
+    BWAPI::UnitType type = unit->getType();
+    if (type != BWAPI::UnitTypes::Terran_SCV &&
+        type != BWAPI::UnitTypes::Zerg_Drone &&
+        type != BWAPI::UnitTypes::Protoss_Probe) {
+        if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
+    }
 }
 
 void UAlbertaBotModule::onSendText(std::string text) 
@@ -113,19 +117,29 @@ void UAlbertaBotModule::onSendText(std::string text)
 void UAlbertaBotModule::onUnitCreate(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitCreate(unit);
-    if(unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
+    BWAPI::UnitType type = unit->getType();
+    if (type != BWAPI::UnitTypes::Terran_SCV &&
+        type != BWAPI::UnitTypes::Zerg_Drone &&
+        type != BWAPI::UnitTypes::Protoss_Probe) {
+        if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
+    }
 }
 
 void UAlbertaBotModule::onUnitComplete(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitComplete(unit);
-    if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
+    BWAPI::UnitType type = unit->getType();
+    if (type != BWAPI::UnitTypes::Terran_SCV &&
+        type != BWAPI::UnitTypes::Zerg_Drone &&
+        type != BWAPI::UnitTypes::Protoss_Probe) {
+        if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
+    }
 }
 
 void UAlbertaBotModule::onUnitShow(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitShow(unit);
-    if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(1);
+    //if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(Config::NEAT::EnemyShowScore);
 }
 
 void UAlbertaBotModule::onUnitHide(BWAPI::Unit unit)
