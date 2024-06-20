@@ -43,6 +43,12 @@
     <Filter Include="Micro\Protoss">
       <UniqueIdentifier>{f8feb9b5-13d3-4026-ac1b-53a5279b6f09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Micro\Terran">
+      <UniqueIdentifier>{e7d0e87c-d5fa-46c6-b0ac-f1bab6a5f154}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Micro\Zerg">
+      <UniqueIdentifier>{d6d5d1cf-d122-4812-8208-ae6716c23dc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\CombatCommander.cpp">
@@ -140,13 +146,6 @@
     </ClCompile>
     <ClCompile Include="..\Source\MacroAct.cpp" />
     <ClCompile Include="..\Source\StrategyBossZerg.cpp" />
-    <ClCompile Include="..\Source\MicroTanks.cpp" />
-    <ClCompile Include="..\Source\MicroDetectors.cpp" />
-    <ClCompile Include="..\Source\MicroLurkers.cpp" />
-    <ClCompile Include="..\Source\MicroMedics.cpp" />
-    <ClCompile Include="..\Source\MicroMelee.cpp" />
-    <ClCompile Include="..\Source\MicroRanged.cpp" />
-    <ClCompile Include="..\Source\MicroTransports.cpp" />
     <ClCompile Include="..\Source\Random.cpp" />
     <ClCompile Include="..\Source\Base.cpp" />
     <ClCompile Include="..\Source\FAP.cpp" />
@@ -161,17 +160,12 @@
     <ClCompile Include="..\Source\Grid.cpp" />
     <ClCompile Include="..\Source\GridDistances.cpp" />
     <ClCompile Include="..\Source\GridAttacks.cpp" />
-    <ClCompile Include="..\Source\MicroOverlords.cpp" />
-    <ClCompile Include="..\Source\MicroMutas.cpp" />
-    <ClCompile Include="..\Source\MicroDefilers.cpp" />
     <ClCompile Include="..\Source\OpsBoss.cpp" />
-    <ClCompile Include="..\Source\MicroScourge.cpp" />
     <ClCompile Include="..\Source\GridWalk.cpp" />
     <ClCompile Include="..\Source\GridRoom.cpp" />
     <ClCompile Include="..\Source\GridTileRoom.cpp" />
     <ClCompile Include="..\Source\GridInset.cpp" />
     <ClCompile Include="..\Source\GridZone.cpp" />
-    <ClCompile Include="..\Source\MicroQueens.cpp" />
     <ClCompile Include="..\Source\BOSimulator.cpp" />
     <ClCompile Include="..\Source\GameRecordNow.cpp" />
     <ClCompile Include="..\Source\GridSafeAirPath.cpp" />
@@ -188,7 +182,6 @@
     <ClCompile Include="..\Source\SkillOpeningTiming.cpp" />
     <ClCompile Include="..\Source\OpeningTimingRecord.cpp" />
     <ClCompile Include="..\Source\SkillLurkers.cpp" />
-    <ClCompile Include="..\Source\MicroIrradiated.cpp" />
     <ClCompile Include="..\Source\TacticsOrders.cpp" />
     <ClCompile Include="..\Source\SquadOrder.cpp" />
     <ClCompile Include="..\Source\StaticDefense.cpp" />
@@ -215,6 +208,45 @@
     </ClCompile>
     <ClCompile Include="..\Source\MicroAirToAir.cpp">
       <Filter>Micro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroDetectors.cpp">
+      <Filter>Micro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroIrradiated.cpp">
+      <Filter>Micro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroMelee.cpp">
+      <Filter>Micro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroRanged.cpp">
+      <Filter>Micro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroTransports.cpp">
+      <Filter>Micro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroTanks.cpp">
+      <Filter>Micro\Terran</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroMedics.cpp">
+      <Filter>Micro\Terran</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroDefilers.cpp">
+      <Filter>Micro\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroLurkers.cpp">
+      <Filter>Micro\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroMutas.cpp">
+      <Filter>Micro\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroOverlords.cpp">
+      <Filter>Micro\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroQueens.cpp">
+      <Filter>Micro\Zerg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MicroScourge.cpp">
+      <Filter>Micro\Zerg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -315,13 +347,6 @@
     <ClInclude Include="..\Source\MacroCommand.h" />
     <ClInclude Include="..\Source\BuildingData.h" />
     <ClInclude Include="..\Source\StrategyBossZerg.h" />
-    <ClInclude Include="..\Source\MicroTanks.h" />
-    <ClInclude Include="..\Source\MicroDetectors.h" />
-    <ClInclude Include="..\Source\MicroLurkers.h" />
-    <ClInclude Include="..\Source\MicroMedics.h" />
-    <ClInclude Include="..\Source\MicroMelee.h" />
-    <ClInclude Include="..\Source\MicroRanged.h" />
-    <ClInclude Include="..\Source\MicroTransports.h" />
     <ClInclude Include="..\Source\Random.h" />
     <ClInclude Include="..\Source\Base.h" />
     <ClInclude Include="..\Source\FAP.h" />
@@ -336,17 +361,12 @@
     <ClInclude Include="..\Source\Grid.h" />
     <ClInclude Include="..\Source\GridDistances.h" />
     <ClInclude Include="..\Source\GridAttacks.h" />
-    <ClInclude Include="..\Source\MicroOverlords.h" />
-    <ClInclude Include="..\Source\MicroMutas.h" />
-    <ClInclude Include="..\Source\MicroDefilers.h" />
     <ClInclude Include="..\Source\OpsBoss.h" />
-    <ClInclude Include="..\Source\MicroScourge.h" />
     <ClInclude Include="..\Source\GridWalk.h" />
     <ClInclude Include="..\Source\GridRoom.h" />
     <ClInclude Include="..\Source\GridTileRoom.h" />
     <ClInclude Include="..\Source\GridInset.h" />
     <ClInclude Include="..\Source\GridZone.h" />
-    <ClInclude Include="..\Source\MicroQueens.h" />
     <ClInclude Include="..\Source\BOSimulator.h" />
     <ClInclude Include="..\Source\GameRecordNow.h" />
     <ClInclude Include="..\Source\GridSafeAirPath.h" />
@@ -363,7 +383,6 @@
     <ClInclude Include="..\Source\OpeningTimingRecord.h" />
     <ClInclude Include="..\Source\SkillLurkers.h" />
     <ClInclude Include="..\Source\TacticsOrders.h" />
-    <ClInclude Include="..\Source\MicroIrradiated.h" />
     <ClInclude Include="..\Source\StaticDefense.h" />
     <ClInclude Include="..\Source\NEATCommander.h">
       <Filter>NEAT</Filter>
@@ -388,6 +407,45 @@
     </ClInclude>
     <ClInclude Include="..\Source\MicroAirToAir.h">
       <Filter>Micro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroDetectors.h">
+      <Filter>Micro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroIrradiated.h">
+      <Filter>Micro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroMelee.h">
+      <Filter>Micro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroRanged.h">
+      <Filter>Micro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroTransports.h">
+      <Filter>Micro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroTanks.h">
+      <Filter>Micro\Terran</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroMedics.h">
+      <Filter>Micro\Terran</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroDefilers.h">
+      <Filter>Micro\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroLurkers.h">
+      <Filter>Micro\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroMutas.h">
+      <Filter>Micro\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroOverlords.h">
+      <Filter>Micro\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroQueens.h">
+      <Filter>Micro\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroScourge.h">
+      <Filter>Micro\Zerg</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

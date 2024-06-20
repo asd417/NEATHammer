@@ -23,6 +23,7 @@
 #include "MicroHighTemplar.h"
 #include "MicroCorsair.h"
 #include "MicroArbiter.h"
+#include "MicroDarkArchon.h"
 
 namespace UAlbertaBot
 {

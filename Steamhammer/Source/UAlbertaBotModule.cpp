@@ -121,7 +121,17 @@ void UAlbertaBotModule::onUnitCreate(BWAPI::Unit unit)
     if (type != BWAPI::UnitTypes::Terran_SCV &&
         type != BWAPI::UnitTypes::Zerg_Drone &&
         type != BWAPI::UnitTypes::Protoss_Probe) {
-        if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
+        if (unit->getPlayer() == the.self())
+        {
+            if (type.isBuilding())
+            {
+                NEATCommander::Instance().scoreFitness(type.buildScore()/10);
+            }
+            else
+            {
+                NEATCommander::Instance().scoreFitness(type.buildScore());
+            }
+        }
     }
 }
 
@@ -139,7 +149,7 @@ void UAlbertaBotModule::onUnitComplete(BWAPI::Unit unit)
 void UAlbertaBotModule::onUnitShow(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitShow(unit);
-    //if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(Config::NEAT::EnemyShowScore);
+    if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(Config::NEAT::EnemyShowScore);
 }
 
 void UAlbertaBotModule::onUnitHide(BWAPI::Unit unit)

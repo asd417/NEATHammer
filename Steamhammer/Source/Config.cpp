@@ -61,7 +61,7 @@ namespace Config
         bool LoadNetworkFromJSON = false;
         std::string NetworkJSON = "";
         int WinScore = 1000;
-        int EnemyShowScore = 100;
+        int EnemyShowScore = 1;
         int FitnessScore_Mineral_Divider = 100;
         int FitnessScore_Gas_Divider = 100;
         int SubtractFitnessScore = 1600;

@@ -67,7 +67,7 @@ namespace UAlbertaBot
     void NEATCommander::scoreFitness(double add)
     {
 
-        //UAB_ASSERT(add > 100.0f, "Large Fitness Gain: %s", std::to_string(add).c_str());
+        UAB_ASSERT(fitness > 0.0f, "Negative Fitness: %s", std::to_string(fitness).c_str());
         fitness += add;
     }
     void NEATCommander::sendFitnessToTrainServer()

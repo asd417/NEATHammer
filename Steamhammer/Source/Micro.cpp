@@ -1418,38 +1418,34 @@ bool Micro::UseTech(BWAPI::Unit unit, BWAPI::TechType tech, const BWAPI::Positio
 
     if (tech == BWAPI::TechTypes::Recall)
     {
-
+        o = BWAPI::Orders::CastRecall;
     }
-    if (tech == BWAPI::TechTypes::Stasis_Field)
+    else if (tech == BWAPI::TechTypes::Stasis_Field)
     {
-
+        o = BWAPI::Orders::CastStasisField;
     }
-    if (tech == BWAPI::TechTypes::Disruption_Web)
+    else if (tech == BWAPI::TechTypes::Disruption_Web)
     {
-
+        o = BWAPI::Orders::CastDisruptionWeb;
     }
-    if (tech == BWAPI::TechTypes::Feedback)
+    else if (tech == BWAPI::TechTypes::Feedback)
     {
-
+        o = BWAPI::Orders::CastFeedback;
     }
-    if (tech == BWAPI::TechTypes::Mind_Control)
+    else if (tech == BWAPI::TechTypes::Mind_Control)
     {
-
+        o = BWAPI::Orders::CastMindControl;
     }
-    if (tech == BWAPI::TechTypes::Maelstrom)
+    else if (tech == BWAPI::TechTypes::Maelstrom)
     {
-
+        o = BWAPI::Orders::CastMaelstrom;
     }
-    if (tech == BWAPI::TechTypes::Psionic_Storm)
+    else if (tech == BWAPI::TechTypes::Psionic_Storm)
     {
-
+        o = BWAPI::Orders::CastPsionicStorm;
     }
-    if (tech == BWAPI::TechTypes::Hallucination)
-    {
-
-    }
-
-    if (tech == BWAPI::TechTypes::Ensnare)
+    
+    else if (tech == BWAPI::TechTypes::Ensnare)
     {
         o = BWAPI::Orders::CastEnsnare;
     }

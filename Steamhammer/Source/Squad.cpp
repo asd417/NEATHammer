@@ -745,7 +745,7 @@ void Squad::addUnitsToMicroManagers()
     _microDefilers.setUnits(defilerUnits);
     _microDetectors.setUnits(detectorUnits);
 
-    _microHighTemplar.setUnits(highTemplarUnits);
+    _microHighTemplars.setUnits(highTemplarUnits);
     _microCorsair.setUnits(corsairUnits);
 
     _microLurkers.setUnits(lurkerUnits);

@@ -1,0 +1,138 @@
+{
+  "Bot Info": 
+  {
+    "BotName": "NEATHammer 4.0",
+    "Authors": "Yeonghun Lee",
+    "PrintInfoOnStart": true
+  },
+
+  "NEAT": 
+  {
+    "Train": true,
+    "TrainingServerIP": "http://127.0.0.1:5000",
+    "LoadNetworkFromJSON": false,
+    "NetworkJSON": "network.json",
+    "WinScore": 1000,
+    "EnemyShowScore": 0,
+    "FitnessScore_Mineral_Divider": 500,
+    "FitnessScore_Gas_Divider": 500,
+    "SubtractFitnessScore": 400,
+    "AutoSurrender": true
+  },
+
+  "BWAPI" :
+  {
+    "SetLocalSpeed"             : 0,
+    "SetFrameSkip"              : 300,
+    "UserInput"                 : false,
+    "CompleteMapInformation"    : false
+  },
+
+  "Micro" :
+  {
+    "KiteWithRangedUnits"       : true,
+    "WorkersDefendRush"         : true,
+    "RetreatMeleeUnitShields"   : 6,
+    "RetreatMeleeUnitHP"        : { "Zerg" : 8, "Protoss" : 18 },
+    "CombatSimRadius"           : 256,
+    "ScoutDefenseRadius"        : { "Terran" : 500 }
+  },
+
+  "Macro" :
+  {
+    "BOSSFrameLimit"            : 160,
+    "ProductionJamFrameLimit"   : 1440,
+    "WorkersPerRefinery"        : 3,
+    "WorkersPerPatch"           : { "Zerg" : 1.6, "Protoss" : 2.0, "Terran" : 2.0 },
+    "AbsoluteMaxWorkers"        : 65,
+    "BuildingSpacing"           : 1,
+    "PylonSpacing"              : 3
+  },
+
+  "Debug" :
+  {
+    "DrawGameInfo"              : false,
+    "DrawUnitHealthBars"        : false,
+    "DrawKills"                 : false,
+    "DrawProductionInfo"        : false,
+    "DrawQueueFixInfo"          : false,
+    "DrawBuildOrderSearchInfo"  : false,
+    "DrawScoutInfo"             : false,
+    "DrawEnemyUnitInfo"         : false,
+    "DrawUnitCounts"            : false,
+    "DrawHiddenEnemies"         : false,
+    "DrawModuleTimers"          : false,
+    "DrawCombatSimInfo"         : false,
+    "DrawUnitTargets"           : false,
+    "DrawUnitOrders"            : false,
+    "DrawMicroState"            : false,
+    "DrawLurkerTactics"         : false,
+    "DrawMapInfo"               : false,
+    "DrawMapGrid"               : false,
+    "DrawMapDistances"          : false,
+    "DrawTerrainHeights"        : false,
+    "DrawBaseInfo"              : false,
+    "DrawExpoScores"            : false,
+    "DrawStrategyBossInfo"      : false,
+    "DrawSquadInfo"             : false,
+    "DrawClusters"              : false,
+    "DrawDefenseClusters"       : false,
+    "DrawWorkerInfo"            : false,
+    "DrawBuildingInfo"          : false,
+    "DrawStaticDefensePlan"     : false,
+    "DrawReservedBuildingTiles"	: false,
+    "DrawResourceAmounts"       : false,
+    "DrawTasks"                 : false,
+    "DrawEvaluation"            : false
+  },
+
+  "Tools" :
+    {
+      "MapGridSize"           : 320
+    },
+
+    "IO" :
+    {
+      "ErrorLogFilename"      : "bwapi-data/write/Steamhammer_ErrorLog.txt",
+      "LogAssertToErrorFile"  : true,
+
+      "StaticDirectory"       : "bwapi-data/AI/",
+      "PreparedDataDirectory" : "bwapi-data/AI/om/",
+      "ReadDirectory"         : "bwapi-data/read/",
+      "WriteDirectory"        : "bwapi-data/write/",
+
+      "OpeningTimingFile"     : "timings.txt",
+
+      "MaxGameRecords"        : 100,
+
+      "ReadOpponentModel"     : true,
+      "WriteOpponentModel"    : true,
+
+      "UseEvaluator"          : true,
+      "UpdateEvaluator"       : true
+    },
+
+   "Skills" :
+   {
+     "SCHNAILMeansHuman"       : true,
+     "HumanOpponent"           : false,
+     "SurrenderWhenHopeIsLost" : true,
+
+     "ScoutHarassEnemy"        : false,
+     "GasSteal"                : true,
+
+     "Burrow"             : true,
+     "UseSunkenRangeBug"  : true,
+     "StaticDefense"      : true,
+
+     "MaxQueens"          : 12,
+     "MaxInfestedTerrans" : 1,
+     "MaxDefilers"        : 2
+   },
+
+  "Strategy" :
+  {
+    "Crazyhammer" : false,
+    "UsePlanRecognizer" : true
+  }
+}
