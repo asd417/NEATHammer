@@ -654,9 +654,14 @@ BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(const Building & b, int
     {
         tile = findAnyLocation(b, extraSpace);
     }
-
-    // Let Bases decide whether to change which base is the main base.
-    the.bases.checkBuildingPosition(b.desiredPosition, tile);
+    try {
+        // Let Bases decide whether to change which base is the main base.
+        the.bases.checkBuildingPosition(b.desiredPosition, tile);
+    }
+    catch (std::exception e)
+    {
+        tile = BWAPI::TilePositions::None;
+    }
 
     return tile;		// may be None
 }
