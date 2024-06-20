@@ -56,6 +56,7 @@ namespace UAlbertaBot
                 //16 mins into game and less than 10 max supply -> enemy bot probably bugged out
                 //surrender
                 //GameMessage("gg");
+                UAB_ASSERT(false, "Frame > 30000 and supply less than 10.");
                 BWAPI::Broodwar->leaveGame();
             }
         }
