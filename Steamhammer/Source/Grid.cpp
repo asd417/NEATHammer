@@ -1,7 +1,7 @@
 #include "Grid.h"
-
+#include <cassert>
 #include "UABAssert.h"
-
+#include "stringformat.h"
 using namespace UAlbertaBot;
 
 // Create an empty, unitialized, unusable grid.
@@ -22,7 +22,11 @@ int Grid::get(int x, int y) const
 {
     UAB_ASSERT(grid.size() == width && width > 0 && x >= 0 && y >= 0 && x < width && y < height,
         "bad at(%d,%d) limit(%d,%d) size %dx%d", x, y, width, height, grid.size(), grid[0].size());
-
+    if (!(grid.size() == width && width > 0 && x >= 0 && y >= 0 && x < width && y < height))
+    {
+        std::string e = Strutil::format("bad at(%d,%d) limit(%d,%d) size %dx%d", x, y, width, height, grid.size(), grid[0].size());
+        throw std::exception(e.c_str());
+    }
     return grid[x][y];
 }
 

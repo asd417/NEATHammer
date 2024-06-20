@@ -72,7 +72,7 @@ void GameCommander::update()
     _timerManager.startTimer(TimerManager::NetworkEvaluation);
     //Performs buildorder search
     NEATCommander::Instance().update();
-    //BOSSManager::Instance().update(35 - _timerManager.getMilliseconds());
+    BOSSManager::Instance().update(35 - _timerManager.getMilliseconds());
     _timerManager.stopTimer(TimerManager::Search);
 
     // May steal workers from WorkerManager, so run it before WorkerManager.

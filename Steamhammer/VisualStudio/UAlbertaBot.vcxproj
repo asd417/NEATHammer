@@ -205,6 +205,7 @@
     <ClCompile Include="..\Source\StaticDefense.cpp" />
     <ClCompile Include="..\Source\StrategyBossZerg.cpp" />
     <ClCompile Include="..\Source\StrategyManager.cpp" />
+    <ClCompile Include="..\Source\stringformat.cpp" />
     <ClCompile Include="..\Source\TacticsOrders.cpp" />
     <ClCompile Include="..\Source\The.cpp" />
     <ClCompile Include="..\source\TimerManager.cpp" />
@@ -300,6 +301,7 @@
     <ClInclude Include="..\Source\StaticDefense.h" />
     <ClInclude Include="..\Source\StrategyBossZerg.h" />
     <ClInclude Include="..\Source\StrategyManager.h" />
+    <ClInclude Include="..\Source\stringformat.h" />
     <ClInclude Include="..\Source\TacticsOrders.h" />
     <ClInclude Include="..\Source\The.h" />
     <ClInclude Include="..\source\TimerManager.h" />

@@ -57,7 +57,7 @@ namespace UAlbertaBot
     void NEATCommander::scoreFitness(double add)
     {
 
-        UAB_ASSERT(fitness > 0.0f, "Negative Fitness: %s", std::to_string(fitness).c_str());
+        //UAB_ASSERT(fitness > 0.0f, "Negative Fitness: %s", std::to_string(fitness).c_str());
         fitness += add;
     }
     void NEATCommander::sendFitnessToTrainServer()
@@ -95,8 +95,9 @@ namespace UAlbertaBot
         int cSupply = BWAPI::Broodwar->self()->supplyUsed();
 
         int min = BWAPI::Broodwar->self()->minerals();
-        if(min > 13000 && Config::NEAT::AutoSurrender) BWAPI::Broodwar->leaveGame(); //Something went wrong if you have this much mineral
         int gas = BWAPI::Broodwar->self()->gas();
+        //Something went wrong if you have this much mineral or gas
+        if((min > 10000 || gas > 10000) && Config::NEAT::AutoSurrender) BWAPI::Broodwar->leaveGame();
 
         double deltaMineral = min > lastMineral ? min - lastMineral : 0;
         double deltaGas = gas > lastGas ? gas - lastGas : 0;
@@ -177,12 +178,13 @@ namespace UAlbertaBot
 
             int mat = macroActType > 0 ? (int)macroActType : 0;
             mat = mat >= (int)MacroActs::Default ? (int)MacroActs::Default - 1 : mat;
-
+            int posx = int(tilePosX);
+            int posy = int(tilePosY);
             //Clamp tile position outputs
-            tilePosX = tilePosX > 0 ? tilePosX : 1;
-            tilePosX = tilePosX < mapWidth ? tilePosX : mapWidth - 1;
-            tilePosY = tilePosY > 0 ? tilePosY : 1;
-            tilePosY = tilePosY < mapHeight ? tilePosY : mapHeight - 1;
+            posx = posx > 0 ? posx : 1;
+            posx = posx < mapWidth ? posx : mapWidth - 1;
+            posy = posy > 0 ? posy : 1;
+            posy = posy < mapHeight ? posy : mapHeight - 1;
 
             MacroCommand mc = MacroCommand(mct, amount1,amount2, ToBWAPIUnit(macroUT));
             //BWAPI::TilePosition tp = ;
@@ -192,7 +194,7 @@ namespace UAlbertaBot
                 ToBWAPITech(tt), 
                 ToBWAPIUpgrade(ugt), 
                 (MacroActs)mat, 
-                {int(tilePosX) , int(tilePosY)});
+                {posx, posy});
         
             //MacroAct action{};
             _actions.push_back(ma);

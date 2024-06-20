@@ -94,19 +94,6 @@ void BuildingManager::assignWorkersToUnassignedBuildings()
             continue;
         }
 
-        if (b.buildersSent > 1 &&
-            b.type == BWAPI::UnitTypes::Zerg_Hatchery &&
-            b.macroLocation != MacroLocation::Main &&
-            the.my.all.count(BWAPI::UnitTypes::Zerg_Larva) == 0)	// yes, we may need more production
-        {
-            // This is a zerg expansion which failed--we sent a builder and it never built.
-            // The builder was most likely killed along the way.
-            // Conclude that we need more production and change it to a macro hatchery.
-            //BWAPI::Broodwar->printf("change to macro hatch %d,%d", b.desiredPosition.x, b.desiredPosition.y);
-            b.macroLocation = MacroLocation::Main;
-            b.desiredPosition = the.bases.myMain()->getTilePosition();  // all macro hatches in main TODO for now
-        }
-
         // The builder may have already been decided before we got this far.
         // If we don't already have a valid builder, choose one.
         // NOTE There is a dependency loop here. To get the builder, we want to know the
@@ -477,11 +464,10 @@ Building & BuildingManager::addTrackedBuildingTask(const MacroAct & act, BWAPI::
 
     Building b(type, desiredLocation);
     b.macroLocation = act.getMacroLocation();
-    if (b.macroLocation == MacroLocation::Tile)
-    {
-        b.desiredPosition = b.finalPosition = act.getTileLocation();
-    }
-    b.isGasSteal = isGasSteal;
+    
+    b.desiredPosition = b.finalPosition = act.getTileLocation();
+    
+    b.isGasSteal = false;
     b.status = BuildingStatus::Unassigned;
 
     // The builder, if provided, may have been killed, or be otherwise unavailable.

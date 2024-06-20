@@ -648,18 +648,19 @@ BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(const Building & b, int
 
     BWAPI::TilePosition tile = BWAPI::TilePositions::None;
     
-    tile = findSpecialLocation(b);
+    //tile = findSpecialLocation(b);
     
-    if (!tile.isValid())
-    {
-        tile = findAnyLocation(b, extraSpace);
-    }
     try {
+        if (!tile.isValid())
+        {
+            tile = findAnyLocation(b, extraSpace);
+        }
         // Let Bases decide whether to change which base is the main base.
         the.bases.checkBuildingPosition(b.desiredPosition, tile);
     }
     catch (std::exception e)
     {
+        UAB_ASSERT_WARNING(false, "Error BuildingPlacer::getBuildLocationNear()");
         tile = BWAPI::TilePositions::None;
     }
 

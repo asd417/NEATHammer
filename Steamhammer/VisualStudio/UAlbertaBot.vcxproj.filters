@@ -248,6 +248,9 @@
     <ClCompile Include="..\Source\MicroScourge.cpp">
       <Filter>Micro\Zerg</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\stringformat.cpp">
+      <Filter>game\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\CombatCommander.h">
@@ -446,6 +449,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\MicroScourge.h">
       <Filter>Micro\Zerg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\stringformat.h">
+      <Filter>game\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

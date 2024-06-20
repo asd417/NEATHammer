@@ -1,5 +1,5 @@
 #include "GridDistances.h"
-
+#include "stringformat.h"
 #include "The.h"
 
 using namespace UAlbertaBot;
@@ -60,7 +60,10 @@ void GridDistances::compute(const BWAPI::TilePosition & start, int limit, bool n
     std::vector<BWAPI::TilePosition> fringe;
     fringe.reserve(width * height);
     fringe.push_back(start);
-
+    if (!(grid.size() == width && width > 0 && start.x >= 0 && start.y >= 0 && start.x < width && start.y < height)) {
+        std::string e = Strutil::format("bad at(%d,%d) limit(%d,%d) size %dx%d", start.x, start.y, width, height, grid.size(), grid[0].size());
+        throw std::exception(e.c_str());
+    }
     grid[start.x][start.y] = 0;
     sortedTilePositions.push_back(start);
 
