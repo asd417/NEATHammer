@@ -832,18 +832,7 @@ void BuildingManager::cancelBuildingType(BWAPI::UnitType t)
 
 BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
 {
-    if (b.isGasSteal)
-    {
-        Base * enemyBase = the.bases.enemyStart();
-        UAB_ASSERT(enemyBase, "Should find enemy base before gas steal");
-        UAB_ASSERT(enemyBase->getGeysers().size() > 0, "Should have spotted an enemy geyser");
-
-        for (BWAPI::Unit geyser : enemyBase->getGeysers())
-        {
-            return geyser->getTilePosition();
-        }
-    }
-
+   
     int numPylons = the.my.completed.count(BWAPI::UnitTypes::Protoss_Pylon);
     if (b.type.requiresPsi() && numPylons == 0)
     {

@@ -843,8 +843,12 @@ void MacroAct::produce(BWAPI::Unit producer) const
     // The building manager handles sunkens and spores.
     else if (isBuilding() && UnitUtil::NeedsWorkerBuildingType(getUnitType()))
     {
-        BWAPI::TilePosition desiredPosition = the.placer.getMacroLocationTile(getMacroLocation());
-        BuildingManager::Instance().addBuildingTask(*this, desiredPosition, producer, isGasSteal());
+        BWAPI::UnitType type = getUnitType();
+        Building b = Building(type, _tileLocation);
+        b.macroLocation = MacroLocation::Tile;
+        BWAPI::TilePosition desiredPosition = BuildingManager::Instance().getBuildingLocation(b);
+
+        BuildingManager::Instance().addBuildingTask(*this, desiredPosition, producer, false);
     }
     // A non-building unit, or a morphed zerg building.
     else if (isUnit())

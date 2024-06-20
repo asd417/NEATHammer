@@ -582,6 +582,7 @@ BWAPI::TilePosition BuildingPlacer::findSpecialLocation(const Building & b) cons
             tile = findGroupedLocation(b);
         }
     }
+    
     else if (b.type == BWAPI::UnitTypes::Protoss_Pylon)
     {
         tile = findPylonlessBaseLocation(b);

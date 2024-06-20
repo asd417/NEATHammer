@@ -176,8 +176,8 @@ void ProductionManager::manageBuildOrderQueue()
             !BuildingManager::Instance().typeIsStalled(currentItem.macroAct.getUnitType()))
         {
             // construct a temporary building object
-            Building b(currentItem.macroAct.getUnitType(), the.placer.getMacroLocationTile(currentItem.macroAct.getMacroLocation()));
-            b.macroLocation = currentItem.macroAct.getMacroLocation();
+            Building b(currentItem.macroAct.getUnitType(), currentItem.macroAct.getTileLocation());
+            b.macroLocation = MacroLocation::Tile;
 
             // predict the worker movement to that building location
             // NOTE If the worker is set moving, this sets flag _movingToThisBuildingLocation = true
