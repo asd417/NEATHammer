@@ -49,17 +49,6 @@ namespace UAlbertaBot
     void NEATCommander::incrementFrame()
     {
         frame++;
-        if (frame > 30000)
-        {
-            if (BWAPI::Broodwar->self()->supplyTotal() < 10 && Config::NEAT::AutoSurrender)
-            {
-                //16 mins into game and less than 10 max supply -> enemy bot probably bugged out
-                //surrender
-                //GameMessage("gg");
-                UAB_ASSERT(false, "Frame > 30000 and supply less than 10.");
-                BWAPI::Broodwar->leaveGame();
-            }
-        }
     }
     double NEATCommander::getFitness()
     {
@@ -106,6 +95,7 @@ namespace UAlbertaBot
         int cSupply = BWAPI::Broodwar->self()->supplyUsed();
 
         int min = BWAPI::Broodwar->self()->minerals();
+        if(min > 13000 && Config::NEAT::AutoSurrender) BWAPI::Broodwar->leaveGame(); //Something went wrong if you have this much mineral
         int gas = BWAPI::Broodwar->self()->gas();
 
         double deltaMineral = min > lastMineral ? min - lastMineral : 0;
