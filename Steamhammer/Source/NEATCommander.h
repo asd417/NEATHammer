@@ -7,7 +7,40 @@
 #include <array>
 namespace UAlbertaBot
 {
+	enum class NetworkProtossUnits {
+		Protoss_Probe,
+		Protoss_Zealot,
+		Protoss_Dragoon,
+		Protoss_High_Templar,
+		Protoss_Archon,
+		Protoss_Dark_Templar,
+		Protoss_Dark_Archon,
+		Protoss_Reaver,
+		Protoss_Shuttle,
+		Protoss_Observer,
+		Protoss_Scout,
+		Protoss_Corsair,
+		Protoss_Arbiter,
+		Protoss_Carrier,
 
+		Protoss_Nexus,
+		Protoss_Pylon,
+		Protoss_Assimilator,
+		Protoss_Gateway,
+		Protoss_Forge,
+		Protoss_Photon_Cannon,
+		Protoss_Shield_Battery,
+		Protoss_Cybernetics_Core,
+		Protoss_Citadel_of_Adun,
+		Protoss_Templar_Archives,
+		Protoss_Robotics_Facility,
+		Protoss_Robotics_Support_Bay,
+		Protoss_Observatory,
+		Protoss_Stargate,
+		Protoss_Fleet_Beacon,
+		Protoss_Arbiter_Tribunal,
+		NETWORK_UNIT_COUNT
+	};
 	enum class NetworkUnits {
 		Terran_SCV,
 		Terran_Marine,
@@ -341,6 +374,7 @@ namespace UAlbertaBot
 
 		void evaluate();
 		void getVisibleMap(int sectionNum);
+		BWAPI::UnitType ToBWAPIUnitProtoss(NetworkProtossUnits ut);
 		BWAPI::UnitType ToBWAPIUnit(NetworkUnits ut);
 		BWAPI::TechType ToBWAPITech(NetworkTech tt);
 		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkUpgrade ut);

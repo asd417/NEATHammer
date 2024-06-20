@@ -564,39 +564,78 @@ int ProductionManager::getFreeGas() const
 //Why is productionManager executing non-production macro commands...
 void ProductionManager::executeCommand(const MacroAct & act)
 {
+    int x = 40;
+    int y = 70;
     UAB_ASSERT(act.isCommand(), "not a command");
-
+    
     MacroCommandType cmd = act.getCommandType().getType();
 
 //NEATCommander will not use ScoutManager.
 //Instead it uses existing squad and squad command type to figure that out.
     if (cmd == MacroCommandType::StopGas)
     {
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::StopGas");
+            UAB_ASSERT(false, "\x04 MacroCommandType::StopGas");
+            y += 10;
+        }
         WorkerManager::Instance().setCollectGas(false);
     }
     else if (cmd == MacroCommandType::StartGas)
     {
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::StartGas");
+            UAB_ASSERT(false, "\x04 MacroCommandType::StartGas");
+            y += 10;
+        }
         WorkerManager::Instance().setCollectGas(true);
     }
     else if (cmd == MacroCommandType::Aggressive)
     {
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::Aggressive");
+            UAB_ASSERT(false, "\x04 MacroCommandType::Aggressive");
+            y += 10;
+        }
         CombatCommander::Instance().setAggression(true);
     }
     else if (cmd == MacroCommandType::Defensive)
     {
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::Defensive");
+            UAB_ASSERT(false, "\x04 MacroCommandType::Defensive");
+            y += 10;
+        }
         CombatCommander::Instance().setAggression(false);
     }
     else if (cmd == MacroCommandType::PostWorker)
     {
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::PostWorker at MacroLocation %d", act.getMacroLocation());
+            UAB_ASSERT(false, "\x04 MacroCommandType::PostWorker at MacroLocation %d", act.getMacroLocation());
+            y += 10;
+        }
         WorkerManager::Instance().postWorker(act.getMacroLocation());
     }
     else if (cmd == MacroCommandType::UnpostWorkers)
     {
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::UnpostWorker at MacroLocation %d", act.getMacroLocation());
+            UAB_ASSERT(false, "\x04 MacroCommandType::UnpostWorker at MacroLocation %d", act.getMacroLocation());
+            y += 10;
+        }
         WorkerManager::Instance().unpostWorkers(act.getMacroLocation());
     }
     //Put all units of type within given radius of given tile position into squad with squadindex
     else if (cmd == MacroCommandType::AssignToSquad)
     {
+
         int radius = act.getCommandType().getAmount2();
         //Clamp radius between 3 and 256
         radius = radius < 3 ? 3 : radius;
@@ -611,6 +650,12 @@ void ProductionManager::executeCommand(const MacroAct & act)
         // There are only 5 squads with index 0 1 2 3 4
         squadIndex = squadIndex < 0 ? 0 : squadIndex;
         squadIndex = squadIndex > 4 ? 4 : squadIndex;
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::AssignToSquad around units at %d %d to squad %d", act.getTileLocation().x, act.getTileLocation().y, squadIndex);
+            UAB_ASSERT(false, "\x04 MacroCommandType::AssignToSquad around units at %d %d to squad %d", act.getTileLocation().x, act.getTileLocation().y, squadIndex);
+            y += 10;
+        }
         CombatCommander::Instance().NEAT_AssignToSquad(foundUnits, squadIndex);
     }
     //Remove all units of type within given radius of given tile position into squad with squadindex
@@ -630,6 +675,13 @@ void ProductionManager::executeCommand(const MacroAct & act)
         // There are only 5 squads with index 0 1 2 3 4
         squadIndex = squadIndex < 0 ? 0 : squadIndex;
         squadIndex = squadIndex > 4 ? 4 : squadIndex;
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::RemoveFromSquad around units at %d %d to squad %d", act.getTileLocation().x, act.getTileLocation().y, squadIndex);
+            UAB_ASSERT(false, "\x04 MacroCommandType::RemoveFromSquad around units at %d %d to squad %d", act.getTileLocation().x, act.getTileLocation().y, squadIndex);
+
+            y += 10;
+        }
         CombatCommander::Instance().NEAT_RemoveFromSquad(foundUnits, squadIndex);
     }
     else if (cmd == MacroCommandType::SetSquadOrder) 
@@ -642,6 +694,13 @@ void ProductionManager::executeCommand(const MacroAct & act)
         // There are only 10 order types
         orderType = orderType < 0 ? 0 : orderType;
         orderType = orderType > 9 ? 9 : orderType;
+        if (Config::Debug::DrawProductionInfo)
+        {
+            BWAPI::Broodwar->drawTextScreen(x - 10, y, "\x04 MacroCommandType::SetSquadOrder to squad %d as %d", squadIndex, orderType);
+            UAB_ASSERT(false, "\x04 MacroCommandType::SetSquadOrder to squad %d as %d", squadIndex, orderType);
+
+            y += 10;
+        }
         CombatCommander::Instance().NEAT_SetSquadOrder((SquadOrderTypes)orderType, squadIndex, { act.getTileLocation().x, act.getTileLocation().y });
     }
 }

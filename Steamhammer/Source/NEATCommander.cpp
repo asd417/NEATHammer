@@ -150,15 +150,13 @@ namespace UAlbertaBot
         tilePosY += network->getOutputVector()[8];
         macroCommandUnitType += network->getOutputVector()[9];
 
-        
-
         curSection++;
         curSection = curSection % maxSections;
         if (curSection == 0)
         {
             int a = macroCommandUnitType > 0 ? (int)macroCommandUnitType : 0;
-            a = a >= (int)NetworkUnits::NETWORK_UNIT_COUNT ? (int)NetworkUnits::NETWORK_UNIT_COUNT - 1 : a;
-            NetworkUnits macroUT = (NetworkUnits)a;
+            a = a >= (int)NetworkProtossUnits::NETWORK_UNIT_COUNT ? (int)NetworkProtossUnits::NETWORK_UNIT_COUNT - 1 : a;
+            NetworkProtossUnits macroUT = (NetworkProtossUnits)a;
 
             int b = unitType > 0 ? (int)unitType : 0;
             b = b >= (int)NetworkUnits::NETWORK_UNIT_COUNT ? (int)NetworkUnits::NETWORK_UNIT_COUNT - 1 : b;
@@ -186,7 +184,7 @@ namespace UAlbertaBot
             posy = posy > 0 ? posy : 1;
             posy = posy < mapHeight ? posy : mapHeight - 1;
 
-            MacroCommand mc = MacroCommand(mct, amount1,amount2, ToBWAPIUnit(macroUT));
+            MacroCommand mc = MacroCommand(mct, amount1,amount2, ToBWAPIUnitProtoss(macroUT));
             //BWAPI::TilePosition tp = ;
             MacroAct ma = MacroAct(
                 mc, 
@@ -328,6 +326,74 @@ namespace UAlbertaBot
                     enemyMapData[i][j] = highestImportanceEnemy;
                 }
             }
+        }
+    }
+
+
+    BWAPI::UnitType NEATCommander::ToBWAPIUnitProtoss(NetworkProtossUnits ut) {
+        switch (ut) {
+        case NetworkProtossUnits::Protoss_Probe:
+            return BWAPI::UnitTypes::Protoss_Probe;
+        case NetworkProtossUnits::Protoss_Zealot:
+            return BWAPI::UnitTypes::Protoss_Zealot;
+        case NetworkProtossUnits::Protoss_Dragoon:
+            return BWAPI::UnitTypes::Protoss_Dragoon;
+        case NetworkProtossUnits::Protoss_High_Templar:
+            return BWAPI::UnitTypes::Protoss_High_Templar;
+        case NetworkProtossUnits::Protoss_Archon:
+            return BWAPI::UnitTypes::Protoss_Archon;
+        case NetworkProtossUnits::Protoss_Dark_Templar:
+            return BWAPI::UnitTypes::Protoss_Dark_Templar;
+        case NetworkProtossUnits::Protoss_Dark_Archon:
+            return BWAPI::UnitTypes::Protoss_Dark_Archon;
+        case NetworkProtossUnits::Protoss_Reaver:
+            return BWAPI::UnitTypes::Protoss_Reaver;
+        case NetworkProtossUnits::Protoss_Shuttle:
+            return BWAPI::UnitTypes::Protoss_Shuttle;
+        case NetworkProtossUnits::Protoss_Observer:
+            return BWAPI::UnitTypes::Protoss_Observer;
+        case NetworkProtossUnits::Protoss_Scout:
+            return BWAPI::UnitTypes::Protoss_Scout;
+        case NetworkProtossUnits::Protoss_Corsair:
+            return BWAPI::UnitTypes::Protoss_Corsair;
+        case NetworkProtossUnits::Protoss_Arbiter:
+            return BWAPI::UnitTypes::Protoss_Arbiter;
+        case NetworkProtossUnits::Protoss_Carrier:
+            return BWAPI::UnitTypes::Protoss_Carrier;
+        case NetworkProtossUnits::Protoss_Nexus:
+            return BWAPI::UnitTypes::Protoss_Nexus;
+        case NetworkProtossUnits::Protoss_Pylon:
+            return BWAPI::UnitTypes::Protoss_Pylon;
+        case NetworkProtossUnits::Protoss_Assimilator:
+            return BWAPI::UnitTypes::Protoss_Assimilator;
+        case NetworkProtossUnits::Protoss_Gateway:
+            return BWAPI::UnitTypes::Protoss_Gateway;
+        case NetworkProtossUnits::Protoss_Forge:
+            return BWAPI::UnitTypes::Protoss_Forge;
+        case NetworkProtossUnits::Protoss_Photon_Cannon:
+            return BWAPI::UnitTypes::Protoss_Photon_Cannon;
+        case NetworkProtossUnits::Protoss_Shield_Battery:
+            return BWAPI::UnitTypes::Protoss_Shield_Battery;
+        case NetworkProtossUnits::Protoss_Cybernetics_Core:
+            return BWAPI::UnitTypes::Protoss_Cybernetics_Core;
+        case NetworkProtossUnits::Protoss_Citadel_of_Adun:
+            return BWAPI::UnitTypes::Protoss_Citadel_of_Adun;
+        case NetworkProtossUnits::Protoss_Templar_Archives:
+            return BWAPI::UnitTypes::Protoss_Templar_Archives;
+        case NetworkProtossUnits::Protoss_Robotics_Facility:
+            return BWAPI::UnitTypes::Protoss_Robotics_Facility;
+        case NetworkProtossUnits::Protoss_Robotics_Support_Bay:
+            return BWAPI::UnitTypes::Protoss_Robotics_Support_Bay;
+        case NetworkProtossUnits::Protoss_Observatory:
+            return BWAPI::UnitTypes::Protoss_Observatory;
+        case NetworkProtossUnits::Protoss_Stargate:
+            return BWAPI::UnitTypes::Protoss_Stargate;
+        case NetworkProtossUnits::Protoss_Fleet_Beacon:
+            return BWAPI::UnitTypes::Protoss_Fleet_Beacon;
+        case NetworkProtossUnits::Protoss_Arbiter_Tribunal:
+            return BWAPI::UnitTypes::Protoss_Arbiter_Tribunal;
+        default:
+            return BWAPI::UnitTypes::Protoss_Probe;
         }
     }
 
