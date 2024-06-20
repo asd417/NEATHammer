@@ -844,11 +844,17 @@ void MacroAct::produce(BWAPI::Unit producer) const
     else if (isBuilding() && UnitUtil::NeedsWorkerBuildingType(getUnitType()))
     {
         BWAPI::UnitType type = getUnitType();
-        Building b = Building(type, _tileLocation);
-        b.macroLocation = MacroLocation::Tile;
-        BWAPI::TilePosition desiredPosition = BuildingManager::Instance().getBuildingLocation(b);
+        BWAPI::TilePosition desiredPosition;
+        try {
+            Building b = Building(type, _tileLocation);
+            b.macroLocation = MacroLocation::Tile;
+            desiredPosition = BuildingManager::Instance().getBuildingLocation(b);
 
-        BuildingManager::Instance().addBuildingTask(*this, desiredPosition, producer, false);
+            BuildingManager::Instance().addBuildingTask(*this, desiredPosition, producer, false);
+        } catch (std::exception e)
+        {
+            throw std::exception("Error in MacroAct::produce()!");
+        }
     }
     // A non-building unit, or a morphed zerg building.
     else if (isUnit())

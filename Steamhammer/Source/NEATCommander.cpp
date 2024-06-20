@@ -149,6 +149,8 @@ namespace UAlbertaBot
         tilePosY += network->getOutputVector()[8];
         macroCommandUnitType += network->getOutputVector()[9];
 
+        
+
         curSection++;
         curSection = curSection % maxSections;
         if (curSection == 0)
@@ -176,6 +178,12 @@ namespace UAlbertaBot
             int mat = macroActType > 0 ? (int)macroActType : 0;
             mat = mat >= (int)MacroActs::Default ? (int)MacroActs::Default - 1 : mat;
 
+            //Clamp tile position outputs
+            tilePosX = tilePosX > 0 ? tilePosX : 1;
+            tilePosX = tilePosX < mapWidth ? tilePosX : mapWidth - 1;
+            tilePosY = tilePosY > 0 ? tilePosY : 1;
+            tilePosY = tilePosY < mapHeight ? tilePosY : mapHeight - 1;
+
             MacroCommand mc = MacroCommand(mct, amount1,amount2, ToBWAPIUnit(macroUT));
             //BWAPI::TilePosition tp = ;
             MacroAct ma = MacroAct(
@@ -184,7 +192,7 @@ namespace UAlbertaBot
                 ToBWAPITech(tt), 
                 ToBWAPIUpgrade(ugt), 
                 (MacroActs)mat, 
-                { (int) tilePosX , (int) tilePosY });
+                {int(tilePosX) , int(tilePosY)});
         
             //MacroAct action{};
             _actions.push_back(ma);

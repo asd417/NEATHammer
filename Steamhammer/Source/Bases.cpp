@@ -635,7 +635,6 @@ void Bases::update()
 void Bases::checkBuildingPosition(const BWAPI::TilePosition & desired, const BWAPI::TilePosition & actual)
 {
     UAB_ASSERT(desired.isValid(), "bad location");
-
     if (the.zone.at(desired) == the.zone.at(mainBase->getTilePosition()))
     {
         // We tried to place in the main base, so let's keep checking.
