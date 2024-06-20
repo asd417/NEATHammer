@@ -159,8 +159,8 @@ namespace UAlbertaBot
             NetworkProtossUnits macroUT = (NetworkProtossUnits)a;
 
             int b = unitType > 0 ? (int)unitType : 0;
-            b = b >= (int)NetworkUnits::NETWORK_UNIT_COUNT ? (int)NetworkUnits::NETWORK_UNIT_COUNT - 1 : b;
-            NetworkUnits ut = (NetworkUnits)b;
+            b = b >= (int)NetworkProtossUnits::NETWORK_UNIT_COUNT ? (int)NetworkProtossUnits::NETWORK_UNIT_COUNT - 1 : b;
+            NetworkProtossUnits ut = (NetworkProtossUnits)b;
 
             int c = techType > 0 ? (int)techType : 0;
             c = c >= (int)NetworkTech::NETWORK_TECH_COUNT ? (int)NetworkTech::NETWORK_TECH_COUNT - 1 : c;
@@ -188,7 +188,7 @@ namespace UAlbertaBot
             //BWAPI::TilePosition tp = ;
             MacroAct ma = MacroAct(
                 mc, 
-                ToBWAPIUnit(ut), 
+                ToBWAPIUnitProtoss(ut), 
                 ToBWAPITech(tt), 
                 ToBWAPIUpgrade(ugt), 
                 (MacroActs)mat, 
