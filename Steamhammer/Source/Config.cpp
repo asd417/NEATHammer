@@ -144,8 +144,6 @@ namespace Config
         int WorkersPerRefinery              = 3;
         double WorkersPerPatch              = 3.0;
         int AbsoluteMaxWorkers				= 75;
-        int BuildingSpacing                 = 1;
-        int PylonSpacing                    = 3;
         bool ExpandToIslands				= false;
     }
 

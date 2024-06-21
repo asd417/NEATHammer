@@ -10,6 +10,12 @@
 
 namespace UAlbertaBot
 {
+    enum class Squads {
+        IDLE,
+        GROUND,
+        FLYING,
+
+    };
 class CombatCommander
 {
     SquadData       _squadData;

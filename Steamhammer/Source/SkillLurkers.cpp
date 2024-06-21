@@ -1,7 +1,6 @@
 #include "SkillLurkers.h"
 
 #include "CombatCommander.h"
-#include "OpponentModel.h"
 #include "ProductionManager.h"
 #include "Random.h"
 #include "The.h"

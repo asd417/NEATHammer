@@ -126,16 +126,14 @@ void CombatCommander::update(const BWAPI::Unitset & combatUnits)
 
     if (frame8 == 1)
     {
-        /*updateIdleSquad();
-        updateIrradiatedSquad();
-        updateOverlordSquad();
-        updateScourgeSquad();
+        updateIdleSquad();
+        updateIrradiatedSquad();//Automatically makes Irradiated Squad
         updateDropSquads();
         updateScoutDefenseSquad();
         updateBaseDefenseSquads();
         updateWatchSquads();
         updateReconSquad();
-        updateAttackSquads();*/
+        updateAttackSquads();
         NEAT_UpdateSquads();
     }
     else if (frame8 % 4 == 2)
@@ -240,101 +238,6 @@ void CombatCommander::updateIrradiatedSquad()
     }
 }
 
-// Put all overlords which are not otherwise assigned into the Overlord squad.
-void CombatCommander::updateOverlordSquad()
-{
-    // If we don't have an overlord squad, then do nothing.
-    // It is created in initializeSquads().
-    if (!_squadData.squadExists("Overlord"))
-    {
-        return;
-    }
-
-    Squad & ovieSquad = _squadData.getSquad("Overlord");
-    for (BWAPI::Unit unit : _combatUnits)
-    {
-        if (unit->getType() == BWAPI::UnitTypes::Zerg_Overlord && _squadData.canAssignUnitToSquad(unit, ovieSquad))
-        {
-            _squadData.assignUnitToSquad(unit, ovieSquad);
-        }
-    }
-}
-
-void CombatCommander::chooseScourgeTarget(const Squad & sourgeSquad)
-{
-    BWAPI::Position center = sourgeSquad.calcCenter();
-
-    BWAPI::Position bestTarget = the.bases.myMain()->getPosition();
-    int bestScore = INT_MIN;
-
-    for (const auto & kv : the.info.getUnitData(the.enemy()).getUnits())
-    {
-        const UnitInfo & ui(kv.second);
-
-        // Skip inappropriate units and units known to have moved away some time ago.
-        // Also stay out of range of enemy static air defense.
-        if (!ui.type.isFlyer() ||           // excludes all buildings, including lifted buildings
-            ui.type.isSpell() ||
-            ui.type == BWAPI::UnitTypes::Protoss_Interceptor ||
-            ui.type == BWAPI::UnitTypes::Zerg_Overlord ||
-            ui.goneFromLastPosition && the.now() - ui.updateFrame > 5 * 24 ||
-            the.airAttacks.inRange(BWAPI::TilePosition(ui.lastPosition)))
-        {
-            continue;
-        }
-
-        int score = MicroScourge::getAttackPriority(ui.type);
-
-        if (ui.unit && ui.unit->isVisible())
-        {
-            score += 2;
-        }
-
-        // Each score increment is worth 2 tiles of distance.
-        const int distance = center.getApproxDistance(ui.lastPosition);
-        score -= distance / 16;
-        if (score > bestScore)
-        {
-            bestTarget = ui.lastPosition;
-            bestScore = score;
-        }
-    }
-
-    _scourgeTarget = bestTarget;
-}
-
-// Put all scourge into the Scourge squad.
-void CombatCommander::updateScourgeSquad()
-{
-    // If we don't have a scourge squad, then do nothing.
-    // It is created in initializeSquads() for zerg only.
-    if (!_squadData.squadExists("Scourge"))
-    {
-        return;
-    }
-
-    Squad & scourgeSquad = _squadData.getSquad("Scourge");
-
-    for (BWAPI::Unit unit : _combatUnits)
-    {
-        if (unit->getType() == BWAPI::UnitTypes::Zerg_Scourge && _squadData.canAssignUnitToSquad(unit, scourgeSquad))
-        {
-            _squadData.assignUnitToSquad(unit, scourgeSquad);
-        }
-    }
-
-    // We want an overlord to come along if the enemy has arbiters or cloaked wraiths,
-    // but only if we have overlord speed.
-    bool wantDetector =
-        the.self()->getUpgradeLevel(BWAPI::UpgradeTypes::Pneumatized_Carapace) > 0 &&
-        the.info.enemyHasAirCloakTech();
-    maybeAssignDetector(scourgeSquad, wantDetector);
-
-    // Issue the order.
-    chooseScourgeTarget(scourgeSquad);
-    scourgeSquad.setOrder(SquadOrder(SquadOrderTypes::OmniAttack, _scourgeTarget, 300, false, _scourgeTarget == the.bases.myMain()->getPosition() ? "Stand by" : "Chase"));
-}
-
 // Comparison function for a sort done below.
 bool compareFirst(const std::pair<int, Base *> & left, const std::pair<int, Base *> & right)
 {
@@ -347,11 +250,6 @@ bool compareFirst(const std::pair<int, Base *> & left, const std::pair<int, Base
 // For now, only zerg keeps watch squads, and only when units are available.
 void CombatCommander::updateWatchSquads()
 {
-    // Only if we're zerg. Not implemented for other races.
-    if (the.selfRace() != BWAPI::Races::Zerg)
-    {
-        return;
-    }
 
     // We choose bases to watch relative to the enemy start, so we must know it first.
     if (!the.bases.enemyStart())
@@ -360,23 +258,21 @@ void CombatCommander::updateWatchSquads()
     }
 
     // What to assign to Watch squads.
-    const bool hasBurrow = the.self()->hasResearched(BWAPI::TechTypes::Burrowing);
-    const int nLings = the.my.completed.count(BWAPI::UnitTypes::Zerg_Zergling);
+    const bool fastZealot = the.self()->getUpgradeLevel(BWAPI::UpgradeTypes::Leg_Enhancements) > 0;
+    const int nZealot = the.my.completed.count(BWAPI::UnitTypes::Protoss_Zealot);
     const int groundStrength =
-        nLings +
-        the.my.completed.count(BWAPI::UnitTypes::Zerg_Hydralisk) +
-        2 * the.my.completed.count(BWAPI::UnitTypes::Zerg_Lurker) +
-        3 * the.my.completed.count(BWAPI::UnitTypes::Zerg_Ultralisk);
-    const int perWatcher = (hasBurrow && the.enemyRace() != BWAPI::Races::Zerg) ? 9 : 12;
-    if (nLings == 0 || the.bases.freeLandBaseCount() == 0)
+        nZealot +
+        the.my.completed.count(BWAPI::UnitTypes::Protoss_Dragoon);
+    const int perWatcher = (fastZealot && the.enemyRace() != BWAPI::Races::Zerg) ? 9 : 12;
+    if (nZealot == 0 || the.bases.freeLandBaseCount() == 0)
     {
         // We have either nothing to watch with, or nothing to watch over.
         _isWatching = false;
     }
 
-    // When _isWatching is set, we ensure at least one watching zergling (if any exist).
+    // When _isWatching is set, we ensure at least one watching zealot (if any exist).
     // Otherwise we might disband the most important squad intermittently, losing its value.
-    int nWatchers = std::min(nLings, Clip(groundStrength / perWatcher, _isWatching ? 1 : 0, hasBurrow ? 4 : 2));
+    int nWatchers = std::min(nZealot, Clip(groundStrength / perWatcher, _isWatching ? 1 : 0, fastZealot ? 3 : 1));
 
     // Sort free bases by nearness to enemy main, which must be known (we check above).
     // Distance scores for good bases, score -1 for others.
@@ -459,8 +355,8 @@ void CombatCommander::updateWatchSquads()
                     {
                         _squadData.assignUnitToSquad(unit, watchSquad);
                         --nWatchers;		// we used one up
-                        // If we have burrow, we want to keep watching at least one neutral base. Flag it.
-                        if (hasBurrow)
+                        // If we have leg enhancement, we want to keep watching at least one neutral base. Flag it.
+                        if (fastZealot)
                         {
                             _isWatching = true;
                         }
@@ -1723,17 +1619,35 @@ void UAlbertaBot::CombatCommander::NEAT_UpdateSquads()
 
 }
 
+/// <summary>
+/// Creates Squads
+/// </summary>
 void UAlbertaBot::CombatCommander::NEAT_CreateSquads()
 {
-    _squadData.createSquad("0", IdlePriority).getOrder().setStatus("Work");
-    _squadData.createSquad("1", IdlePriority);
-    _squadData.createSquad("2", IdlePriority);
-    _squadData.createSquad("3", IdlePriority);
-    _squadData.createSquad("4", IdlePriority);
+    _squadData.createSquad("Idle", IdlePriority).getOrder().setStatus("Work");
+    // The ground squad will pressure an enemy base.
+    _squadData.createSquad("Ground", AttackPriority);
+
+    // The flying squad separates air units so they can act independently.
+    _squadData.createSquad("Flying", AttackPriority);
+
+    // The recon squad carries out reconnaissance in force to deny enemy bases.
+    // It is filled in when enough units are available.
+    Squad & reconSquad = _squadData.createSquad("Recon", ReconPriority);
+    reconSquad.setOrder(SquadOrder("Recon"));
+    reconSquad.setCombatSimRadius(200);  // combat sim includes units in a smaller radius than for a combat squad
+    reconSquad.setFightVisible(true);    // combat sim sees only visible enemy units (not all known enemies)
+
+    BWAPI::Position ourBasePosition = BWAPI::Position(the.self()->getStartLocation());
+    _squadData.createSquad("ScoutDefense", ScoutDefensePriority).
+        setOrder(SquadOrder(SquadOrderTypes::Defend, ourBasePosition, Config::Micro::ScoutDefenseRadius, false, "Stop that scout"));
+
+    _squadData.createSquad("Drop", DropPriority).setOrder(SquadOrder(SquadOrderTypes::Hold, ourBasePosition, AttackRadius, false, "Wait for transport"));
 }
 
 void CombatCommander::NEAT_AssignToSquad(BWAPI::Unitset units, int squadIndex)
 {
+
     for (BWAPI::Unit u : units) {
         _squadData.getSquad(std::to_string(squadIndex)).addUnit(u);
     }

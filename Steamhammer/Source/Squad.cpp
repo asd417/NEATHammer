@@ -130,7 +130,7 @@ void Squad::update()
     _microDetectors.go(_units);
 
     // High templar stay home until they merge to archons, all that's supported so far.
-    //_microHighTemplars.update();
+    //_microHighTemplar.update();
 
     // Queens don't go into clusters, but act independently.
     _microQueens.update(_vanguard);
@@ -141,6 +141,7 @@ void Squad::update()
     {
         if (unit->getType().isDetector() ||
             unit->getType().spaceProvided() > 0 ||
+            unit->getType() == BWAPI::UnitTypes::Protoss_High_Templar ||
             unit->getType() == BWAPI::UnitTypes::Zerg_Queen)
         {
             // Don't cluster detectors, transports, high templar, queens.
@@ -297,16 +298,12 @@ void Squad::microSpecialUnits(const UnitCluster & cluster)
         {
             vanguard = _vanguard;									// squad vanguard
         }
-        _microArbiter.updateMovement(cluster, vanguard);
-        _microHighTemplars.updateMovement(cluster, vanguard);
+        
         _microDefilers.updateMovement(cluster, vanguard);
         _microMedics.update(cluster, vanguard);
     }
     else if (spellPhase == 2)
     {
-        _microArbiter.updateSpell(cluster);
-        _microCorsair.updateSpell(cluster);
-        _microHighTemplars.updateSpell(cluster);
         _microDefilers.updateSwarm(cluster);
     }
     else if (spellPhase == 4)
@@ -584,7 +581,7 @@ void Squad::setOrderForMicroManagers()
     _microMelee.setOrder(_order);
     _microRanged.setOrder(_order);
     _microDetectors.setOrder(_order);
-    _microHighTemplars.setOrder(_order);
+    _microHighTemplar.setOrder(_order);
     _microLurkers.setOrder(_order);
     _microMedics.setOrder(_order);
     //_microMutas.setOrder(_order);
@@ -602,6 +599,7 @@ void Squad::addUnitsToMicroManagers()
     BWAPI::Unitset rangedUnits;
     BWAPI::Unitset defilerUnits;
     BWAPI::Unitset detectorUnits;
+    BWAPI::Unitset highTemplarUnits;
     BWAPI::Unitset scourgeUnits;
     BWAPI::Unitset transportUnits;
     BWAPI::Unitset lurkerUnits;
@@ -609,9 +607,6 @@ void Squad::addUnitsToMicroManagers()
     BWAPI::Unitset queenUnits;
     BWAPI::Unitset tankUnits;
     BWAPI::Unitset medicUnits;
-    //Protoss Micro Units
-    BWAPI::Unitset highTemplarUnits;
-    BWAPI::Unitset corsairUnits;
 
     // We will assign zerglings as defiler food. The defiler micro manager will control them.
     int defilerFoodWanted = 0;
@@ -648,13 +643,10 @@ void Squad::addUnitsToMicroManagers()
                 overlordUnits.insert(unit);
             }
             else if (unit->getType() == BWAPI::UnitTypes::Terran_Valkyrie ||
+                unit->getType() == BWAPI::UnitTypes::Protoss_Corsair ||
                 unit->getType() == BWAPI::UnitTypes::Zerg_Devourer)
             {
                 airToAirUnits.insert(unit);
-            }
-            else if (unit->getType() == BWAPI::UnitTypes::Protoss_Corsair)
-            {
-                corsairUnits.insert(unit);
             }
             else if (unit->getType() == BWAPI::UnitTypes::Protoss_High_Templar)
             {
@@ -736,7 +728,7 @@ void Squad::addUnitsToMicroManagers()
             break;
         }
     }
-    //Add all special micro units here
+
     _microIrradiated.setUnits(irradiatedUnits);
     _microOverlords.setUnits(overlordUnits);
     _microAirToAir.setUnits(airToAirUnits);
@@ -744,10 +736,7 @@ void Squad::addUnitsToMicroManagers()
     _microRanged.setUnits(rangedUnits);
     _microDefilers.setUnits(defilerUnits);
     _microDetectors.setUnits(detectorUnits);
-
-    _microHighTemplars.setUnits(highTemplarUnits);
-    _microCorsair.setUnits(corsairUnits);
-
+    _microHighTemplar.setUnits(highTemplarUnits);
     _microLurkers.setUnits(lurkerUnits);
     _microMedics.setUnits(medicUnits);
     //_microMutas.setUnits(mutaUnits);

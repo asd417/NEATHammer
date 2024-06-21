@@ -4,7 +4,6 @@
 #include "Bases.h"
 #include "InformationManager.h"
 #include "MapGrid.h"
-#include "OpeningTiming.h"
 #include "ParseUtils.h"
 #include "ProductionManager.h"
 #include "Random.h"
@@ -16,7 +15,7 @@ The::The()
     : bases(Bases::Instance())
     , grid(MapGrid::Instance())
     , info(InformationManager::Instance())
-    , openingTiming(OpeningTiming::Instance())
+    //, openingTiming(OpeningTiming::Instance())
     , production(ProductionManager::Instance())
     , random(Random::Instance())
     , staticDefense(*new StaticDefense)

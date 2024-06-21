@@ -14,7 +14,7 @@ TimerManager::TimerManager()
 
     _timerNames.push_back("UnitInfo");	// InformationManager
     _timerNames.push_back("MapGrid");
-    _timerNames.push_back("Opponent");	// OpponentModel
+    _timerNames.push_back("Skill");
 
     _timerNames.push_back("Search");
     _timerNames.push_back("Worker");

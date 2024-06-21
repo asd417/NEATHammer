@@ -139,8 +139,6 @@ namespace Config
         extern int WorkersPerRefinery;
         extern double WorkersPerPatch;
         extern int AbsoluteMaxWorkers;
-        extern int BuildingSpacing;
-        extern int PylonSpacing;
         extern int ProductionJamFrameLimit;
         extern bool ExpandToIslands;
     }

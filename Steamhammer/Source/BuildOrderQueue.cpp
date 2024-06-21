@@ -313,7 +313,7 @@ void BuildOrderQueue::drawQueueInformation(int x, int y, bool outOfBook)
             prefix = white;
         }
 
-        BWAPI::Broodwar->drawTextScreen(x, y, " %c%s", prefix, NiceMacroActName(act.getName()).c_str());
+        BWAPI::Broodwar->drawTextScreen(x, y, " %c%s confidence: %4.2f", prefix, NiceMacroActName(act.getName()).c_str(), act.confidence);
         y += 10;
     }
 
@@ -321,10 +321,6 @@ void BuildOrderQueue::drawQueueInformation(int x, int y, bool outOfBook)
     if (remaining > 0)
     {
         endMark << '+' << remaining << " more ";
-    }
-    if (!outOfBook)
-    {
-        endMark << "[book]";
     }
     if (!endMark.str().empty())
     {

@@ -108,9 +108,6 @@
     <ClCompile Include="..\source\BuildOrderQueue.cpp">
       <Filter>game\macro\buildorders</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\BOSSManager.cpp">
-      <Filter>game\macro\buildorders</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\BuildOrder.cpp">
       <Filter>game\macro\buildorders</Filter>
     </ClCompile>
@@ -145,14 +142,11 @@
       <Filter>util</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\MacroAct.cpp" />
-    <ClCompile Include="..\Source\StrategyBossZerg.cpp" />
     <ClCompile Include="..\Source\Random.cpp" />
     <ClCompile Include="..\Source\Base.cpp" />
     <ClCompile Include="..\Source\FAP.cpp" />
     <ClCompile Include="..\Source\GameRecord.cpp" />
-    <ClCompile Include="..\Source\OpponentModel.cpp" />
     <ClCompile Include="..\Source\PlayerSnapshot.cpp" />
-    <ClCompile Include="..\Source\OpponentPlan.cpp" />
     <ClCompile Include="..\Source\Bases.cpp" />
     <ClCompile Include="..\Source\ProductionGoal.cpp" />
     <ClCompile Include="..\Source\MapPartitions.cpp" />
@@ -172,18 +166,13 @@
     <ClCompile Include="..\Source\GridCreep.cpp" />
     <ClCompile Include="..\Source\ResourceInfo.cpp" />
     <ClCompile Include="..\Source\Skill.cpp" />
-    <ClCompile Include="..\Source\SkillGasSteal.cpp" />
     <ClCompile Include="..\Source\SkillKit.cpp" />
     <ClCompile Include="..\Source\SkillUnitTimings.cpp" />
     <ClCompile Include="..\Source\GridBuildable.cpp" />
     <ClCompile Include="..\Source\MacroCommand.cpp" />
     <ClCompile Include="..\Source\SkillBattles.cpp" />
-    <ClCompile Include="..\Source\OpeningTiming.cpp" />
-    <ClCompile Include="..\Source\SkillOpeningTiming.cpp" />
-    <ClCompile Include="..\Source\OpeningTimingRecord.cpp" />
     <ClCompile Include="..\Source\SkillLurkers.cpp" />
     <ClCompile Include="..\Source\TacticsOrders.cpp" />
-    <ClCompile Include="..\Source\SquadOrder.cpp" />
     <ClCompile Include="..\Source\StaticDefense.cpp" />
     <ClCompile Include="..\Source\NEATCommander.cpp">
       <Filter>NEAT</Filter>
@@ -251,6 +240,9 @@
     <ClCompile Include="..\Source\stringformat.cpp">
       <Filter>game\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\SquadOrder.cpp">
+      <Filter>game\combat\squad</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\CombatCommander.h">
@@ -310,9 +302,6 @@
     <ClInclude Include="..\source\BuildOrderQueue.h">
       <Filter>game\macro\buildorders</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\BOSSManager.h">
-      <Filter>game\macro\buildorders</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\BuildOrder.h">
       <Filter>game\macro\buildorders</Filter>
     </ClInclude>
@@ -349,14 +338,11 @@
     <ClInclude Include="..\Source\MacroAct.h" />
     <ClInclude Include="..\Source\MacroCommand.h" />
     <ClInclude Include="..\Source\BuildingData.h" />
-    <ClInclude Include="..\Source\StrategyBossZerg.h" />
     <ClInclude Include="..\Source\Random.h" />
     <ClInclude Include="..\Source\Base.h" />
     <ClInclude Include="..\Source\FAP.h" />
     <ClInclude Include="..\Source\GameRecord.h" />
-    <ClInclude Include="..\Source\OpponentModel.h" />
     <ClInclude Include="..\Source\PlayerSnapshot.h" />
-    <ClInclude Include="..\Source\OpponentPlan.h" />
     <ClInclude Include="..\Source\Bases.h" />
     <ClInclude Include="..\Source\ProductionGoal.h" />
     <ClInclude Include="..\Source\MapPartitions.h" />
@@ -376,14 +362,10 @@
     <ClInclude Include="..\Source\GridCreep.h" />
     <ClInclude Include="..\Source\ResourceInfo.h" />
     <ClInclude Include="..\Source\Skill.h" />
-    <ClInclude Include="..\Source\SkillGasSteal.h" />
     <ClInclude Include="..\Source\SkillKit.h" />
     <ClInclude Include="..\Source\SkillUnitTimings.h" />
     <ClInclude Include="..\Source\GridBuildable.h" />
     <ClInclude Include="..\Source\SkillBattles.h" />
-    <ClInclude Include="..\Source\OpeningTiming.h" />
-    <ClInclude Include="..\Source\SkillOpeningTiming.h" />
-    <ClInclude Include="..\Source\OpeningTimingRecord.h" />
     <ClInclude Include="..\Source\SkillLurkers.h" />
     <ClInclude Include="..\Source\TacticsOrders.h" />
     <ClInclude Include="..\Source\StaticDefense.h" />

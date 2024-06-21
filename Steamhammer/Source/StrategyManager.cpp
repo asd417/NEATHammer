@@ -3,9 +3,9 @@
 #include "Bases.h"
 #include "CombatCommander.h"
 #include "MapTools.h"
-#include "OpponentModel.h"
+
 #include "ProductionManager.h"
-#include "StrategyBossZerg.h"
+
 #include "UnitUtil.h"
 
 using namespace UAlbertaBot;

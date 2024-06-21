@@ -9,7 +9,6 @@
 #include "NEATCommander.h"
 #include "../../BOSS/source/BOSS.h"
 #include "GameCommander.h"
-#include "OpeningTiming.h"
 #include "ParseUtils.h"
 
 using namespace UAlbertaBot;

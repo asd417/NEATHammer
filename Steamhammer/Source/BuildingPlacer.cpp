@@ -869,6 +869,47 @@ BWAPI::Position BuildingPlacer::getMacroLocationPos(MacroLocation loc) const
     return TileCenter(getMacroLocationTile(loc));
 }
 
+
+/// <summary>
+/// Get Closest Geyser position from the given position
+/// </summary>
+/// <param name="targetPosition"></param>
+/// <returns></returns>
+BWAPI::TilePosition BuildingPlacer::getRefineryPosition(BWAPI::TilePosition targetPosition) const
+{
+    BWAPI::TilePosition closestGeyser = BWAPI::TilePositions::None;
+    int minGeyserDistanceFromHome = 100000;
+    BWAPI::Position homePosition = { targetPosition.x, targetPosition.y };
+
+    for (BWAPI::Unit geyser : BWAPI::Broodwar->getGeysers())
+    {
+        // Check to see if the geyser is near one of our depots.
+        for (BWAPI::Unit unit : the.self()->getUnits())
+        {
+            if (unit->getType().isResourceDepot() && unit->getDistance(geyser) < 300)
+            {
+                // Don't take a geyser which is in enemy static defense range. It'll just die.
+                // This is rare so we check it only after other checks succeed.
+                if (the.groundAttacks.inRange(geyser->getType(), geyser->getTilePosition()))
+                {
+                    break;
+                }
+
+                int homeDistance = geyser->getDistance(homePosition);
+
+                if (homeDistance < minGeyserDistanceFromHome)
+                {
+                    minGeyserDistanceFromHome = homeDistance;
+                    closestGeyser = geyser->getTilePosition();      // BWAPI bug workaround by Arrak
+                }
+                break;
+            }
+        }
+    }
+
+    return closestGeyser;
+}
+
 // NOTE This allows building only on visible geysers.
 BWAPI::TilePosition BuildingPlacer::getRefineryPosition() const
 {

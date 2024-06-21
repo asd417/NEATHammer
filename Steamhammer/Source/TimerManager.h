@@ -24,7 +24,7 @@ public:
         Total, 
         InformationManager, 
         MapGrid, 
-        OpponentModel, 
+        Skill, 
         Search, 
         Worker, 
         Production, 

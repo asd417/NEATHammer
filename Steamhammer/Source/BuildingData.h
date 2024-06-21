@@ -54,7 +54,7 @@ public:
     Building(BWAPI::UnitType t, BWAPI::TilePosition desired)
         : macroLocation		(MacroLocation::Anywhere)
         , desiredPosition	(desired)
-        , finalPosition		(BWAPI::TilePositions::None)
+        , finalPosition		(desired)
         , type              (t)
         , buildingUnit      (nullptr)
         , builderUnit       (nullptr)

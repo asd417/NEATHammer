@@ -2,7 +2,6 @@
 
 #include "Bases.h"
 #include "GameCommander.h"
-#include "OpponentModel.h"
 #include "ScoutManager.h"
 
 using namespace UAlbertaBot;
@@ -67,7 +66,7 @@ void GameRecordNow::update()
         {
             enemyStartingBaseID = the.bases.enemyStart()->getID();
         }
-        enemyPlan = OpponentModel::Instance().getEnemyPlan();
+        //enemyPlan = OpponentModel::Instance().getEnemyPlan();
         if (!frameWeMadeFirstCombatUnit && InformationManager::Instance().weHaveCombatUnits())
         {
             frameWeMadeFirstCombatUnit = now;

@@ -32,6 +32,7 @@ namespace UAlbertaBot
                 sectionsCoords.push_back({ i * 32, j * 32 });
             }
         }
+        builderOutputs.fill(0.0f);
         InitializeNetwork();
     }
     void NEATCommander::update()
@@ -59,6 +60,55 @@ namespace UAlbertaBot
 
         //UAB_ASSERT(fitness > 0.0f, "Negative Fitness: %s", std::to_string(fitness).c_str());
         fitness += add;
+    }
+
+    void NEATCommander::InitializeNetwork()
+    {
+        if (!Config::NEAT::LoadNetworkFromJSON)
+        {
+            bool retry = true;
+            int id = -1;
+            json r{};
+            while (retry) {
+                DBKeySpace dbkeys{};
+                dbkeys.push_back("Fitness");
+                DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys };
+                bool res = db.getData("/genome", r);
+                try {
+                    //network
+                    id = r[0]["id"];
+                    std::cout << id << std::endl;
+
+                    if (id == -1 || !res) throw std::exception("id is -1");
+                    retry = false;
+                }
+                catch (std::exception e) {
+                    //std::cout << "Error while retrieving new genome to evaluate: " << e.what() << "\n";
+                    //std::cout << "\tWaiting for 3000 miliseconds\n";
+                    r.clear();
+                    id = -1;
+                    Sleep(2000);
+                }
+            }
+
+            std::cout << "Creating Network Structure" << id << "\n";
+
+            try {
+                json networkJson = json::parse(std::string(r[0]["Network"]));
+                //Delete existing network
+                if (!network) delete network;
+                network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+                for (const json& ne : networkJson["node_evals"]) {
+                    network->AddNodeEval(ne);
+                }
+                if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Gene");//Faulty Gene. Surrender immediately;
+            }
+            catch (std::exception e) {
+                std::cout << "Error creating Network Structure: " << e.what() << "\n";
+                BWAPI::Broodwar->leaveGame();
+            }
+            genomeID = id;
+        }
     }
     void NEATCommander::sendFitnessToTrainServer()
     {
@@ -89,7 +139,6 @@ namespace UAlbertaBot
         inputVector.clear();
         
         getVisibleMap(curSection);
-        
         
         int mSupply = BWAPI::Broodwar->self()->supplyTotal();
         int cSupply = BWAPI::Broodwar->self()->supplyUsed();
@@ -139,126 +188,105 @@ namespace UAlbertaBot
 
         network->Activate(inputVector);
         //output vector size is 10
-        macroActType += network->getOutputVector()[0];
-        unitType += network->getOutputVector()[1];
-        techType += network->getOutputVector()[2];
-        upgradeType += network->getOutputVector()[3];
-        macroCommandType += network->getOutputVector()[4];
-        amount1 += network->getOutputVector()[5];
-        amount2 += network->getOutputVector()[6];
-        tilePosX += network->getOutputVector()[7];
-        tilePosY += network->getOutputVector()[8];
-        macroCommandUnitType += network->getOutputVector()[9];
 
+        //macroActType += network->getOutputVector()[0];
+        //unitType += network->getOutputVector()[1];
+        //techType += network->getOutputVector()[2];
+        //upgradeType += network->getOutputVector()[3];
+        //macroCommandType += network->getOutputVector()[outputVectorOffset];
+        
+        //Read output nodes 
+        // 
+        // Network can output:
+        //  Type of thing to build,
+        //  MacroCommandType, 
+        //  Tile position used by some of the macro command types and building build position
+        // 
+        //BuilderOutput and MacroCommandTypeOutput will be chosen through strongest node output 
+        for (int i = 0; i < (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i++)
+        {
+            builderOutputs[i] += network->getOutputVector()[i];
+        }
+        constexpr int outputVectorOffset = (int)NetworkProtossOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
+        for (int i = (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i < outputVectorOffset; i++)
+        {
+            macroCommandTypeOutputs[i] += network->getOutputVector()[i];
+        }
+        tilePosX += network->getOutputVector()[outputVectorOffset];
+        tilePosY += network->getOutputVector()[outputVectorOffset+1];
+        
         curSection++;
         curSection = curSection % maxSections;
+        //Looked through all sections. Make command
         if (curSection == 0)
         {
-            int a = macroCommandUnitType > 0 ? (int)macroCommandUnitType : 0;
-            a = a >= (int)NetworkProtossUnits::NETWORK_UNIT_COUNT ? (int)NetworkProtossUnits::NETWORK_UNIT_COUNT - 1 : a;
-            NetworkProtossUnits macroUT = (NetworkProtossUnits)a;
-
-            int b = unitType > 0 ? (int)unitType : 0;
-            b = b >= (int)NetworkProtossUnits::NETWORK_UNIT_COUNT ? (int)NetworkProtossUnits::NETWORK_UNIT_COUNT - 1 : b;
-            NetworkProtossUnits ut = (NetworkProtossUnits)b;
-
-            int c = techType > 0 ? (int)techType : 0;
-            c = c >= (int)NetworkTech::NETWORK_TECH_COUNT ? (int)NetworkTech::NETWORK_TECH_COUNT - 1 : c;
-            NetworkTech tt = (NetworkTech)c;
-
-            int d = upgradeType > 0 ? (int)upgradeType : 0;
-            d = d >= (int)NetworkUpgrade::NETWORK_UPGRADE_COUNT ? (int)NetworkUpgrade::NETWORK_UPGRADE_COUNT - 1 : d;
-            NetworkUpgrade ugt = (NetworkUpgrade)d;
-
-            int e = macroCommandType > 0 ? (int)macroCommandType : 0;
-            e = e >= (int)MacroCommandType::QueueBarrier ? (int)MacroCommandType::QueueBarrier - 1 : e;
-            MacroCommandType mct = (MacroCommandType)e;
-
-            int mat = macroActType > 0 ? (int)macroActType : 0;
-            mat = mat >= (int)MacroActs::Default ? (int)MacroActs::Default - 1 : mat;
+            int highestBuildOptionOutput = 0;
+            double highestBuildOptionOutputScore = 0;
+            for (int i = 0; i < (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i++)
+            {
+                if (builderOutputs[i] > highestBuildOptionOutputScore && canBuild((NetworkProtossOptions)i))
+                {
+                    highestBuildOptionOutput = i;
+                    highestBuildOptionOutputScore = builderOutputs[i];
+                }
+            }
+            
+            int highestMacroCommandTypeOutput = 0;
+            double highestMacroCommandTypeOutputScore = 0;
+            for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)
+            {
+                //Check if unit exists
+                if (macroCommandTypeOutputs[i] > highestMacroCommandTypeOutputScore)
+                {
+                    highestMacroCommandTypeOutput = i;
+                    highestMacroCommandTypeOutputScore = macroCommandTypeOutputs[i];
+                }
+            }
+            
             int posx = int(tilePosX);
             int posy = int(tilePosY);
+
             //Clamp tile position outputs
             posx = posx > 0 ? posx : 1;
             posx = posx < mapWidth ? posx : mapWidth - 1;
             posy = posy > 0 ? posy : 1;
             posy = posy < mapHeight ? posy : mapHeight - 1;
 
-            MacroCommand mc = MacroCommand(mct, amount1,amount2, ToBWAPIUnitProtoss(macroUT));
-            //BWAPI::TilePosition tp = ;
-            MacroAct ma = MacroAct(
-                mc, 
-                ToBWAPIUnitProtoss(ut), 
-                ToBWAPITech(tt), 
-                ToBWAPIUpgrade(ugt), 
-                (MacroActs)mat, 
-                {posx, posy});
-        
-            //MacroAct action{};
+            MacroAct ma;
+            // compare score between build option score and macro command type score
+            if (highestBuildOptionOutputScore > highestMacroCommandTypeOutputScore)
+            {
+                //BuildOutput has stronger signal than MacroCommandUnitType signal
+                if ((NetworkProtossOptions)highestBuildOptionOutput < NetworkProtossOptions::Psionic_Storm) //unit or building
+                {
+                    ma = MacroAct(ToBWAPIUnit((NetworkProtossOptions)highestBuildOptionOutput), { posx,posy });
+                }
+                else if ((NetworkProtossOptions)highestBuildOptionOutput < NetworkProtossOptions::Protoss_Ground_Armor) //tech
+                {
+                    ma = MacroAct(ToBWAPITech((NetworkProtossOptions)highestBuildOptionOutput));
+                }
+                else //upgrade
+                {
+                    ma = MacroAct(ToBWAPIUpgrade((NetworkProtossOptions)highestBuildOptionOutput));
+                }
+                ma.confidence = highestBuildOptionOutputScore;
+            }
+            else {
+                ma = MacroAct((MacroCommandType)highestMacroCommandTypeOutput, {posx,posy});
+                ma.confidence = highestMacroCommandTypeOutputScore;
+            }
+            
             _actions.push_back(ma);
             //std::cout << "Network Evaluated " << std::to_string(_actions.size()) << " actions\n";
-        
-            macroActType = 0.0f; //Unit, Tech, Upgrade, Command, Default
-            unitType = 0.0f;
-            techType = 0.0f;
-            upgradeType = 0.0f;
-            macroCommandType = 0.0f;
-            amount1 = 0.0f;
-            amount2 = 0.0f;
+            //Reset output vector
+            builderOutputs.fill(0.0f);
+            macroCommandTypeOutputs.fill(0.0f);
             tilePosX = 0.0f; //0~256
             tilePosY = 0.0f; //0~256
-            macroCommandUnitType = 0.0f;
+          
         }
     }
 
-    void NEATCommander::InitializeNetwork()
-    {
-        if (!Config::NEAT::LoadNetworkFromJSON)
-        {
-            bool retry = true;
-            int id = -1;
-            json r{};
-            while (retry) {
-                DBKeySpace dbkeys{};
-                dbkeys.push_back("Fitness");
-                DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys};
-                bool res = db.getData("/genome", r);
-                try {
-                    //network
-                    id = r[0]["id"];
-                    std::cout << id << std::endl;
-
-                    if (id == -1 || !res) throw std::exception("id is -1");
-                    retry = false;
-                }
-                catch (std::exception e) {
-                    //std::cout << "Error while retrieving new genome to evaluate: " << e.what() << "\n";
-                    //std::cout << "\tWaiting for 3000 miliseconds\n";
-                    r.clear();
-                    id = -1;
-                    Sleep(2000);
-                }
-            }
-        
-            std::cout << "Creating Network Structure" << id << "\n";
-
-            try {
-                json networkJson = json::parse(std::string(r[0]["Network"]));
-                //Delete existing network
-                if (!network) delete network;
-                network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
-                for (const json& ne : networkJson["node_evals"]) {
-                    network->AddNodeEval(ne);
-                }
-                if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Gene");//Faulty Gene. Surrender immediately;
-            }
-            catch (std::exception e) {
-                std::cout << "Error creating Network Structure: " << e.what() << "\n";
-                BWAPI::Broodwar->leaveGame();
-            }
-            genomeID = id;
-        }
-    }
 
     int NEATCommander::getWorkerCount(BWAPI::Unitset& allMyUnits)
     {
@@ -328,9 +356,32 @@ namespace UAlbertaBot
             }
         }
     }
+    
+    bool NEATCommander::canBuild(NetworkProtossOptions option)
+    {
+        if (option < NetworkProtossOptions::Psionic_Storm)
+        {
+            //unit or building
+            return BWAPI::Broodwar->canMake(ToBWAPIUnit(option));
+        }
+        else if (option < NetworkProtossOptions::Protoss_Ground_Armor)
+        {
+            //tech
+            return BWAPI::Broodwar->canResearch(ToBWAPITech(option));
+        }
+        else
+        {
+            //upgrade
+            return BWAPI::Broodwar->canUpgrade(ToBWAPIUpgrade(option));
+        }
+    }
 
+    bool NEATCommander::canBuild(NetworkProtossUnits option)
+    {
+        return BWAPI::Broodwar->canMake(ToBWAPIUnit(option));
+    }
 
-    BWAPI::UnitType NEATCommander::ToBWAPIUnitProtoss(NetworkProtossUnits ut) {
+    BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkProtossUnits ut) {
         switch (ut) {
         case NetworkProtossUnits::Protoss_Probe:
             return BWAPI::UnitTypes::Protoss_Probe;
@@ -360,388 +411,148 @@ namespace UAlbertaBot
             return BWAPI::UnitTypes::Protoss_Arbiter;
         case NetworkProtossUnits::Protoss_Carrier:
             return BWAPI::UnitTypes::Protoss_Carrier;
-        case NetworkProtossUnits::Protoss_Nexus:
-            return BWAPI::UnitTypes::Protoss_Nexus;
-        case NetworkProtossUnits::Protoss_Pylon:
-            return BWAPI::UnitTypes::Protoss_Pylon;
-        case NetworkProtossUnits::Protoss_Assimilator:
-            return BWAPI::UnitTypes::Protoss_Assimilator;
-        case NetworkProtossUnits::Protoss_Gateway:
-            return BWAPI::UnitTypes::Protoss_Gateway;
-        case NetworkProtossUnits::Protoss_Forge:
-            return BWAPI::UnitTypes::Protoss_Forge;
-        case NetworkProtossUnits::Protoss_Photon_Cannon:
-            return BWAPI::UnitTypes::Protoss_Photon_Cannon;
-        case NetworkProtossUnits::Protoss_Shield_Battery:
-            return BWAPI::UnitTypes::Protoss_Shield_Battery;
-        case NetworkProtossUnits::Protoss_Cybernetics_Core:
-            return BWAPI::UnitTypes::Protoss_Cybernetics_Core;
-        case NetworkProtossUnits::Protoss_Citadel_of_Adun:
-            return BWAPI::UnitTypes::Protoss_Citadel_of_Adun;
-        case NetworkProtossUnits::Protoss_Templar_Archives:
-            return BWAPI::UnitTypes::Protoss_Templar_Archives;
-        case NetworkProtossUnits::Protoss_Robotics_Facility:
-            return BWAPI::UnitTypes::Protoss_Robotics_Facility;
-        case NetworkProtossUnits::Protoss_Robotics_Support_Bay:
-            return BWAPI::UnitTypes::Protoss_Robotics_Support_Bay;
-        case NetworkProtossUnits::Protoss_Observatory:
-            return BWAPI::UnitTypes::Protoss_Observatory;
-        case NetworkProtossUnits::Protoss_Stargate:
-            return BWAPI::UnitTypes::Protoss_Stargate;
-        case NetworkProtossUnits::Protoss_Fleet_Beacon:
-            return BWAPI::UnitTypes::Protoss_Fleet_Beacon;
-        case NetworkProtossUnits::Protoss_Arbiter_Tribunal:
-            return BWAPI::UnitTypes::Protoss_Arbiter_Tribunal;
+        case NetworkProtossUnits::NETWORK_UNIT_COUNT:
+            return BWAPI::UnitTypes::None;
         default:
             return BWAPI::UnitTypes::Protoss_Probe;
         }
     }
-
-    BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkUnits ut) {
+    BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkProtossOptions ut) {
         switch (ut) {
-        case NetworkUnits::Terran_SCV:
-            return BWAPI::UnitTypes::Terran_SCV;
-        case NetworkUnits::Terran_Marine:
-            return BWAPI::UnitTypes::Terran_Marine;
-        case NetworkUnits::Terran_Firebat:
-            return BWAPI::UnitTypes::Terran_Firebat;
-        case NetworkUnits::Terran_Medic:
-            return BWAPI::UnitTypes::Terran_Medic;
-        case NetworkUnits::Terran_Ghost:
-            return BWAPI::UnitTypes::Terran_Ghost;
-        case NetworkUnits::Terran_Vulture:
-            return BWAPI::UnitTypes::Terran_Vulture;
-        case NetworkUnits::Terran_Siege_Tank_Tank_Mode:
-            return BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode;
-        case NetworkUnits::Terran_Goliath:
-            return BWAPI::UnitTypes::Terran_Goliath;
-        case NetworkUnits::Terran_Wraith:
-            return BWAPI::UnitTypes::Terran_Wraith;
-        case NetworkUnits::Terran_Dropship:
-            return BWAPI::UnitTypes::Terran_Dropship;
-        case NetworkUnits::Terran_Science_Vessel:
-            return BWAPI::UnitTypes::Terran_Science_Vessel;
-        case NetworkUnits::Terran_Valkyrie:
-            return BWAPI::UnitTypes::Terran_Valkyrie;
-        case NetworkUnits::Terran_Battlecruiser:
-            return BWAPI::UnitTypes::Terran_Battlecruiser;
-        case NetworkUnits::Terran_Command_Center:
-            return BWAPI::UnitTypes::Terran_Command_Center;
-        case NetworkUnits::Terran_Comsat_Station:
-            return BWAPI::UnitTypes::Terran_Comsat_Station;
-        case NetworkUnits::Terran_Nuclear_Silo:
-            return BWAPI::UnitTypes::Terran_Nuclear_Silo;
-        case NetworkUnits::Terran_Supply_Depot:
-            return BWAPI::UnitTypes::Terran_Supply_Depot;
-        case NetworkUnits::Terran_Refinery:
-            return BWAPI::UnitTypes::Terran_Refinery;
-        case NetworkUnits::Terran_Barracks:
-            return BWAPI::UnitTypes::Terran_Barracks;
-        case NetworkUnits::Terran_Engineering_Bay:
-            return BWAPI::UnitTypes::Terran_Engineering_Bay;
-        case NetworkUnits::Terran_Missile_Turret:
-            return BWAPI::UnitTypes::Terran_Missile_Turret;
-        case NetworkUnits::Terran_Academy:
-            return BWAPI::UnitTypes::Terran_Academy;
-        case NetworkUnits::Terran_Factory:
-            return BWAPI::UnitTypes::Terran_Factory;
-        case NetworkUnits::Terran_Machine_Shop:
-            return BWAPI::UnitTypes::Terran_Machine_Shop;
-        case NetworkUnits::Terran_Starport:
-            return BWAPI::UnitTypes::Terran_Starport;
-        case NetworkUnits::Terran_Control_Tower:
-            return BWAPI::UnitTypes::Terran_Control_Tower;
-        case NetworkUnits::Terran_Science_Facility:
-            return BWAPI::UnitTypes::Terran_Science_Facility;
-        case NetworkUnits::Terran_Physics_Lab:
-            return BWAPI::UnitTypes::Terran_Physics_Lab;
-        case NetworkUnits::Terran_Covert_Ops:
-            return BWAPI::UnitTypes::Terran_Covert_Ops;
-        case NetworkUnits::Terran_Armory:
-            return BWAPI::UnitTypes::Terran_Armory;
-        case NetworkUnits::Zerg_Drone:
-            return BWAPI::UnitTypes::Zerg_Drone;
-        case NetworkUnits::Zerg_Zergling:
-            return BWAPI::UnitTypes::Zerg_Zergling;
-        case NetworkUnits::Zerg_Overlord:
-            return BWAPI::UnitTypes::Zerg_Overlord;
-        case NetworkUnits::Zerg_Hydralisk:
-            return BWAPI::UnitTypes::Zerg_Hydralisk;
-        case NetworkUnits::Zerg_Lurker:
-            return BWAPI::UnitTypes::Zerg_Lurker;
-        case NetworkUnits::Zerg_Mutalisk:
-            return BWAPI::UnitTypes::Zerg_Mutalisk;
-        case NetworkUnits::Zerg_Guardian:
-            return BWAPI::UnitTypes::Zerg_Guardian;
-        case NetworkUnits::Zerg_Devourer:
-            return BWAPI::UnitTypes::Zerg_Devourer;
-        case NetworkUnits::Zerg_Queen:
-            return BWAPI::UnitTypes::Zerg_Queen;
-        case NetworkUnits::Zerg_Scourge:
-            return BWAPI::UnitTypes::Zerg_Scourge;
-        case NetworkUnits::Zerg_Defiler:
-            return BWAPI::UnitTypes::Zerg_Defiler;
-        case NetworkUnits::Zerg_Ultralisk:
-            return BWAPI::UnitTypes::Zerg_Ultralisk;
-        case NetworkUnits::Zerg_Infested_Terran:
-            return BWAPI::UnitTypes::Zerg_Infested_Terran;
-        case NetworkUnits::Zerg_Hatchery:
-            return BWAPI::UnitTypes::Zerg_Hatchery;
-        case NetworkUnits::Zerg_Lair:
-            return BWAPI::UnitTypes::Zerg_Lair;
-        case NetworkUnits::Zerg_Hive:
-            return BWAPI::UnitTypes::Zerg_Hive;
-        case NetworkUnits::Zerg_Creep_Colony:
-            return BWAPI::UnitTypes::Zerg_Creep_Colony;
-        case NetworkUnits::Zerg_Sunken_Colony:
-            return BWAPI::UnitTypes::Zerg_Sunken_Colony;
-        case NetworkUnits::Zerg_Spore_Colony:
-            return BWAPI::UnitTypes::Zerg_Spore_Colony;
-        case NetworkUnits::Zerg_Extractor:
-            return BWAPI::UnitTypes::Zerg_Extractor;
-        case NetworkUnits::Zerg_Spawning_Pool:
-            return BWAPI::UnitTypes::Zerg_Spawning_Pool;
-        case NetworkUnits::Zerg_Evolution_Chamber:
-            return BWAPI::UnitTypes::Zerg_Evolution_Chamber;
-        case NetworkUnits::Zerg_Hydralisk_Den:
-            return BWAPI::UnitTypes::Zerg_Hydralisk_Den;
-        case NetworkUnits::Zerg_Spire:
-            return BWAPI::UnitTypes::Zerg_Spire;
-        case NetworkUnits::Zerg_Greater_Spire:
-            return BWAPI::UnitTypes::Zerg_Greater_Spire;
-        case NetworkUnits::Zerg_Queens_Nest:
-            return BWAPI::UnitTypes::Zerg_Queens_Nest;
-        case NetworkUnits::Zerg_Ultralisk_Cavern:
-            return BWAPI::UnitTypes::Zerg_Ultralisk_Cavern;
-        case NetworkUnits::Zerg_Defiler_Mound:
-            return BWAPI::UnitTypes::Zerg_Defiler_Mound;
-        case NetworkUnits::Zerg_Nydus_Canal:
-            return BWAPI::UnitTypes::Zerg_Nydus_Canal;
-        case NetworkUnits::Protoss_Probe:
+        case NetworkProtossOptions::Protoss_Probe:
             return BWAPI::UnitTypes::Protoss_Probe;
-        case NetworkUnits::Protoss_Zealot:
+        case NetworkProtossOptions::Protoss_Zealot:
             return BWAPI::UnitTypes::Protoss_Zealot;
-        case NetworkUnits::Protoss_Dragoon:
+        case NetworkProtossOptions::Protoss_Dragoon:
             return BWAPI::UnitTypes::Protoss_Dragoon;
-        case NetworkUnits::Protoss_High_Templar:
+        case NetworkProtossOptions::Protoss_High_Templar:
             return BWAPI::UnitTypes::Protoss_High_Templar;
-        case NetworkUnits::Protoss_Archon:
+        case NetworkProtossOptions::Protoss_Archon:
             return BWAPI::UnitTypes::Protoss_Archon;
-        case NetworkUnits::Protoss_Dark_Templar:
+        case NetworkProtossOptions::Protoss_Dark_Templar:
             return BWAPI::UnitTypes::Protoss_Dark_Templar;
-        case NetworkUnits::Protoss_Dark_Archon:
+        case NetworkProtossOptions::Protoss_Dark_Archon:
             return BWAPI::UnitTypes::Protoss_Dark_Archon;
-        case NetworkUnits::Protoss_Reaver:
+        case NetworkProtossOptions::Protoss_Reaver:
             return BWAPI::UnitTypes::Protoss_Reaver;
-        case NetworkUnits::Protoss_Shuttle:
+        case NetworkProtossOptions::Protoss_Shuttle:
             return BWAPI::UnitTypes::Protoss_Shuttle;
-        case NetworkUnits::Protoss_Observer:
+        case NetworkProtossOptions::Protoss_Observer:
             return BWAPI::UnitTypes::Protoss_Observer;
-        case NetworkUnits::Protoss_Scout:
+        case NetworkProtossOptions::Protoss_Scout:
             return BWAPI::UnitTypes::Protoss_Scout;
-        case NetworkUnits::Protoss_Corsair:
+        case NetworkProtossOptions::Protoss_Corsair:
             return BWAPI::UnitTypes::Protoss_Corsair;
-        case NetworkUnits::Protoss_Arbiter:
+        case NetworkProtossOptions::Protoss_Arbiter:
             return BWAPI::UnitTypes::Protoss_Arbiter;
-        case NetworkUnits::Protoss_Carrier:
+        case NetworkProtossOptions::Protoss_Carrier:
             return BWAPI::UnitTypes::Protoss_Carrier;
-        case NetworkUnits::Protoss_Nexus:
+        case NetworkProtossOptions::Protoss_Nexus:
             return BWAPI::UnitTypes::Protoss_Nexus;
-        case NetworkUnits::Protoss_Pylon:
+        case NetworkProtossOptions::Protoss_Pylon:
             return BWAPI::UnitTypes::Protoss_Pylon;
-        case NetworkUnits::Protoss_Assimilator:
+        case NetworkProtossOptions::Protoss_Assimilator:
             return BWAPI::UnitTypes::Protoss_Assimilator;
-        case NetworkUnits::Protoss_Gateway:
+        case NetworkProtossOptions::Protoss_Gateway:
             return BWAPI::UnitTypes::Protoss_Gateway;
-        case NetworkUnits::Protoss_Forge:
+        case NetworkProtossOptions::Protoss_Forge:
             return BWAPI::UnitTypes::Protoss_Forge;
-        case NetworkUnits::Protoss_Photon_Cannon:
+        case NetworkProtossOptions::Protoss_Photon_Cannon:
             return BWAPI::UnitTypes::Protoss_Photon_Cannon;
-        case NetworkUnits::Protoss_Shield_Battery:
+        case NetworkProtossOptions::Protoss_Shield_Battery:
             return BWAPI::UnitTypes::Protoss_Shield_Battery;
-        case NetworkUnits::Protoss_Cybernetics_Core:
+        case NetworkProtossOptions::Protoss_Cybernetics_Core:
             return BWAPI::UnitTypes::Protoss_Cybernetics_Core;
-        case NetworkUnits::Protoss_Citadel_of_Adun:
+        case NetworkProtossOptions::Protoss_Citadel_of_Adun:
             return BWAPI::UnitTypes::Protoss_Citadel_of_Adun;
-        case NetworkUnits::Protoss_Templar_Archives:
+        case NetworkProtossOptions::Protoss_Templar_Archives:
             return BWAPI::UnitTypes::Protoss_Templar_Archives;
-        case NetworkUnits::Protoss_Robotics_Facility:
+        case NetworkProtossOptions::Protoss_Robotics_Facility:
             return BWAPI::UnitTypes::Protoss_Robotics_Facility;
-        case NetworkUnits::Protoss_Robotics_Support_Bay:
+        case NetworkProtossOptions::Protoss_Robotics_Support_Bay:
             return BWAPI::UnitTypes::Protoss_Robotics_Support_Bay;
-        case NetworkUnits::Protoss_Observatory:
+        case NetworkProtossOptions::Protoss_Observatory:
             return BWAPI::UnitTypes::Protoss_Observatory;
-        case NetworkUnits::Protoss_Stargate:
+        case NetworkProtossOptions::Protoss_Stargate:
             return BWAPI::UnitTypes::Protoss_Stargate;
-        case NetworkUnits::Protoss_Fleet_Beacon:
+        case NetworkProtossOptions::Protoss_Fleet_Beacon:
             return BWAPI::UnitTypes::Protoss_Fleet_Beacon;
-        case NetworkUnits::Protoss_Arbiter_Tribunal:
+        case NetworkProtossOptions::Protoss_Arbiter_Tribunal:
             return BWAPI::UnitTypes::Protoss_Arbiter_Tribunal;
+        case NetworkProtossOptions::NETWORK_OPTION_COUNT:
+            return BWAPI::UnitTypes::None;
         default:
-            return BWAPI::UnitTypes::Terran_SCV;
+            return BWAPI::UnitTypes::Protoss_Probe;
         }
     }
-
-    BWAPI::TechType NEATCommander::ToBWAPITech(NetworkTech tt) 
+    BWAPI::TechType NEATCommander::ToBWAPITech(NetworkProtossOptions tt)
     {
         switch (tt) {
-        case NetworkTech::Stim_Packs:
-            return BWAPI::TechTypes::Stim_Packs;
-        case NetworkTech::Optical_Flare:
-            return BWAPI::TechTypes::Optical_Flare;
-        case NetworkTech::Restoration:
-            return BWAPI::TechTypes::Restoration;
-        case NetworkTech::Tank_Siege_Mode:
-            return BWAPI::TechTypes::Tank_Siege_Mode;
-        case NetworkTech::Irradiate:
-            return BWAPI::TechTypes::Irradiate;
-        case NetworkTech::EMP_Shockwave:
-            return BWAPI::TechTypes::EMP_Shockwave;
-        case NetworkTech::Cloaking_Field:
-            return BWAPI::TechTypes::Cloaking_Field;
-        case NetworkTech::Personnel_Cloaking:
-            return BWAPI::TechTypes::Personnel_Cloaking;
-        case NetworkTech::Lockdown:
-            return BWAPI::TechTypes::Lockdown;
-        case NetworkTech::Yamato_Gun:
-            return BWAPI::TechTypes::Yamato_Gun;
-        case NetworkTech::Nuclear_Strike:
-            return BWAPI::TechTypes::Nuclear_Strike;
-        case NetworkTech::Burrowing:
-            return BWAPI::TechTypes::Burrowing;
-        case NetworkTech::Spawn_Broodlings:
-            return BWAPI::TechTypes::Spawn_Broodlings;
-        case NetworkTech::Plague:
-            return BWAPI::TechTypes::Plague;
-        case NetworkTech::Consume:
-            return BWAPI::TechTypes::Consume;
-        case NetworkTech::Ensnare:
-            return BWAPI::TechTypes::Ensnare;
-        case NetworkTech::Lurker_Aspect:
-            return BWAPI::TechTypes::Lurker_Aspect;
-        case NetworkTech::Psionic_Storm:
+        case NetworkProtossOptions::Psionic_Storm:
             return BWAPI::TechTypes::Psionic_Storm;
-        case NetworkTech::Hallucination:
+        case NetworkProtossOptions::Hallucination:
             return BWAPI::TechTypes::Hallucination;
-        case NetworkTech::Recall:
+        case NetworkProtossOptions::Recall:
             return BWAPI::TechTypes::Recall;
-        case NetworkTech::Stasis_Field:
+        case NetworkProtossOptions::Stasis_Field:
             return BWAPI::TechTypes::Stasis_Field;
-        case NetworkTech::Disruption_Web:
+        case NetworkProtossOptions::Disruption_Web:
             return BWAPI::TechTypes::Disruption_Web;
-        case NetworkTech::Mind_Control:
+        case NetworkProtossOptions::Mind_Control:
             return BWAPI::TechTypes::Mind_Control;
-        case NetworkTech::Maelstrom:
+        case NetworkProtossOptions::Maelstrom:
             return BWAPI::TechTypes::Maelstrom;
+        case NetworkProtossOptions::NETWORK_OPTION_COUNT:
+            return BWAPI::TechTypes::None;
         default:
-            return BWAPI::TechTypes::Stim_Packs;
+            return BWAPI::TechTypes::Psionic_Storm;
         }
     }
-    BWAPI::UpgradeType NEATCommander::ToBWAPIUpgrade(NetworkUpgrade ut) 
+    BWAPI::UpgradeType NEATCommander::ToBWAPIUpgrade(NetworkProtossOptions ut)
     {
         switch (ut) {
-        case NetworkUpgrade::U_238_Shells:
-            return BWAPI::UpgradeTypes::U_238_Shells;
-        case NetworkUpgrade::Terran_Infantry_Armor:
-            return BWAPI::UpgradeTypes::Terran_Infantry_Armor;
-        case NetworkUpgrade::Terran_Infantry_Weapons:
-            return BWAPI::UpgradeTypes::Terran_Infantry_Weapons;
-        case NetworkUpgrade::Terran_Vehicle_Plating:
-            return BWAPI::UpgradeTypes::Terran_Vehicle_Plating;
-        case NetworkUpgrade::Terran_Vehicle_Weapons:
-            return BWAPI::UpgradeTypes::Terran_Vehicle_Weapons;
-        case NetworkUpgrade::Ion_Thrusters:
-            return BWAPI::UpgradeTypes::Ion_Thrusters;
-        case NetworkUpgrade::Titan_Reactor:
-            return BWAPI::UpgradeTypes::Titan_Reactor;
-        case NetworkUpgrade::Terran_Ship_Plating:
-            return BWAPI::UpgradeTypes::Terran_Ship_Plating;
-        case NetworkUpgrade::Terran_Ship_Weapons:
-            return BWAPI::UpgradeTypes::Terran_Ship_Weapons;
-        case NetworkUpgrade::Moebius_Reactor:
-            return BWAPI::UpgradeTypes::Moebius_Reactor;
-        case NetworkUpgrade::Ocular_Implants:
-            return BWAPI::UpgradeTypes::Ocular_Implants;
-        case NetworkUpgrade::Apollo_Reactor:
-            return BWAPI::UpgradeTypes::Apollo_Reactor;
-        case NetworkUpgrade::Colossus_Reactor:
-            return BWAPI::UpgradeTypes::Colossus_Reactor;
-        case NetworkUpgrade::Caduceus_Reactor:
-            return BWAPI::UpgradeTypes::Caduceus_Reactor;
-        case NetworkUpgrade::Charon_Boosters:
-            return BWAPI::UpgradeTypes::Charon_Boosters;
-        case NetworkUpgrade::Zerg_Carapace:
-            return BWAPI::UpgradeTypes::Zerg_Carapace;
-        case NetworkUpgrade::Zerg_Flyer_Carapace:
-            return BWAPI::UpgradeTypes::Zerg_Flyer_Carapace;
-        case NetworkUpgrade::Zerg_Melee_Attacks:
-            return BWAPI::UpgradeTypes::Zerg_Melee_Attacks;
-        case NetworkUpgrade::Zerg_Missile_Attacks:
-            return BWAPI::UpgradeTypes::Zerg_Missile_Attacks;
-        case NetworkUpgrade::Zerg_Flyer_Attacks:
-            return BWAPI::UpgradeTypes::Zerg_Flyer_Attacks;
-        case NetworkUpgrade::Ventral_Sacs:
-            return BWAPI::UpgradeTypes::Ventral_Sacs;
-        case NetworkUpgrade::Antennae:
-            return BWAPI::UpgradeTypes::Antennae;
-        case NetworkUpgrade::Pneumatized_Carapace:
-            return BWAPI::UpgradeTypes::Pneumatized_Carapace;
-        case NetworkUpgrade::Metabolic_Boost:
-            return BWAPI::UpgradeTypes::Metabolic_Boost;
-        case NetworkUpgrade::Adrenal_Glands:
-            return BWAPI::UpgradeTypes::Adrenal_Glands;
-        case NetworkUpgrade::Muscular_Augments:
-            return BWAPI::UpgradeTypes::Muscular_Augments;
-        case NetworkUpgrade::Grooved_Spines:
-            return BWAPI::UpgradeTypes::Grooved_Spines;
-        case NetworkUpgrade::Gamete_Meiosis:
-            return BWAPI::UpgradeTypes::Gamete_Meiosis;
-        case NetworkUpgrade::Metasynaptic_Node:
-            return BWAPI::UpgradeTypes::Metasynaptic_Node;
-        case NetworkUpgrade::Chitinous_Plating:
-            return BWAPI::UpgradeTypes::Chitinous_Plating;
-        case NetworkUpgrade::Anabolic_Synthesis:
-            return BWAPI::UpgradeTypes::Anabolic_Synthesis;
-        case NetworkUpgrade::Protoss_Ground_Armor:
+        case NetworkProtossOptions::Protoss_Ground_Armor:
             return BWAPI::UpgradeTypes::Protoss_Ground_Armor;
-        case NetworkUpgrade::Protoss_Air_Armor:
+        case NetworkProtossOptions::Protoss_Air_Armor:
             return BWAPI::UpgradeTypes::Protoss_Air_Armor;
-        case NetworkUpgrade::Protoss_Ground_Weapons:
+        case NetworkProtossOptions::Protoss_Ground_Weapons:
             return BWAPI::UpgradeTypes::Protoss_Ground_Weapons;
-        case NetworkUpgrade::Protoss_Air_Weapons:
+        case NetworkProtossOptions::Protoss_Air_Weapons:
             return BWAPI::UpgradeTypes::Protoss_Air_Weapons;
-        case NetworkUpgrade::Protoss_Plasma_Shields:
+        case NetworkProtossOptions::Protoss_Plasma_Shields:
             return BWAPI::UpgradeTypes::Protoss_Plasma_Shields;
-        case NetworkUpgrade::Singularity_Charge:
+        case NetworkProtossOptions::Singularity_Charge:
             return BWAPI::UpgradeTypes::Singularity_Charge;
-        case NetworkUpgrade::Leg_Enhancements:
+        case NetworkProtossOptions::Leg_Enhancements:
             return BWAPI::UpgradeTypes::Leg_Enhancements;
-        case NetworkUpgrade::Scarab_Damage:
+        case NetworkProtossOptions::Scarab_Damage:
             return BWAPI::UpgradeTypes::Scarab_Damage;
-        case NetworkUpgrade::Reaver_Capacity:
+        case NetworkProtossOptions::Reaver_Capacity:
             return BWAPI::UpgradeTypes::Reaver_Capacity;
-        case NetworkUpgrade::Gravitic_Drive:
+        case NetworkProtossOptions::Gravitic_Drive:
             return BWAPI::UpgradeTypes::Gravitic_Drive;
-        case NetworkUpgrade::Sensor_Array:
+        case NetworkProtossOptions::Sensor_Array:
             return BWAPI::UpgradeTypes::Sensor_Array;
-        case NetworkUpgrade::Gravitic_Boosters:
+        case NetworkProtossOptions::Gravitic_Boosters:
             return BWAPI::UpgradeTypes::Gravitic_Boosters;
-        case NetworkUpgrade::Khaydarin_Amulet:
+        case NetworkProtossOptions::Khaydarin_Amulet:
             return BWAPI::UpgradeTypes::Khaydarin_Amulet;
-        case NetworkUpgrade::Apial_Sensors:
+        case NetworkProtossOptions::Apial_Sensors:
             return BWAPI::UpgradeTypes::Apial_Sensors;
-        case NetworkUpgrade::Gravitic_Thrusters:
+        case NetworkProtossOptions::Gravitic_Thrusters:
             return BWAPI::UpgradeTypes::Gravitic_Thrusters;
-        case NetworkUpgrade::Carrier_Capacity:
+        case NetworkProtossOptions::Carrier_Capacity:
             return BWAPI::UpgradeTypes::Carrier_Capacity;
-        case NetworkUpgrade::Khaydarin_Core:
+        case NetworkProtossOptions::Khaydarin_Core:
             return BWAPI::UpgradeTypes::Khaydarin_Core;
-        case NetworkUpgrade::Argus_Jewel:
+        case NetworkProtossOptions::Argus_Jewel:
             return BWAPI::UpgradeTypes::Argus_Jewel;
-        case NetworkUpgrade::Argus_Talisman:
+        case NetworkProtossOptions::Argus_Talisman:
             return BWAPI::UpgradeTypes::Argus_Talisman;
+        case NetworkProtossOptions::NETWORK_OPTION_COUNT:
+            return BWAPI::UpgradeTypes::None;
         default:
-            return BWAPI::UpgradeTypes::U_238_Shells;
+            return BWAPI::UpgradeTypes::Protoss_Ground_Armor;
         }
     }
 

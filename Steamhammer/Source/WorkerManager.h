@@ -105,9 +105,10 @@ public:
     void        setRepairWorker(BWAPI::Unit worker,BWAPI::Unit unitToRepair);
     void        stopRepairing(BWAPI::Unit worker);
     void        setCombatWorker(BWAPI::Unit worker);
+    void        postGivenWorker(BWAPI::Unit worker, BWAPI::TilePosition loc);
     void        postGivenWorker(BWAPI::Unit worker, MacroLocation loc);
-    BWAPI::Unit postWorker(MacroLocation loc);
-    void        unpostWorkers(MacroLocation loc);
+    BWAPI::Unit postWorker(BWAPI::TilePosition loc);
+    void        unpostWorkers(BWAPI::TilePosition loc);
 
     bool        willHaveResources(int mineralsRequired,int gasRequired,double distance);
     void        rebalanceWorkers();

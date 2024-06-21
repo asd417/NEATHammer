@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Common.h"
-#include "OpeningTimingRecord.h"
-#include "OpponentPlan.h"
 #include "PlayerSnapshot.h"
 #include "Skill.h"
 
@@ -67,8 +65,7 @@ protected:
     std::string openingName;
     int myStartingBaseID;
     int enemyStartingBaseID;
-    OpeningPlan expectedEnemyPlan;
-    OpeningPlan enemyPlan;
+
     bool win;
 
     // Gas steal data only for v 1.4 game records.
@@ -105,7 +102,6 @@ protected:
 
     void parseMatchup(const std::string & s);
 
-    OpeningPlan readOpeningPlan(std::istream & input);
 
     bool readPlayerSnapshot(std::istream & input, PlayerSnapshot & snap);
     GameSnapshot * readGameSnapshot(std::istream & input);
@@ -123,7 +119,7 @@ protected:
 
 public:
     // Store opening timing skill data specially.
-    OpeningTimingRecord openingTimingRecord;
+    //OpeningTimingRecord openingTimingRecord;
 
     GameRecord();
     GameRecord(std::istream & input);
@@ -141,8 +137,6 @@ public:
     bool getEnemyIsRandom() const { return enemyIsRandom; };
     const std::string & getMapName() const { return mapName; };
     const std::string & getOpeningName() const { return openingName; };
-    OpeningPlan getExpectedEnemyPlan() const { return expectedEnemyPlan; };
-    OpeningPlan getEnemyPlan() const { return enemyPlan; };
     bool getWin() const { return win; };
     int getFrameScoutSentForGasSteal() const { return frameScoutSentForGasSteal; };
     bool getGasStealHappened() const { return gasStealHappened; };

@@ -10,6 +10,7 @@
 
 #include "MicroDefilers.h"
 #include "MicroDetectors.h"
+#include "MicroHighTemplar.h"
 #include "MicroIrradiated.h"
 #include "MicroLurkers.h"
 #include "MicroMedics.h"
@@ -19,11 +20,6 @@
 #include "MicroScourge.h"
 #include "MicroTanks.h"
 #include "MicroTransports.h"
-
-#include "MicroHighTemplar.h"
-#include "MicroCorsair.h"
-#include "MicroArbiter.h"
-#include "MicroDarkArchon.h"
 
 namespace UAlbertaBot
 {
@@ -62,13 +58,7 @@ class Squad
     MicroRanged			_microRanged;
     MicroDefilers		_microDefilers;
     MicroDetectors		_microDetectors;
-
-    //Protoss
-    MicroHighTemplar	_microHighTemplars;
-    MicroCorsair        _microCorsair;
-    MicroArbiter        _microArbiter;
-    MicroDarkArchon     _microDarkArchon;
-
+    MicroHighTemplar	_microHighTemplar;
     MicroLurkers		_microLurkers;
     MicroMedics			_microMedics;
     //MicroMutas          _microMutas;

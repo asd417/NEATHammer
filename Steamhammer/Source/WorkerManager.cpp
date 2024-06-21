@@ -1194,20 +1194,20 @@ void WorkerManager::setCombatWorker(BWAPI::Unit worker)
 /// </summary>
 /// <param name="worker"></param>
 /// <param name="loc"></param>
-void WorkerManager::postGivenWorker(BWAPI::Unit worker, MacroLocation loc)
+void WorkerManager::postGivenWorker(BWAPI::Unit worker, BWAPI::TilePosition loc)
 {
     workerData.setWorkerPost(worker, loc);
 }
 
 /// <summary>
-/// Post the closest free worker to the given macro location.
+/// Post the closest free worker to the given tile location.
 /// In case of failure (which should be rare), do nothing and return null.
 /// </summary>
 /// <param name="loc"></param>
 /// <returns></returns>
-BWAPI::Unit WorkerManager::postWorker(MacroLocation loc)
+BWAPI::Unit WorkerManager::postWorker(BWAPI::TilePosition loc)
 {
-    BWAPI::Position pos = the.placer.getMacroLocationPos(loc);
+    BWAPI::Position pos = { loc.x * 32, loc.y * 32 };
     UAB_ASSERT(pos.isValid(), "post to bad macroloc");
 
     BWAPI::Unit worker = getUnencumberedWorker(pos, MAX_DISTANCE);
@@ -1224,13 +1224,16 @@ BWAPI::Unit WorkerManager::postWorker(MacroLocation loc)
     return worker;
 }
 
-// Release all workers at the given macro location from their posts.
-// If the location is Anywhere (the default), release all posted workers.
-void WorkerManager::unpostWorkers(MacroLocation loc)
+// Release all workers within 5 tile radis from post
+void WorkerManager::unpostWorkers(BWAPI::TilePosition loc)
 {
+    BWAPI::Position p = { loc.x * 32, loc.y * 32 };
+    
     for (BWAPI::Unit worker : workerData.getWorkers())
     {
-        if (loc == MacroLocation::Anywhere || loc == workerData.getWorkerPostLocation(worker))
+        double dist = p.getDistance(workerData.getWorkerPostPosition(worker));
+        //Radius of 5 tiles
+        if (dist < 32 * 5)
         {
             WorkerData::WorkerJob job = workerData.getWorkerJob(worker);
             if (job == WorkerData::Posted)

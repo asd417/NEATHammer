@@ -5,7 +5,7 @@
 #include "MapGrid.h"
 #include "MapTools.h"
 #include "Micro.h"
-#include "OpponentModel.h"
+
 #include "ProductionManager.h"
 #include "The.h"
 
@@ -141,12 +141,6 @@ void ScoutManager::update()
         _overlordScout = nullptr;
     }
 
-    // Release the overlord scout if the enemy has mobile or static anti-air.
-    if (_overlordScout && (InformationManager::Instance().enemyHasAntiAir() || overlordBlockedByAirDefense()))
-    {
-        releaseOverlordScout();
-    }
-
     // If we're done with a gas steal and we don't want to keep scouting, release the worker.
     // If we're zerg, the worker may have turned into an extractor. That is handled elsewhere.
     if (_scoutCommand == MacroCommandType::None && _gasStealOver)
@@ -167,43 +161,12 @@ void ScoutManager::update()
     if (_workerScout)
     {
         bool moveScout = true;
-        if (wantGasSteal())              // implies !_gasStealOver
-        {
-            if (gasSteal())
-            {
-                moveScout = false;
-            }
-            else if (_queuedGasSteal)    // gas steal queued but not finished
-            {
-                // We're in the midst of stealing gas. Let BuildingManager control the worker.
-                moveScout = false;
-                _gasStealStatus = "Stealing gas";
-            }
-        }
-        else
-        {
-            if (_gasStealOver)
-            {
-                _gasStealStatus = "Finished or failed";
-            }
-            else
-            {
-                _gasStealStatus = "Not planned";
-            }
-        }
+        
         if (moveScout)
         {
             moveGroundScout();
         }
     }
-    else if (_gasStealOver)
-    {
-        // We get here if we're stealing gas as zerg when the worker turns into an extractor.
-        _gasStealStatus = "Finished or failed";
-    }
-
-    
-
     drawScoutInformation(200, 320);
 }
 
@@ -262,12 +225,12 @@ void ScoutManager::releaseOverlordScout()
 
 void ScoutManager::setScoutCommand(MacroCommandType cmd)
 {
-    /*UAB_ASSERT(
+    UAB_ASSERT(
         cmd == MacroCommandType::Scout ||
         cmd == MacroCommandType::ScoutIfNeeded ||
         cmd == MacroCommandType::ScoutLocation ||
         cmd == MacroCommandType::ScoutOnceOnly,
-        "bad scout command");*/
+        "bad scout command");
 
     _scoutCommand = cmd;
 }
@@ -388,6 +351,48 @@ void ScoutManager::moveGroundScout()
 // NOTE This may release the worker scout if scouting is complete!
 void ScoutManager::followGroundPath()
 {
+    // Called only after the enemy base is found.
+    Base* enemyBase = the.bases.enemyStart();
+
+    if (the.zone.at(enemyBase->getTilePosition()) != the.zone.at(_workerScout->getTilePosition()))
+    {
+        // We're not there yet. Go there.
+        the.micro.MoveSafely(_workerScout, enemyBase->getCenter(), &enemyBase->getDistances());
+        return;
+    }
+
+    // NOTE Sight range of a worker is 224, except a probe which has 256.
+    if (_nextDestination.isValid() && _workerScout->getDistance(_nextDestination) > 96)
+    {
+        // We're still a fair distance from the next waypoint. Stay the course.
+        if (Config::Debug::DrawScoutInfo)
+        {
+            BWAPI::Broodwar->drawCircleMap(_nextDestination, 3, BWAPI::Colors::Yellow, true);
+            BWAPI::Broodwar->drawLineMap(_workerScout->getPosition(), _nextDestination, BWAPI::Colors::Yellow);
+        }
+        the.micro.MoveSafely(_workerScout, _nextDestination);
+        return;
+    }
+
+    // We're at the enemy base and need another waypoint.
+    BWAPI::Position destination = the.grid.getLeastExploredNear(enemyBase->getPosition(), true);
+    if (destination.isValid())
+    {
+        _nextDestination = destination;
+        if (_scoutCommand == MacroCommandType::ScoutOnceOnly && !wantGasSteal())
+        {
+            if (BWAPI::Broodwar->isExplored(BWAPI::TilePosition(_nextDestination)))
+            {
+                releaseWorkerScout();
+                return;
+            }
+        }
+    }
+    else
+    {
+        _nextDestination = enemyBase->getCenter();
+    }
+    the.micro.MoveSafely(_workerScout, _nextDestination);
 }
 
 // Called after the overlord has reached the enemy resource depot,
@@ -435,51 +440,6 @@ void ScoutManager::moveAirScoutAroundEnemyBase()
         // We apparently can't go anywhere. Let the overlord run free.
         releaseOverlordScout();
     }
-}
-
-// Called only when a gas steal is requested.
-// Return true to say that gas stealing controls the worker, and
-// false if the caller gets control.
-bool ScoutManager::gasSteal()
-{
-    Base * enemyBase = the.bases.enemyStart();
-    if (!enemyBase)
-    {
-        _gasStealStatus = "Enemy base not found";
-        return false;
-    }
-
-    _enemyGeyser = getTheEnemyGeyser();
-    if (!_enemyGeyser || !_enemyGeyser->getInitialTilePosition().isValid())
-    {
-        // No need to set status. It will change on the next frame.
-        _gasStealOver = true;
-        return false;
-    }
-
-    // The conditions are met. Do it!
-    _startedGasSteal = true;
-
-    if (_enemyGeyser->isVisible() && _enemyGeyser->getType() != BWAPI::UnitTypes::Resource_Vespene_Geyser)
-    {
-        // We can see the geyser and it has become something else.
-        // That should mean that the geyser has been taken since we first saw it.
-        _gasStealOver = true;    // give up
-        // No need to set status. It will change on the next frame.
-        return false;
-    }
-    else if (_enemyGeyser->isVisible() && _workerScout->getDistance(_enemyGeyser) < 300)
-    {
-        
-        _gasStealStatus = "Stealing gas";
-    }
-    else
-    {
-        // We don't see the geyser yet. Move toward it.
-        the.micro.MoveSafely(_workerScout, _enemyGeyser->getInitialPosition());
-        _gasStealStatus = "Moving to steal gas";
-    }
-    return true;
 }
 
 // Choose an enemy worker to harass, or none.

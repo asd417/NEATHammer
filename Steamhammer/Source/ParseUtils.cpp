@@ -4,7 +4,6 @@
 #include "JSONTools.h"
 
 #include "BuildOrder.h"
-#include "OpponentModel.h"
 #include "Random.h"
 #include "StrategyManager.h"
 
@@ -253,8 +252,6 @@ void ParseUtils::ParseTextCommand(const std::string & commandString)
 
         // Macro Options
         else if (variableName == "absolutemaxworkers") { Config::Macro::AbsoluteMaxWorkers = GetIntFromString(val); }
-        else if (variableName == "buildingspacing") { Config::Macro::BuildingSpacing = GetIntFromString(val); }
-        else if (variableName == "pylonspacing") { Config::Macro::PylonSpacing = GetIntFromString(val); }
 
         // Debug Options
         else if (variableName == "errorlogfilename") { Config::IO::ErrorLogFilename = val; }

@@ -4,7 +4,6 @@
 #include "BuildingPlacer.h"
 #include "ProductionManager.h"
 #include "ScoutManager.h"
-#include "StrategyBossZerg.h"
 #include "The.h"
 #include "UnitUtil.h"
 
@@ -827,22 +826,17 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
 
     if (b.type.isRefinery())
     {
-        return the.placer.getRefineryPosition();
+        return the.placer.getRefineryPosition(b.desiredPosition);
     }
 
-    MacroLocation loc = b.macroLocation;
-
-    if (loc == MacroLocation::Tile && b.finalPosition.isValid())
+    if (b.finalPosition.isValid())
     {
         return the.placer.getBuildLocationNear(b, 0);
     }
 
-    // A resource depot going Anywhere is really going to an expansion.
-    if (b.type.isResourceDepot() && loc == MacroLocation::Anywhere)
-    {
-        loc = MacroLocation::Expo;
-    }
 
+    MacroLocation loc = b.macroLocation;
+    // A resource depot going Anywhere is really going to an expansion.
     // A resource depot goes at an expansion location, except for certain non-base hatchery locations.
     // Only zerg macro hatcheries and proxy hatcheries are placed away from expo locations.
     if (b.type.isResourceDepot() &&
@@ -852,38 +846,15 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
         b.macroLocation != MacroLocation::Front &&
         b.macroLocation != MacroLocation::Center)
     {
-        BWAPI::TilePosition pos = the.placer.getExpoLocationTile(b.macroLocation);
+        BWAPI::TilePosition pos = the.placer.getExpoLocationTile(MacroLocation::Expo);
         if (the.placer.buildingOK(b, pos) && !the.groundAttacks.inRange(b.type, pos))
         {
             return pos;
         }
         return BWAPI::TilePositions::None;
     }
-
-    int distance = Config::Macro::BuildingSpacing;
-    if (b.type == BWAPI::UnitTypes::Terran_Bunker ||
-        b.type == BWAPI::UnitTypes::Terran_Missile_Turret ||
-        b.type == BWAPI::UnitTypes::Protoss_Photon_Cannon ||
-        b.type == BWAPI::UnitTypes::Zerg_Sunken_Colony ||
-        b.type == BWAPI::UnitTypes::Zerg_Spore_Colony ||
-        b.type == BWAPI::UnitTypes::Zerg_Creep_Colony)
-    {
-        // Pack defenses tightly together.
-        distance = 0;
-    }
-    else if (b.type == BWAPI::UnitTypes::Protoss_Pylon)
-    {
-        if (numPylons < 3)
-        {
-            // Early pylons may be spaced differently than other buildings.
-            distance = Config::Macro::PylonSpacing;
-        }
-        else
-        {
-            // Building spacing == 1 is usual. Be more generous with pylons.
-            distance = 2;
-        }
-    }
+    int distance = 1;
+    if (b.type == BWAPI::UnitTypes::Protoss_Pylon) distance = 2;
 
     // The building placer does the rest.
     return the.placer.getBuildLocationNear(b, distance);

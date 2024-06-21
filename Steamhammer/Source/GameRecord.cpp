@@ -2,7 +2,6 @@
 
 #include "Bases.h"
 #include "Logger.h"
-#include "OpponentModel.h"
 #include "The.h"
 
 using namespace UAlbertaBot;
@@ -92,18 +91,6 @@ void GameRecord::parseMatchup(const std::string & s)
     }
 }
 
-OpeningPlan GameRecord::readOpeningPlan(std::istream & input)
-{
-    std::string line;
-
-    if (std::getline(input, line))
-    {
-        return OpeningPlanFromString(line);
-    }
-
-    // BWAPI::Broodwar->printf("read bad opening plan");
-    throw game_record_read_error();
-}
 
 // Return true if the snapshot is valid and we should continue reading, otherwise false or throw.
 bool GameRecord::readPlayerSnapshot(std::istream & input, PlayerSnapshot & snap)
@@ -217,8 +204,6 @@ void GameRecord::read_v3_0(std::istream & input)
     myStartingBaseID = readNumber(input);
     enemyStartingBaseID = readNumber(input);
     if (!std::getline(input, openingName)) { throw game_record_read_error(); }
-    expectedEnemyPlan = readOpeningPlan(input);
-    enemyPlan = readOpeningPlan(input);
     win = readNumber(input) != 0;
 
     frameWeMadeFirstCombatUnit = readNumber(input);
@@ -283,8 +268,6 @@ void GameRecord::read_v1_4(std::istream & input)
 
     if (!std::getline(input, mapName))     { throw game_record_read_error(); }
     if (!std::getline(input, openingName)) { throw game_record_read_error(); }
-    expectedEnemyPlan = readOpeningPlan(input);
-    enemyPlan = readOpeningPlan(input);
     win = readNumber(input) != 0;
     frameScoutSentForGasSteal = readNumber(input);
     gasStealHappened = readNumber(input) != 0;
@@ -413,8 +396,6 @@ GameRecord::GameRecord()
     , mapName(BWAPI::Broodwar->mapFileName())
     , myStartingBaseID(the.bases.myStart()->getID())
     , enemyStartingBaseID(the.bases.enemyStart() ? the.bases.enemyStart()->getID() : 0)
-    , expectedEnemyPlan(OpeningPlan::Unknown)
-    , enemyPlan(OpeningPlan::Unknown)
     , win(false)                   // until proven otherwise
     , frameScoutSentForGasSteal(0)
     , gasStealHappened(false)
@@ -442,8 +423,6 @@ GameRecord::GameRecord(std::istream & input)
     , enemyIsRandom(false)
     , myStartingBaseID(0)
     , enemyStartingBaseID(0)
-    , expectedEnemyPlan(OpeningPlan::Unknown)
-    , enemyPlan(OpeningPlan::Unknown)
     , win(false)                   // until proven otherwise
     , frameScoutSentForGasSteal(0)
     , gasStealHappened(false)
@@ -466,12 +445,6 @@ GameRecord::GameRecord(std::istream & input)
 // Write the game record to the given stream. File format:
 void GameRecord::write(std::ostream & output)
 {
-    // We only now notice that there was an expected enemy opening plan.
-    // Can't initialize this right off, and there is no point in tracking it during the game.
-    if (!savedRecord)
-    {
-        expectedEnemyPlan = OpponentModel::Instance().getInitialExpectedEnemyPlan();
-    }
 
     output << latestRecordFormat << '\n';
     output <<
@@ -482,8 +455,6 @@ void GameRecord::write(std::ostream & output)
     output << myStartingBaseID << '\n';
     output << enemyStartingBaseID << '\n';
     output << openingName << '\n';
-    output << OpeningPlanString(expectedEnemyPlan) << '\n';
-    output << OpeningPlanString(enemyPlan) << '\n';
     output << (win ? '1' : '0') << '\n';
 
     output << frameWeMadeFirstCombatUnit << '\n';

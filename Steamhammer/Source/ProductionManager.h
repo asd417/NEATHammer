@@ -4,7 +4,6 @@
 
 #include "Common.h"
 
-#include "BOSSManager.h"
 #include "BuildOrder.h"
 #include "BuildOrderQueue.h"
 #include "BuildingManager.h"
@@ -65,11 +64,8 @@ public:
     void	drawQueueInformation(std::map<BWAPI::UnitType,int> & numUnits,int x,int y,int index);
     void	setBuildOrder(const BuildOrder & buildOrder);
     void	update();
-    void	onUnitMorph(BWAPI::Unit unit);
     void	onUnitDestroy(BWAPI::Unit unit);
     void	drawProductionInformation(int x, int y);
-    void	startExtractorTrick(BWAPI::UnitType type);
-    void    liftBuildings(BWAPI::UnitType type) const;
 
     bool	nextIsBuilding() const;
 

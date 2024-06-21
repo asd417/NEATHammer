@@ -22,89 +22,10 @@ namespace UAlbertaBot
 		Protoss_Corsair,
 		Protoss_Arbiter,
 		Protoss_Carrier,
-
-		Protoss_Nexus,
-		Protoss_Pylon,
-		Protoss_Assimilator,
-		Protoss_Gateway,
-		Protoss_Forge,
-		Protoss_Photon_Cannon,
-		Protoss_Shield_Battery,
-		Protoss_Cybernetics_Core,
-		Protoss_Citadel_of_Adun,
-		Protoss_Templar_Archives,
-		Protoss_Robotics_Facility,
-		Protoss_Robotics_Support_Bay,
-		Protoss_Observatory,
-		Protoss_Stargate,
-		Protoss_Fleet_Beacon,
-		Protoss_Arbiter_Tribunal,
 		NETWORK_UNIT_COUNT
 	};
-	enum class NetworkUnits {
-		Terran_SCV,
-		Terran_Marine,
-		Terran_Firebat,
-		Terran_Medic,
-		Terran_Ghost,
-		Terran_Vulture,
-		Terran_Siege_Tank_Tank_Mode,
-		Terran_Goliath,
-		Terran_Wraith,
-		Terran_Dropship,
-		Terran_Science_Vessel,
-		Terran_Valkyrie,
-		Terran_Battlecruiser,
-
-		Terran_Command_Center,
-		Terran_Comsat_Station,
-		Terran_Nuclear_Silo,
-		Terran_Supply_Depot,
-		Terran_Refinery,
-		Terran_Barracks,
-		Terran_Engineering_Bay,
-		Terran_Missile_Turret,
-		Terran_Academy,
-		Terran_Factory,
-		Terran_Machine_Shop,
-		Terran_Starport,
-		Terran_Control_Tower,
-		Terran_Science_Facility,
-		Terran_Physics_Lab,
-		Terran_Covert_Ops,
-		Terran_Armory,
-
-		Zerg_Drone,
-		Zerg_Zergling,
-		Zerg_Overlord,
-		Zerg_Hydralisk,
-		Zerg_Lurker,
-		Zerg_Mutalisk,
-		Zerg_Guardian,
-		Zerg_Devourer,
-		Zerg_Queen,
-		Zerg_Scourge,
-		Zerg_Defiler,
-		Zerg_Ultralisk,
-		Zerg_Infested_Terran,
-
-		Zerg_Hatchery,
-		Zerg_Lair,
-		Zerg_Hive,
-		Zerg_Creep_Colony,
-		Zerg_Sunken_Colony,
-		Zerg_Spore_Colony,
-		Zerg_Extractor,
-		Zerg_Spawning_Pool,
-		Zerg_Evolution_Chamber,
-		Zerg_Hydralisk_Den,
-		Zerg_Spire,
-		Zerg_Greater_Spire,
-		Zerg_Queens_Nest,
-		Zerg_Ultralisk_Cavern,
-		Zerg_Defiler_Mound,
-		Zerg_Nydus_Canal,
-
+	enum class NetworkProtossOptions {
+		//All Units
 		Protoss_Probe,
 		Protoss_Zealot,
 		Protoss_Dragoon,
@@ -119,7 +40,7 @@ namespace UAlbertaBot
 		Protoss_Corsair,
 		Protoss_Arbiter,
 		Protoss_Carrier,
-
+		//All Buildings
 		Protoss_Nexus,
 		Protoss_Pylon,
 		Protoss_Assimilator,
@@ -136,29 +57,7 @@ namespace UAlbertaBot
 		Protoss_Stargate,
 		Protoss_Fleet_Beacon,
 		Protoss_Arbiter_Tribunal,
-		NETWORK_UNIT_COUNT
-	};
-	//Only include researchable techs	
-	enum class NetworkTech {
-		Stim_Packs,
-		Optical_Flare,
-		Restoration,
-		Tank_Siege_Mode,
-		Irradiate,
-		EMP_Shockwave,
-		Cloaking_Field,
-		Personnel_Cloaking,
-		Lockdown,
-		Yamato_Gun,
-		Nuclear_Strike,
-
-		Burrowing,
-		Spawn_Broodlings,
-		Plague,
-		Consume,
-		Ensnare,
-		Lurker_Aspect,
-
+		//All Researchable tech
 		Psionic_Storm,
 		Hallucination,
 		Recall,
@@ -166,43 +65,7 @@ namespace UAlbertaBot
 		Disruption_Web,
 		Mind_Control,
 		Maelstrom,
-		NETWORK_TECH_COUNT
-	};
-
-	enum class NetworkUpgrade {
-		U_238_Shells,
-		Terran_Infantry_Armor,
-		Terran_Infantry_Weapons,
-		Terran_Vehicle_Plating,
-		Terran_Vehicle_Weapons,
-		Ion_Thrusters,
-		Titan_Reactor,
-		Terran_Ship_Plating,
-		Terran_Ship_Weapons,
-		Moebius_Reactor,
-		Ocular_Implants,
-		Apollo_Reactor,
-		Colossus_Reactor,
-		Caduceus_Reactor,
-		Charon_Boosters,
-
-		Zerg_Carapace,
-		Zerg_Flyer_Carapace,
-		Zerg_Melee_Attacks,
-		Zerg_Missile_Attacks,
-		Zerg_Flyer_Attacks,
-		Ventral_Sacs,
-		Antennae,
-		Pneumatized_Carapace,
-		Metabolic_Boost,
-		Adrenal_Glands,
-		Muscular_Augments,
-		Grooved_Spines,
-		Gamete_Meiosis,
-		Metasynaptic_Node,
-		Chitinous_Plating,
-		Anabolic_Synthesis,
-
+		//All upgrades
 		Protoss_Ground_Armor,
 		Protoss_Air_Armor,
 		Protoss_Ground_Weapons,
@@ -222,7 +85,8 @@ namespace UAlbertaBot
 		Khaydarin_Core,
 		Argus_Jewel,
 		Argus_Talisman,
-		NETWORK_UPGRADE_COUNT
+
+		NETWORK_OPTION_COUNT
 	};
 
 	//Entries with higher number will override the data if the tile has multiple types of units
@@ -356,28 +220,25 @@ namespace UAlbertaBot
 		int lastGas;
 
 		//output vector
-		double macroActType; //Unit, Tech, Upgrade, Command, Default
-		double unitType;
-		double techType;
-		double upgradeType;
-		double macroCommandType;
-		double amount1;
-		double amount2;
+		std::array<double, (size_t)NetworkProtossOptions::NETWORK_OPTION_COUNT> builderOutputs;
+		std::array<double, (size_t)MacroCommandType::QueueBarrier> macroCommandTypeOutputs;
 		double tilePosX; //0~256
 		double tilePosY; //0~256
-		double macroCommandUnitType;
 
 		void InitializeNetwork();
 
 		bool isWorkerType(BWAPI::UnitType type);
 		int getWorkerCount(BWAPI::Unitset& allUnits);
+		BWAPI::Unit NEATCommander::getProducer(NetworkProtossOptions option) const;
 
 		void evaluate();
 		void getVisibleMap(int sectionNum);
-		BWAPI::UnitType ToBWAPIUnitProtoss(NetworkProtossUnits ut);
-		BWAPI::UnitType ToBWAPIUnit(NetworkUnits ut);
-		BWAPI::TechType ToBWAPITech(NetworkTech tt);
-		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkUpgrade ut);
+		bool canBuild(NetworkProtossOptions option);
+		bool canBuild(NetworkProtossUnits option);
+		BWAPI::UnitType ToBWAPIUnit(NetworkProtossOptions ut);
+		BWAPI::UnitType ToBWAPIUnit(NetworkProtossUnits ut);
+		BWAPI::TechType ToBWAPITech(NetworkProtossOptions tt);
+		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkProtossOptions ut);
 		NEAT_TileType getTileType(BWAPI::UnitType type);
 		std::vector<MacroAct> _actions{};
 

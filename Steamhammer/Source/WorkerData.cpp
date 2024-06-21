@@ -17,6 +17,12 @@ WorkerData::WorkerPost::WorkerPost(MacroLocation loc)
 {
 }
 
+WorkerData::WorkerPost::WorkerPost(BWAPI::TilePosition loc)
+    : location(MacroLocation::Tile)
+    , position({ loc.x * 32, loc.y * 32 })
+{
+}
+
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 WorkerData::WorkerData()
@@ -178,7 +184,7 @@ void WorkerData::setWorkerJob(BWAPI::Unit unit, const BWAPI::TilePosition & tile
 
 // Post the worker: Give it a Posted job.
 // Calculate the map position from the macro location and remember it.
-void WorkerData::setWorkerPost(BWAPI::Unit unit, MacroLocation loc)
+void WorkerData::setWorkerPost(BWAPI::Unit unit, BWAPI::TilePosition loc)
 {
     if (!unit) { return; }
 
@@ -500,18 +506,6 @@ BWAPI::TilePosition WorkerData::getWorkerTile(BWAPI::Unit unit)
     }
 
     return BWAPI::TilePositions::None;
-}
-
-MacroLocation WorkerData::getWorkerPostLocation(BWAPI::Unit unit)
-{
-    std::map<BWAPI::Unit, WorkerData::WorkerPost>::iterator it = workerPostMap.find(unit);
-
-    if (it != workerPostMap.end())
-    {
-        return it->second.location;
-    }
-
-    return MacroLocation::Anywhere;
 }
 
 BWAPI::Position WorkerData::getWorkerPostPosition(BWAPI::Unit unit)

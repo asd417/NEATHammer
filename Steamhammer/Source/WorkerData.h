@@ -17,6 +17,7 @@ class WorkerPost
 public:
     WorkerPost();
     WorkerPost(MacroLocation loc);
+    WorkerPost(BWAPI::TilePosition loc);
 
     MacroLocation location;
     BWAPI::Position position;
@@ -70,6 +71,7 @@ public:
     void			setWorkerJob(BWAPI::Unit unit, const BWAPI::TilePosition & tile);
 
     void			setWorkerPost(BWAPI::Unit unit, MacroLocation loc);
+    void            setWorkerPost(BWAPI::Unit unit, BWAPI::TilePosition loc);
     void            resetWorkerPost(BWAPI::Unit unit, WorkerJob job);
 
     int				getNumWorkers() const;
@@ -98,7 +100,7 @@ public:
     BWAPI::Unit		getWorkerRepairUnit(BWAPI::Unit unit);
     BWAPI::TilePosition getWorkerTile(BWAPI::Unit unit);
 
-    MacroLocation   getWorkerPostLocation(BWAPI::Unit unit);
+
     BWAPI::Position getWorkerPostPosition(BWAPI::Unit unit);
 
     BWAPI::Unitset  getMineralPatchesNearDepot(BWAPI::Unit depot);

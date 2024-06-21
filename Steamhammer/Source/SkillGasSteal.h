@@ -4,7 +4,6 @@
 
 #include "Skill.h"
 
-#include "OpponentModel.h"
 
 namespace UAlbertaBot
 {
@@ -39,8 +38,6 @@ private:
     bool _initialized;
     bool _failed;
 
-    OpponentModel::OpeningInfoType tryInfo;
-    OpponentModel::OpeningInfoType successInfo;
     int successLifetime;        // mean lifetime (destruction frame) of refinery when made
     int stealGasTiming;         // mean enemy gas timing after successful steal
     int otherGasTiming;         // mean enemy gas timing in other games

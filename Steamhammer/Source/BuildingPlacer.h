@@ -66,6 +66,7 @@ public:
     BWAPI::TilePosition getExpoLocationTile(MacroLocation loc) const;
     BWAPI::TilePosition getMacroLocationTile(MacroLocation loc) const;
     BWAPI::Position     getMacroLocationPos(MacroLocation loc) const;
+    BWAPI::TilePosition getRefineryPosition(BWAPI::TilePosition targetPosition) const;
     BWAPI::TilePosition	getRefineryPosition() const;
 
     BWAPI::TilePosition getTerrainProxyPosition(const Base * base) const;

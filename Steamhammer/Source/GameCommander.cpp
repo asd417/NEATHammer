@@ -3,14 +3,13 @@
 #include "Bases.h"
 #include "BuildingPlacer.h"
 #include "MapTools.h"
-#include "OpponentModel.h"
+
 #include "UnitUtil.h"
 
 #include "BuildingManager.h"
 #include "InformationManager.h"
 #include "MapGrid.h"
-#include "OpeningTiming.h"
-#include "OpponentModel.h"
+
 #include "ProductionManager.h"
 #include "ScoutManager.h"
 #include "StrategyManager.h"
@@ -62,18 +61,16 @@ void GameCommander::update()
     MapGrid::Instance().update();
     _timerManager.stopTimer(TimerManager::MapGrid);
 
-    _timerManager.startTimer(TimerManager::OpponentModel);
-    OpponentModel::Instance().update();
+    _timerManager.startTimer(TimerManager::Skill);
     the.skillkit.update();
-    _timerManager.stopTimer(TimerManager::OpponentModel);
+    _timerManager.stopTimer(TimerManager::Skill);
 
     // -- Managers that act on information. --
 
     _timerManager.startTimer(TimerManager::NetworkEvaluation);
     //Performs buildorder search
     NEATCommander::Instance().update();
-    BOSSManager::Instance().update(35 - _timerManager.getMilliseconds());
-    _timerManager.stopTimer(TimerManager::Search);
+    _timerManager.stopTimer(TimerManager::NetworkEvaluation);
 
     // May steal workers from WorkerManager, so run it before WorkerManager.
     // NEAT Network evaluation occurs inside ProductionManager
@@ -94,9 +91,9 @@ void GameCommander::update()
     _combatCommander.update(_combatUnits);
     _timerManager.stopTimer(TimerManager::Combat);
 
-    //_timerManager.startTimer(TimerManager::Scout);
-    //ScoutManager::Instance().update();
-    //_timerManager.stopTimer(TimerManager::Scout);
+    _timerManager.startTimer(TimerManager::Scout);
+    ScoutManager::Instance().update();
+    _timerManager.stopTimer(TimerManager::Scout);
 
     // Execute micro commands gathered above. Do this at the end of the frame.
     _timerManager.startTimer(TimerManager::Micro);
@@ -111,8 +108,8 @@ void GameCommander::update()
 
 void GameCommander::onEnd(bool isWinner)
 {
-    OpponentModel::Instance().setWin(isWinner);
-    OpponentModel::Instance().write();
+    //OpponentModel::Instance().setWin(isWinner);
+    //OpponentModel::Instance().write();
 
     NEATCommander::Instance().sendFitnessToTrainServer();
 
@@ -133,7 +130,6 @@ void GameCommander::drawDebugInterface()
     BuildingManager::Instance().drawBuildingInformation(200, 50);
     the.placer.drawReservedTiles();
     ProductionManager::Instance().drawProductionInformation(30, 60);
-    BOSSManager::Instance().drawSearchInformation(490, 100);
     the.map.drawHomeDistances();
     drawTerrainHeights();
     drawDefenseClusters();
@@ -153,37 +149,15 @@ void GameCommander::drawGameInformation(int x, int y)
         return;
     }
 
-    const OpponentModel::OpponentSummary & summary = OpponentModel::Instance().getSummary();
-    BWAPI::Broodwar->drawTextScreen(x, y, "%c%s %c%d-%d %c%s",
+    //const OpponentModel::OpponentSummary & summary = OpponentModel::Instance().getSummary();
+    BWAPI::Broodwar->drawTextScreen(x, y, "%c%s vs %c%s",
         BWAPI::Broodwar->self()->getTextColor(), BWAPI::Broodwar->self()->getName().c_str(),
-        white, summary.totalWins, summary.totalGames - summary.totalWins,
+        //white, summary.totalWins, summary.totalGames - summary.totalWins,
         BWAPI::Broodwar->enemy()->getTextColor(), BWAPI::Broodwar->enemy()->getName().c_str());
     y += 12;
     
     const std::string & openingGroup = StrategyManager::Instance().getOpeningGroup();
 
-    y += 12;
-
-    std::string expect;
-    std::string enemyPlanString;
-    if (OpponentModel::Instance().getEnemyPlan() == OpeningPlan::Unknown &&
-        OpponentModel::Instance().getExpectedEnemyPlan() != OpeningPlan::Unknown)
-    {
-        if (OpponentModel::Instance().isEnemySingleStrategy())
-        {
-            expect = "surely ";
-        }
-        else
-        {
-            expect = "expect ";
-        }
-        enemyPlanString = OpponentModel::Instance().getExpectedEnemyPlanString();
-    }
-    else
-    {
-        enemyPlanString = OpponentModel::Instance().getEnemyPlanString();
-    }
-    BWAPI::Broodwar->drawTextScreen(x, y, "%cOpp Plan %c%s%c%s", white, orange, expect.c_str(), yellow, enemyPlanString.c_str());
     y += 12;
 
     std::string island = "";
