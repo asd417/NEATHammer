@@ -12,6 +12,7 @@ namespace UAlbertaBot
         
         return instance;
     }
+    
     NEATCommander::NEATCommander() {
         mapWidth = BWAPI::Broodwar->mapWidth();
         mapHeight = BWAPI::Broodwar->mapHeight();
@@ -133,9 +134,50 @@ namespace UAlbertaBot
             }
         }
     }
+    void NEATCommander::onUnitCreate(BWAPI::Unit unit)
+    {
+    }
+    void NEATCommander::onUnitComplete(BWAPI::Unit unit)
+    {
+        BWAPI::UnitType type = unit->getType();
+        if (type != BWAPI::UnitTypes::Terran_SCV &&
+            type != BWAPI::UnitTypes::Zerg_Drone &&
+            type != BWAPI::UnitTypes::Protoss_Probe) {
+            if (unit->getPlayer() == the.self())
+            {
+                if (type.isBuilding())
+                {
+                    //Not a huge motivation to build
+                    NEATCommander::Instance().scoreFitness(type.buildScore() / 10);
+                }
+                else
+                {
+                    //Huge Motivation to build army
+                    NEATCommander::Instance().scoreFitness(type.buildScore() * 10);
+                }
+            }
+        }
+    }
+    void NEATCommander::onUnitDestroy(BWAPI::Unit unit)
+    {
+        BWAPI::UnitType type = unit->getType();
+        //Strong motivation to kill
+        if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(type.buildScore() * 20);
+        //If building is destroyed deduct some of the score that was given by creating the building
+        if (unit->getPlayer() == the.self() && type.isBuilding()) NEATCommander::Instance().scoreFitness(-type.buildScore() / 20);
+    }
+    void NEATCommander::onUnitHide(BWAPI::Unit unit)
+    {
+    }
+    void NEATCommander::onUnitShow(BWAPI::Unit unit)
+    {
+        //Used detector to reveal invisible unit
+        if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(Config::NEAT::EnemyShowScore);
+    }
     void NEATCommander::evaluate()
     {
         if (!network) return;
+        if (_actions.size() > 2) return;
         inputVector.clear();
         
         getVisibleMap(curSection);

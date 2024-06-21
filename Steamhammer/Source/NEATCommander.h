@@ -212,6 +212,17 @@ namespace UAlbertaBot
 		double getFitness();
 		void scoreFitness(double add);
 		void sendFitnessToTrainServer();
+
+		//Callbacks
+		void onUnitCreate(BWAPI::Unit unit);
+		void onUnitComplete(BWAPI::Unit unit);
+		void onUnitDestroy(BWAPI::Unit unit);
+
+		//When visible unit becomes invisible
+		void onUnitHide(BWAPI::Unit unit);
+
+		//When invisible unit becomes visible
+		void onUnitShow(BWAPI::Unit unit);
 	private:
 		NEATCommander();
 		int mapWidth;

@@ -94,18 +94,13 @@ void UAlbertaBotModule::onFrame()
 void UAlbertaBotModule::onUnitDestroy(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitDestroy(unit);
-    if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
+    NEATCommander::Instance().onUnitDestroy(unit);
+    
 }
 
 void UAlbertaBotModule::onUnitMorph(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitMorph(unit);
-    BWAPI::UnitType type = unit->getType();
-    if (type != BWAPI::UnitTypes::Terran_SCV &&
-        type != BWAPI::UnitTypes::Zerg_Drone &&
-        type != BWAPI::UnitTypes::Protoss_Probe) {
-        if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
-    }
 }
 
 void UAlbertaBotModule::onSendText(std::string text) 
@@ -113,47 +108,46 @@ void UAlbertaBotModule::onSendText(std::string text)
     ParseUtils::ParseTextCommand(text);
 }
 
+/// <summary>
+/// Called when any unit is created.
+/// </summary>
+/// <param name="unit"></param>
 void UAlbertaBotModule::onUnitCreate(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitCreate(unit);
-    BWAPI::UnitType type = unit->getType();
-    if (type != BWAPI::UnitTypes::Terran_SCV &&
-        type != BWAPI::UnitTypes::Zerg_Drone &&
-        type != BWAPI::UnitTypes::Protoss_Probe) {
-        if (unit->getPlayer() == the.self())
-        {
-            if (type.isBuilding())
-            {
-                NEATCommander::Instance().scoreFitness(type.buildScore()/10);
-            }
-            else
-            {
-                NEATCommander::Instance().scoreFitness(type.buildScore());
-            }
-        }
-    }
+    NEATCommander::Instance().onUnitCreate(unit);
 }
-
+/// <summary>
+/// Called when the state of a unit changes from incomplete to complete.
+/// (finished training or finished constructing
+/// </summary>
+/// <param name="unit"></param>
 void UAlbertaBotModule::onUnitComplete(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitComplete(unit);
-    BWAPI::UnitType type = unit->getType();
-    if (type != BWAPI::UnitTypes::Terran_SCV &&
-        type != BWAPI::UnitTypes::Zerg_Drone &&
-        type != BWAPI::UnitTypes::Protoss_Probe) {
-        if (unit->getPlayer() == the.self()) NEATCommander::Instance().scoreFitness(unit->getType().buildScore());
-    }
+    NEATCommander::Instance().onUnitComplete(unit);
+    
 }
 
+/// <summary>
+/// Called when a previously invisible unit becomes visible.
+/// </summary>
+/// <param name="unit"></param>
 void UAlbertaBotModule::onUnitShow(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitShow(unit);
-    if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(Config::NEAT::EnemyShowScore);
+    NEATCommander::Instance().onUnitShow(unit);
+    
 }
 
+/// <summary>
+/// Called just as a visible unit is becoming invisible.
+/// </summary>
+/// <param name="unit"></param>
 void UAlbertaBotModule::onUnitHide(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitHide(unit);
+    NEATCommander::Instance().onUnitHide(unit);
 }
 
 void UAlbertaBotModule::onUnitRenegade(BWAPI::Unit unit)
