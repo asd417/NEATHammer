@@ -218,7 +218,7 @@ namespace UAlbertaBot
                 inputVector.push_back(enemyMapData[i][j]);
             }
         }
-        //16x16 + 16x16 + 10 = 522
+        //16x16 + 16x16 + 12 = 524
         inputVector.push_back(mSupply);
         inputVector.push_back(cSupply);
         inputVector.push_back(min);
@@ -227,6 +227,8 @@ namespace UAlbertaBot
         inputVector.push_back(ctime);
         inputVector.push_back(sectionCoordW);
         inputVector.push_back(sectionCoordH);
+        inputVector.push_back(mapWidth);
+        inputVector.push_back(mapWidth);
         inputVector.push_back(workerCount);
         inputVector.push_back(enemyRace);
 
@@ -256,14 +258,10 @@ namespace UAlbertaBot
         //Looked through all sections. Make command
         if (curSection == 0)
         {
-            int posx = int(tilePosX);
-            int posy = int(tilePosY);
-
-            //Clamp tile position outputs
-            posx = posx > 0 ? posx : 1;
-            posx = posx < mapWidth ? posx : mapWidth - 1;
-            posy = posy > 0 ? posy : 1;
-            posy = posy < mapHeight ? posy : mapHeight - 1;
+            std::clamp(tilePosX, (double) 0.0f, (double) 1.0f);
+            std::clamp(tilePosY, (double) 0.0f, (double) 1.0f);
+            int posx = int(tilePosX * mapWidth);
+            int posy = int(tilePosY * mapHeight);
 
             int highestBuildOptionOutput = 0;
             double highestBuildOptionOutputScore = 0;
