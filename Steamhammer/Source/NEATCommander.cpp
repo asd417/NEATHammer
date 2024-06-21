@@ -140,9 +140,7 @@ namespace UAlbertaBot
     void NEATCommander::onUnitComplete(BWAPI::Unit unit)
     {
         BWAPI::UnitType type = unit->getType();
-        if (type != BWAPI::UnitTypes::Terran_SCV &&
-            type != BWAPI::UnitTypes::Zerg_Drone &&
-            type != BWAPI::UnitTypes::Protoss_Probe) {
+        if (!type.isWorker()) {
             if (unit->getPlayer() == the.self())
             {
                 if (type.isBuilding())
@@ -165,6 +163,8 @@ namespace UAlbertaBot
         if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(type.buildScore() * 20);
         //If building is destroyed deduct some of the score that was given by creating the building
         if (unit->getPlayer() == the.self() && type.isBuilding()) NEATCommander::Instance().scoreFitness(-type.buildScore() / 20);
+        //Worker destroyed = bad
+        if (unit->getPlayer() == the.self() && type.isWorker()) NEATCommander::Instance().scoreFitness(-type.buildScore());
     }
     void NEATCommander::onUnitHide(BWAPI::Unit unit)
     {
@@ -176,6 +176,11 @@ namespace UAlbertaBot
     }
     void NEATCommander::evaluate()
     {
+        int min = BWAPI::Broodwar->self()->minerals();
+        int gas = BWAPI::Broodwar->self()->gas();
+        //Check whether to surrender
+        //Something went wrong if you have this much mineral or gas
+        if ((min > 10000 || gas > 10000) && Config::NEAT::AutoSurrender) BWAPI::Broodwar->leaveGame();
         if (!network) return;
         if (_actions.size() > 2) return;
         inputVector.clear();
@@ -185,19 +190,15 @@ namespace UAlbertaBot
         int mSupply = BWAPI::Broodwar->self()->supplyTotal();
         int cSupply = BWAPI::Broodwar->self()->supplyUsed();
 
-        int min = BWAPI::Broodwar->self()->minerals();
-        int gas = BWAPI::Broodwar->self()->gas();
-        //Something went wrong if you have this much mineral or gas
-        if((min > 10000 || gas > 10000) && Config::NEAT::AutoSurrender) BWAPI::Broodwar->leaveGame();
-
         double deltaMineral = min > lastMineral ? min - lastMineral : 0;
         double deltaGas = gas > lastGas ? gas - lastGas : 0;
 
         lastMineral = min;
         lastGas = gas;
 
-        scoreFitness(deltaMineral / Config::NEAT::FitnessScore_Gas_Divider);
-        scoreFitness(deltaGas / Config::NEAT::FitnessScore_Gas_Divider);
+        //What if we remove the gas and mineral from fitness score?
+        //scoreFitness(deltaMineral / Config::NEAT::FitnessScore_Gas_Divider);
+        //scoreFitness(deltaGas / Config::NEAT::FitnessScore_Gas_Divider);
 
         int ctime = frame;
         int sectionCoordW = sectionsCoords[curSection][0];
@@ -205,18 +206,19 @@ namespace UAlbertaBot
         BWAPI::Unitset myUnits = the.self()->getUnits();
         int workerCount = getWorkerCount(myUnits);
         int enemyRace = BWAPI::Broodwar->enemy()->getRace();
-
+        //16x16 
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
                 inputVector.push_back(friendlyMapData[i][j]);
             }
         }
+        //16x16 + 16x16
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
                 inputVector.push_back(enemyMapData[i][j]);
             }
         }
-
+        //16x16 + 16x16 + 10 = 522
         inputVector.push_back(mSupply);
         inputVector.push_back(cSupply);
         inputVector.push_back(min);
@@ -229,14 +231,6 @@ namespace UAlbertaBot
         inputVector.push_back(enemyRace);
 
         network->Activate(inputVector);
-        //output vector size is 10
-
-        //macroActType += network->getOutputVector()[0];
-        //unitType += network->getOutputVector()[1];
-        //techType += network->getOutputVector()[2];
-        //upgradeType += network->getOutputVector()[3];
-        //macroCommandType += network->getOutputVector()[outputVectorOffset];
-        
         //Read output nodes 
         // 
         // Network can output:
@@ -256,17 +250,26 @@ namespace UAlbertaBot
         }
         tilePosX += network->getOutputVector()[outputVectorOffset];
         tilePosY += network->getOutputVector()[outputVectorOffset+1];
-        
+
         curSection++;
         curSection = curSection % maxSections;
         //Looked through all sections. Make command
         if (curSection == 0)
         {
+            int posx = int(tilePosX);
+            int posy = int(tilePosY);
+
+            //Clamp tile position outputs
+            posx = posx > 0 ? posx : 1;
+            posx = posx < mapWidth ? posx : mapWidth - 1;
+            posy = posy > 0 ? posy : 1;
+            posy = posy < mapHeight ? posy : mapHeight - 1;
+
             int highestBuildOptionOutput = 0;
             double highestBuildOptionOutputScore = 0;
             for (int i = 0; i < (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i++)
             {
-                if (builderOutputs[i] > highestBuildOptionOutputScore && canBuild((NetworkProtossOptions)i))
+                if (builderOutputs[i] > highestBuildOptionOutputScore && canBuild((NetworkProtossOptions)i, { posx,posy }))
                 {
                     highestBuildOptionOutput = i;
                     highestBuildOptionOutputScore = builderOutputs[i];
@@ -285,14 +288,6 @@ namespace UAlbertaBot
                 }
             }
             
-            int posx = int(tilePosX);
-            int posy = int(tilePosY);
-
-            //Clamp tile position outputs
-            posx = posx > 0 ? posx : 1;
-            posx = posx < mapWidth ? posx : mapWidth - 1;
-            posy = posy > 0 ? posy : 1;
-            posy = posy < mapHeight ? posy : mapHeight - 1;
 
             MacroAct ma;
             // compare score between build option score and macro command type score
@@ -399,12 +394,15 @@ namespace UAlbertaBot
         }
     }
     
-    bool NEATCommander::canBuild(NetworkProtossOptions option)
+    bool NEATCommander::canBuild(NetworkProtossOptions option, BWAPI::TilePosition location)
     {
-        if (option < NetworkProtossOptions::Psionic_Storm)
+        if (option < NetworkProtossOptions::Psionic_Storm && location.isValid())
         {
             //unit or building
-            return BWAPI::Broodwar->canMake(ToBWAPIUnit(option));
+            BWAPI::UnitType type = ToBWAPIUnit(option);
+            if (type.isRefinery()) return BWAPI::Broodwar->canMake(type); 
+            //If it's not a refinery check if that can built at that location (building placer will adjust the build location if it is a refinery)
+            else return BWAPI::Broodwar->canMake(type) && BWAPI::Broodwar->canBuildHere(location, type);
         }
         else if (option < NetworkProtossOptions::Protoss_Ground_Armor)
         {
