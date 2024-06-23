@@ -79,6 +79,7 @@ public:
     int     getCombatGasSpent() const { return _combatGasSpent; };
 
     BuildOrderQueue & getQueue() { return _queue; };
+    
 };
 
 class CompareWhenStarted

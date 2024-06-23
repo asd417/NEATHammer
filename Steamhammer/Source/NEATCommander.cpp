@@ -329,12 +329,13 @@ namespace UAlbertaBot
             std::clamp(tilePosY, (double) 0.0f, (double) 1.0f);
             int posx = int(tilePosX * mapWidth);
             int posy = int(tilePosY * mapHeight);
+            BWAPI::TilePosition buildPos = { posx,posy };
 
             int highestBuildOptionOutput = 0;
             double highestBuildOptionOutputScore = 0;
             for (int i = 0; i < (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i++)
             {
-                if (builderOutputs[i] > highestBuildOptionOutputScore && canBuild((NetworkProtossOptions)i, { posx,posy }))
+                if (builderOutputs[i] > highestBuildOptionOutputScore && canBuild((NetworkProtossOptions)i, buildPos))
                 {
                     highestBuildOptionOutput = i;
                     highestBuildOptionOutputScore = builderOutputs[i];
@@ -360,7 +361,7 @@ namespace UAlbertaBot
                 //BuildOutput has stronger signal than MacroCommandUnitType signal
                 if ((NetworkProtossOptions)highestBuildOptionOutput < NetworkProtossOptions::Psionic_Storm) //unit or building
                 {
-                    ma = MacroAct(ToBWAPIUnit((NetworkProtossOptions)highestBuildOptionOutput), { posx,posy });
+                    ma = MacroAct(ToBWAPIUnit((NetworkProtossOptions)highestBuildOptionOutput), buildPos);
                 }
                 else if ((NetworkProtossOptions)highestBuildOptionOutput < NetworkProtossOptions::Protoss_Ground_Armor) //tech
                 {
@@ -548,15 +549,30 @@ namespace UAlbertaBot
         }
     }
     
-    bool NEATCommander::canBuild(NetworkProtossOptions option, BWAPI::TilePosition location)
+    bool NEATCommander::canBuild(NetworkProtossOptions option, BWAPI::TilePosition& location)
     {
         if (option < NetworkProtossOptions::Psionic_Storm && location.isValid())
         {
             //unit or building
             BWAPI::UnitType type = ToBWAPIUnit(option);
+            
             if (type.isRefinery()) return BWAPI::Broodwar->canMake(type); 
-            //If it's not a refinery check if that can built at that location (building placer will adjust the build location if it is a refinery)
-            else return BWAPI::Broodwar->canMake(type) && BWAPI::Broodwar->canBuildHere(location, type);
+            else if (type.isBuilding()){
+                //If it's not a refinery check if that can built at that location (building placer will adjust the build location if it is a refinery)
+                //int numPylons = the.my.completed.count(BWAPI::UnitTypes::Protoss_Pylon);
+                if (type.requiresPsi())
+                {
+                    //Check for pylon
+                    //Edit building position if it requires pylon power
+                    location = getClosestProtossBuildPosition({ location.x * 32, location.y * 32 }, type);
+                    if (location == BWAPI::TilePositions::None || location == BWAPI::TilePositions::Invalid)
+                    {
+                        return false;
+                    }
+                }
+                return BWAPI::Broodwar->canMake(type) && BWAPI::Broodwar->canBuildHere(location, type);
+            }
+            else return BWAPI::Broodwar->canMake(type);
         }
         else if (option < NetworkProtossOptions::Protoss_Ground_Armor)
         {
@@ -573,6 +589,35 @@ namespace UAlbertaBot
     bool NEATCommander::canBuild(NetworkProtossUnits option)
     {
         return BWAPI::Broodwar->canMake(ToBWAPIUnit(option));
+    }
+
+    BWAPI::TilePosition NEATCommander::getClosestProtossBuildPosition(BWAPI::Position closestTo, BWAPI::UnitType buildingType) const
+    {
+        BWAPI::Unit targetPylon = BWAPI::Broodwar->getClosestUnit(closestTo, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_Pylon);
+        if (targetPylon == nullptr)
+        {
+            return BWAPI::TilePositions::None;
+        }
+        BWAPI::TilePosition pylonTile = targetPylon->getTilePosition();
+        BWAPI::TilePosition closestTile = { closestTo.x / 32, closestTo.y / 32 };
+        int deltaX = closestTile.x - pylonTile.x;
+        int deltaY = closestTile.y - pylonTile.y;
+        int distanceSQ = deltaX * deltaX + deltaY * deltaY;
+        double distance = std::sqrt((double)distanceSQ);
+        int unitDeltaX = deltaX / distance;
+        int unitDeltaY = deltaY / distance;
+        int maxDistance = 12;
+        BWAPI::TilePosition finalTile;
+
+        for (int i = maxDistance; i > 0; i--)
+        {
+            if (BWAPI::Broodwar->canBuildHere({ unitDeltaX * i, unitDeltaY * i }, buildingType))
+            {
+                finalTile = { unitDeltaX * i, unitDeltaY * i };
+                return finalTile;
+            }
+        }
+        return BWAPI::TilePositions::None;
     }
 
     BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkProtossUnits ut) {

@@ -254,8 +254,9 @@ namespace UAlbertaBot
 		void evaluate();
 		void getVisibleMap(int sectionNum);
 		void getVisibleMapSimple(int sectionNum);
-		bool canBuild(NetworkProtossOptions option, BWAPI::TilePosition location);
+		bool canBuild(NetworkProtossOptions option, BWAPI::TilePosition& location);
 		bool canBuild(NetworkProtossUnits option);
+		BWAPI::TilePosition getClosestProtossBuildPosition(BWAPI::Position closestTo, BWAPI::UnitType buildingType) const;
 		BWAPI::UnitType ToBWAPIUnit(NetworkProtossOptions ut);
 		BWAPI::UnitType ToBWAPIUnit(NetworkProtossUnits ut);
 		BWAPI::TechType ToBWAPITech(NetworkProtossOptions tt);
