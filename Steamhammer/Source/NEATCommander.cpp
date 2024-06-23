@@ -604,16 +604,16 @@ namespace UAlbertaBot
         int deltaY = closestTile.y - pylonTile.y;
         int distanceSQ = deltaX * deltaX + deltaY * deltaY;
         double distance = std::sqrt((double)distanceSQ);
-        int unitDeltaX = deltaX / distance;
-        int unitDeltaY = deltaY / distance;
+        double unitDeltaX = deltaX / distance;
+        double unitDeltaY = deltaY / distance;
         int maxDistance = 12;
         BWAPI::TilePosition finalTile;
 
         for (int i = maxDistance; i > 0; i--)
         {
-            if (BWAPI::Broodwar->canBuildHere({ unitDeltaX * i, unitDeltaY * i }, buildingType))
+            if (BWAPI::Broodwar->canBuildHere({ (int)(unitDeltaX * i), (int)(unitDeltaY * i) }, buildingType))
             {
-                finalTile = { unitDeltaX * i, unitDeltaY * i };
+                finalTile = { (int)(unitDeltaX * i), (int)(unitDeltaY * i) };
                 return finalTile;
             }
         }
