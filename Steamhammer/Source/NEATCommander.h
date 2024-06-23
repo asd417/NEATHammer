@@ -262,7 +262,7 @@ namespace UAlbertaBot
 		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkProtossOptions ut);
 		NEAT_TileType getTileType(BWAPI::UnitType type);
 		std::vector<MacroAct> _actions{};
-
+		bool initialized = false;
 		int frame = 0;
 		int maxSections;
 		int curSection = 0;

@@ -14,6 +14,7 @@ namespace UAlbertaBot
     }
     
     NEATCommander::NEATCommander() {
+        initialized = false;
         mapWidth = BWAPI::Broodwar->mapWidth();
         mapHeight = BWAPI::Broodwar->mapHeight();
         //We'll look 32x32 section
@@ -34,6 +35,7 @@ namespace UAlbertaBot
             }
         }
         builderOutputs.fill(0.0f);
+        frame = 0;
         InitializeNetwork();
     }
     void NEATCommander::update()
@@ -51,7 +53,7 @@ namespace UAlbertaBot
     void NEATCommander::incrementFrame()
     {
         frame++;
-        if (frame > 171432) BWAPI::Broodwar->leaveGame(); //Game has been going for 2 hours... something probably went wrong
+        if (initialized && frame > 171432) BWAPI::Broodwar->leaveGame(); //Game has been going for 2 hours... something probably went wrong
     }
     double NEATCommander::getFitness()
     {
@@ -111,6 +113,7 @@ namespace UAlbertaBot
                 BWAPI::Broodwar->leaveGame();
             }
             genomeID = id;
+            initialized = true;
         }
     }
     void NEATCommander::sendFitnessToTrainServer()
@@ -142,21 +145,26 @@ namespace UAlbertaBot
     void NEATCommander::onUnitComplete(BWAPI::Unit unit)
     {
         BWAPI::UnitType type = unit->getType();
-        if (!type.isWorker()) {
-            if (unit->getPlayer() == the.self())
+        
+        if (unit->getPlayer() == the.self())
+        {
+            if (type.isBuilding())
             {
-                if (type.isBuilding())
-                {
-                    //Not a huge motivation to build buildings
-                    NEATCommander::Instance().scoreFitness(type.buildScore());
-                }
-                else
-                {
-                    //Huge Motivation to build army
-                    NEATCommander::Instance().scoreFitness(type.buildScore() * 10);
-                }
+                //Not a huge motivation to build buildings
+                NEATCommander::Instance().scoreFitness(type.buildScore());
+            }
+            else if(type.isWorker())
+            {
+                //Some Motivation to build army
+                NEATCommander::Instance().scoreFitness(type.buildScore());
+            }
+            else
+            {
+                //Huge Motivation to build army
+                NEATCommander::Instance().scoreFitness(type.buildScore() * 10);
             }
         }
+        
     }
     void NEATCommander::onUnitDestroy(BWAPI::Unit unit)
     {
@@ -166,7 +174,7 @@ namespace UAlbertaBot
         //If building is destroyed deduct some of the score that was given by creating the building
         if (unit->getPlayer() == the.self() && type.isBuilding()) NEATCommander::Instance().scoreFitness(-type.buildScore() / 20);
         //Worker destroyed = bad
-        if (unit->getPlayer() == the.self() && type.isWorker()) NEATCommander::Instance().scoreFitness(-type.buildScore());
+        if (unit->getPlayer() == the.self() && type.isWorker()) NEATCommander::Instance().scoreFitness(-type.buildScore() / 10);
     }
     void NEATCommander::onUnitHide(BWAPI::Unit unit)
     {
