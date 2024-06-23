@@ -458,6 +458,7 @@ namespace UAlbertaBot
             else {
                 ma = MacroAct((MacroCommandType)highestMacroCommandTypeOutput, { posx,posy });
                 ma.confidence = highestMacroCommandTypeOutputScore;
+                UAB_ASSERT(false, "MacroCommand. Build score was only: %4.8f", highestBuildOptionOutputScore);
             }
 
             _actions.push_back(ma);

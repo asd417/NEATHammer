@@ -643,7 +643,6 @@ void ProductionManager::executeCommand(const MacroAct & act)
     else if (cmd == MacroCommandType::QueueBarrier || cmd == MacroCommandType::None)
     {
         // It does nothing! Every command is a queue barrier
-        UAB_ASSERT(false, "MacroCommand == None");
     }
     else
     {

@@ -313,7 +313,7 @@ void BuildOrderQueue::drawQueueInformation(int x, int y, bool outOfBook)
             prefix = white;
         }
 
-        BWAPI::Broodwar->drawTextScreen(x, y, " %c%s confidence: %4.2f", prefix, NiceMacroActName(act.getName()).c_str(), act.confidence);
+        BWAPI::Broodwar->drawTextScreen(x, y, " %c%s confidence: %4.8f", prefix, NiceMacroActName(act.getName()).c_str(), act.confidence);
         y += 10;
     }
 
