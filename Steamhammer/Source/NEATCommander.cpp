@@ -185,7 +185,8 @@ namespace UAlbertaBot
         if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(Config::NEAT::EnemyShowScore);
     }
     void NEATCommander::evaluate()
-    {
+    {   
+        if (!initialized) return;
         int min = BWAPI::Broodwar->self()->minerals();
         int gas = BWAPI::Broodwar->self()->gas();
         //Check whether to surrender
