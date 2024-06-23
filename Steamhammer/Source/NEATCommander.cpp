@@ -151,17 +151,17 @@ namespace UAlbertaBot
             if (type.isBuilding())
             {
                 //Not a huge motivation to build buildings
-                NEATCommander::Instance().scoreFitness(type.buildScore());
+                scoreFitness(type.buildScore());
             }
             else if(type.isWorker())
             {
                 //Some Motivation to build army
-                NEATCommander::Instance().scoreFitness(type.buildScore());
+                scoreFitness(type.buildScore());
             }
             else
             {
                 //Huge Motivation to build army
-                NEATCommander::Instance().scoreFitness(type.buildScore() * 10);
+                scoreFitness(type.buildScore() * 10);
             }
         }
         
@@ -170,19 +170,19 @@ namespace UAlbertaBot
     {
         BWAPI::UnitType type = unit->getType();
         //Strong motivation to kill
-        if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(type.buildScore() * 20);
+        if (unit->getPlayer() == the.enemy()) scoreFitness(type.buildScore() * 20);
         //If building is destroyed deduct some of the score that was given by creating the building
-        if (unit->getPlayer() == the.self() && type.isBuilding()) NEATCommander::Instance().scoreFitness(-type.buildScore() / 20);
+        if (unit->getPlayer() == the.self() && type.isBuilding()) scoreFitness(-type.buildScore() / 20);
         //Worker destroyed = bad
-        if (unit->getPlayer() == the.self() && type.isWorker()) NEATCommander::Instance().scoreFitness(-type.buildScore() / 10);
+        if (unit->getPlayer() == the.self() && type.isWorker()) scoreFitness(-type.buildScore() / 10);
     }
     void NEATCommander::onUnitHide(BWAPI::Unit unit)
     {
     }
     void NEATCommander::onUnitShow(BWAPI::Unit unit)
     {
-        //Used detector to reveal invisible unit
-        if (unit->getPlayer() == the.enemy()) NEATCommander::Instance().scoreFitness(Config::NEAT::EnemyShowScore);
+        //Used detector to reveal invisible units
+        if (unit->getPlayer() == the.enemy()) scoreFitness(Config::NEAT::EnemyShowScore);
     }
     void NEATCommander::evaluate()
     {   
