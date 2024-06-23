@@ -170,6 +170,19 @@ void ScoutManager::update()
     drawScoutInformation(200, 320);
 }
 
+void UAlbertaBot::ScoutManager::onUnitDiscover(BWAPI::Unit u)
+{
+    //Check if scout is in progress
+    if (!_workerScout) return;
+
+    //if unit within vision range of scouting worker,
+    //Probe has a sight range of 8 tiles
+    if (u->getDistance(_workerScout) < 8*32)
+    {
+        //Score fitness to the ai that ordered this scout
+    }
+}
+
 // If zerg, our first overlord is used to scout immediately at the start of the game.
 void ScoutManager::setOverlordScout(BWAPI::Unit unit)
 {
@@ -233,6 +246,19 @@ void ScoutManager::setScoutCommand(MacroCommandType cmd)
         "bad scout command");
 
     _scoutCommand = cmd;
+}
+
+void ScoutManager::setScoutCommand(MacroCommandType cmd, int issuedAI)
+{
+    UAB_ASSERT(
+        cmd == MacroCommandType::Scout ||
+        cmd == MacroCommandType::ScoutIfNeeded ||
+        cmd == MacroCommandType::ScoutLocation ||
+        cmd == MacroCommandType::ScoutOnceOnly,
+        "bad scout command");
+
+    _scoutCommand = cmd;
+    _orderIssuedBy = issuedAI;
 }
 
 void ScoutManager::drawScoutInformation(int x, int y)

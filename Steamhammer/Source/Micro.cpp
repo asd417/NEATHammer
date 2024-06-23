@@ -164,6 +164,20 @@ void MicroState::setOrder(BWAPI::Unit u, BWAPI::Order o)
     }
 }
 
+void MicroState::setOrder(BWAPI::Unit u, BWAPI::Order o, BWAPI::UnitType ut)
+{
+    check(u, o);
+    if (order != o || targetUnitType != ut)
+    {
+        order = o;
+        targetUnitType = ut;
+        orderFrame = the.now();
+        executeFrame = -1;
+
+        startPosition = u->getPosition();
+    }
+}
+
 // Order that targets a unit.
 void MicroState::setOrder(BWAPI::Unit u, BWAPI::Order o, BWAPI::Unit t)
 {
@@ -1098,15 +1112,9 @@ bool Micro::Make(BWAPI::Unit producer, BWAPI::UnitType type)
         return producer->buildAddon(type);
     }
 
-    // Zerg morphs units, except for the infested terran, which is trained. Tricky!
-    if (type.getRace() == BWAPI::Races::Zerg && type != BWAPI::UnitTypes::Zerg_Infested_Terran)
-    {
-        orders[producer].setOrder(producer, type.isBuilding() ? BWAPI::Orders::ZergBuildingMorph : BWAPI::Orders::ZergUnitMorph);
-        return producer->morph(type);
-    }
-
-    orders[producer].setOrder(producer, BWAPI::Orders::Train);
+    orders[producer].setOrder(producer, BWAPI::Orders::Train, type);
     return producer->train(type);
+    
 }
 
 // Cancel a building under construction or a morphing unit.

@@ -11,6 +11,7 @@ class MicroState
 private:
     BWAPI::Order order;
     BWAPI::Unit targetUnit;				// nullptr if none
+    BWAPI::UnitType targetUnitType;     // Target UnitType
     BWAPI::Position targetPosition;		// None if none
 
     double attack;                      // <.5 to retreat, >= .5 to attack
@@ -40,6 +41,7 @@ public:
     MicroState();
 
     void setOrder(BWAPI::Unit u, BWAPI::Order o);
+    void setOrder(BWAPI::Unit u, BWAPI::Order o, BWAPI::UnitType ut);
     void setOrder(BWAPI::Unit u, BWAPI::Order o, BWAPI::Unit t);
     void setOrder(BWAPI::Unit u, BWAPI::Order o, BWAPI::Position p);
 

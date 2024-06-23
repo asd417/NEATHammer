@@ -574,6 +574,7 @@ void ProductionManager::executeCommand(const MacroAct & act)
         cmd == MacroCommandType::ScoutOnceOnly)
     {
         ScoutManager::Instance().setScoutCommand(cmd);
+        //ScoutManager::Instance().setScoutCommand(cmd, aiIndex);
     }
     else if (cmd == MacroCommandType::StopGas)
     {
@@ -614,9 +615,10 @@ void ProductionManager::executeCommand(const MacroAct & act)
     {
         WorkerManager::Instance().unpostWorkers(act.getTileLocation());
     }
-    else if (cmd == MacroCommandType::QueueBarrier)
+    else if (cmd == MacroCommandType::QueueBarrier || cmd == MacroCommandType::None)
     {
-        // It does nothing! Every command is a queue barrier.
+        // It does nothing! Every command is a queue barrier
+        UAB_ASSERT(false, "MacroCommand == None");
     }
     else
     {

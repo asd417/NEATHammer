@@ -201,6 +201,15 @@ namespace UAlbertaBot
 		Terran_Battlecruiser,
 		Terran_Nuclear_Missile, //This is the only thing that the bot will see when the nuke is fired (if fired within visible range?)
 	};
+
+	enum NEAT_TileType_Simple {
+		sFOG = 0,
+		sWALKABLE,
+		sNOTWALKABLE,
+		sMINERAL,
+		sGAS,
+		sUNIT=10
+	};
 	class NEATCommander {
 	public:
 		static NEATCommander& Instance();
@@ -244,6 +253,7 @@ namespace UAlbertaBot
 
 		void evaluate();
 		void getVisibleMap(int sectionNum);
+		void getVisibleMapSimple(int sectionNum);
 		bool canBuild(NetworkProtossOptions option, BWAPI::TilePosition location);
 		bool canBuild(NetworkProtossUnits option);
 		BWAPI::UnitType ToBWAPIUnit(NetworkProtossOptions ut);
@@ -258,10 +268,13 @@ namespace UAlbertaBot
 		int curSection = 0;
 		std::vector<std::array<int, 2>> sectionsCoords{};
 		std::array<std::array<int, 16>, 16> enemyMapData{};
+		std::array<std::array<int, 16>, 16> enemyMapBuildingData{};
 		std::array<std::array<int, 16>, 16> friendlyMapData{};
+		std::array<std::array<int, 16>, 16> friendlyMapBuildingData{};
 
 		FeedForwardNetwork* network;
 		std::vector<double> inputVector{};
+		
 
 		int genomeID = 0;
 		double fitness = 0.0f;

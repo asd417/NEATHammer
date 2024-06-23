@@ -66,6 +66,7 @@ public:
     void goScout();
     int getScoutTime() const { return _initialScoutTime; };
 
+    void onUnitDiscover(BWAPI::Unit unit);
     void onUnitShow(BWAPI::Unit unit);
     void onUnitHide(BWAPI::Unit unit);
     void onUnitCreate(BWAPI::Unit unit);

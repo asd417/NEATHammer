@@ -9,6 +9,7 @@
 #include "NEATCommander.h"
 #include "../../BOSS/source/BOSS.h"
 #include "GameCommander.h"
+
 #include "ParseUtils.h"
 
 using namespace UAlbertaBot;
@@ -136,8 +137,11 @@ void UAlbertaBotModule::onUnitComplete(BWAPI::Unit unit)
 void UAlbertaBotModule::onUnitShow(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitShow(unit);
-    NEATCommander::Instance().onUnitShow(unit);
-    
+}
+
+void UAlbertaBotModule::onUnitDiscover(BWAPI::Unit unit)
+{
+    GameCommander::Instance().onUnitDiscover(unit);
 }
 
 /// <summary>

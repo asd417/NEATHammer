@@ -51,6 +51,7 @@ namespace UAlbertaBot
     void NEATCommander::incrementFrame()
     {
         frame++;
+        if (frame > 171432) BWAPI::Broodwar->leaveGame(); //Game has been going for 2 hours... something probably went wrong
     }
     double NEATCommander::getFitness()
     {
@@ -73,9 +74,9 @@ namespace UAlbertaBot
             while (retry) {
                 DBKeySpace dbkeys{};
                 dbkeys.push_back("Fitness");
-                DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys };
-                bool res = db.getData("/genome", r);
                 try {
+                    DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys };
+                    bool res = db.getData("/genome", r);
                     //network
                     id = r[0]["id"];
                     std::cout << id << std::endl;
@@ -86,6 +87,7 @@ namespace UAlbertaBot
                 catch (std::exception e) {
                     //std::cout << "Error while retrieving new genome to evaluate: " << e.what() << "\n";
                     //std::cout << "\tWaiting for 3000 miliseconds\n";
+                    UAB_ASSERT(false, "Error while retrieving new genome to evaluate: %s", e.what());
                     r.clear();
                     id = -1;
                     Sleep(2000);
@@ -145,8 +147,8 @@ namespace UAlbertaBot
             {
                 if (type.isBuilding())
                 {
-                    //Not a huge motivation to build
-                    NEATCommander::Instance().scoreFitness(type.buildScore() / 10);
+                    //Not a huge motivation to build buildings
+                    NEATCommander::Instance().scoreFitness(type.buildScore());
                 }
                 else
                 {
@@ -206,7 +208,12 @@ namespace UAlbertaBot
         BWAPI::Unitset myUnits = the.self()->getUnits();
         int workerCount = getWorkerCount(myUnits);
         int enemyRace = BWAPI::Broodwar->enemy()->getRace();
-        //16x16 
+
+#define HyperNEAT
+
+#ifndef HyperNEAT
+        //NEAT Input: 16x16 + 16x16 + 12 = 524
+        
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
                 inputVector.push_back(friendlyMapData[i][j]);
@@ -218,7 +225,6 @@ namespace UAlbertaBot
                 inputVector.push_back(enemyMapData[i][j]);
             }
         }
-        //16x16 + 16x16 + 12 = 524
         inputVector.push_back(mSupply);
         inputVector.push_back(cSupply);
         inputVector.push_back(min);
@@ -231,7 +237,58 @@ namespace UAlbertaBot
         inputVector.push_back(mapWidth);
         inputVector.push_back(workerCount);
         inputVector.push_back(enemyRace);
-
+#else
+        //HyperNEAT encoding 16x2 x 16x2 = 32x32 = 1024 input nodes
+        //fm |em
+        //-------
+        //fmb|emb
+            
+        for (int xi = 0; xi < 32; xi++)
+        {
+            for (int yi = 0; yi < 32; yi++)
+            {
+                if (xi < 16)
+                {
+                    if (yi < 16)
+                    {
+                        //Friendly map encoding
+                        inputVector.push_back(friendlyMapData[xi][yi]);
+                    }
+                    else
+                    {
+                        //yi >= 16
+                        //Friendly building map encoding
+                        inputVector.push_back(friendlyMapBuildingData[xi][yi - 16]);
+                    }
+                }
+                else
+                {
+                    if (yi < 16)
+                    {
+                        //enemy map encoding
+                        inputVector.push_back(enemyMapData[xi - 16][yi]);
+                    }
+                    else
+                    {
+                        //enemy building map encoding
+                        inputVector.push_back(enemyMapData[xi - 16][yi - 16]);
+                    }
+                }
+            }
+        }
+        inputVector[0] = mSupply;
+        inputVector[1] = cSupply;
+        inputVector[2] = min;
+        inputVector[3] = gas;
+        inputVector[4] = ctime;
+        inputVector[5] = ctime;
+        inputVector[6] = sectionCoordW;
+        inputVector[7] = sectionCoordH;
+        inputVector[8] = mapWidth;
+        inputVector[9] = mapWidth;
+        inputVector[10] = workerCount;
+        inputVector[11] = enemyRace;
+#endif
         network->Activate(inputVector);
         //Read output nodes 
         // 
@@ -253,6 +310,7 @@ namespace UAlbertaBot
         tilePosX += network->getOutputVector()[outputVectorOffset];
         tilePosY += network->getOutputVector()[outputVectorOffset+1];
 
+        //We scanned through the whole map
         curSection++;
         curSection = curSection % maxSections;
         //Looked through all sections. Make command
@@ -285,7 +343,6 @@ namespace UAlbertaBot
                     highestMacroCommandTypeOutputScore = macroCommandTypeOutputs[i];
                 }
             }
-            
 
             MacroAct ma;
             // compare score between build option score and macro command type score
@@ -318,7 +375,6 @@ namespace UAlbertaBot
             macroCommandTypeOutputs.fill(0.0f);
             tilePosX = 0.0f; //0~256
             tilePosY = 0.0f; //0~256
-          
         }
     }
 
@@ -339,6 +395,97 @@ namespace UAlbertaBot
         if (type == BWAPI::UnitTypes::Terran_SCV || type == BWAPI::UnitTypes::Zerg_Drone || type == BWAPI::UnitTypes::Protoss_Probe) {
             return true;
         }
+    }
+
+    void NEATCommander::getVisibleMapSimple(int sectionNum)
+    {
+        int a = sectionNum;
+        if (sectionNum >= maxSections) throw std::overflow_error("sectionNum is bigger than maxSections");
+        int startW = sectionsCoords[sectionNum][0];
+        int startH = sectionsCoords[sectionNum][1];
+        for (int x = 0; x < 16; x++)
+        {
+            for (int y = 0; y < 16; y++)
+            {
+                //Half resolution it
+                BWAPI::TilePosition tp = { startW + x * 2,startH + y * 2 };
+                BWAPI::WalkPosition wp = { (startW + x * 2) * 4,(startH + y * 2) * 4 }; //WalkPosition is 8 pixels big
+
+                if (!BWAPI::Broodwar->isVisible(tp)) {
+                    friendlyMapData[x][y]           = NEAT_TileType_Simple::sFOG;
+                    friendlyMapBuildingData[x][y]   = NEAT_TileType_Simple::sFOG;
+                    enemyMapData[x][y]              = NEAT_TileType_Simple::sFOG;
+                    enemyMapBuildingData[x][y]      = NEAT_TileType_Simple::sFOG;
+                    break;
+                }
+                else
+                {
+                    //BWAPI::UnitFilter uf = BWAPI::UnitFilter(the.self());
+                    BWAPI::Unitset allyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsAlly);
+                    BWAPI::Unitset enemyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsEnemy);
+                    BWAPI::Unitset mineralOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, 
+                        BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field ||
+                        BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field_Type_2 ||
+                        BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field_Type_3);
+                    BWAPI::Unitset gasOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, 
+                        BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Vespene_Geyser);
+
+                    
+
+                    NEAT_TileType_Simple fm     = NEAT_TileType_Simple::sNOTWALKABLE;
+                    NEAT_TileType_Simple fmb    = NEAT_TileType_Simple::sNOTWALKABLE;
+                    NEAT_TileType_Simple em     = NEAT_TileType_Simple::sNOTWALKABLE;
+                    NEAT_TileType_Simple emb    = NEAT_TileType_Simple::sNOTWALKABLE;
+
+                    if (BWAPI::Broodwar->isWalkable(wp)) {
+                        fm  = NEAT_TileType_Simple::sWALKABLE;
+                        fmb = NEAT_TileType_Simple::sWALKABLE;
+                        em  = NEAT_TileType_Simple::sWALKABLE;
+                        emb = NEAT_TileType_Simple::sWALKABLE;
+                    }
+                    if (mineralOnTile.size() > 0)
+                    {
+                        fm  = NEAT_TileType_Simple::sMINERAL;
+                        fmb = NEAT_TileType_Simple::sMINERAL;
+                        em  = NEAT_TileType_Simple::sMINERAL;
+                        emb = NEAT_TileType_Simple::sMINERAL;
+                    }
+                    if (gasOnTile.size() > 0)
+                    {
+                        fm  = NEAT_TileType_Simple::sGAS;
+                        fmb = NEAT_TileType_Simple::sGAS;
+                        em  = NEAT_TileType_Simple::sGAS;
+                        emb = NEAT_TileType_Simple::sGAS;
+                    }
+
+                    for (BWAPI::Unit u : allyUnitsOnTile) {
+                        if (u->getType().isBuilding())
+                        {
+                            fmb = NEAT_TileType_Simple::sUNIT;
+                        }
+                        else
+                        {
+                            fm = NEAT_TileType_Simple::sUNIT;
+                        }
+                    }
+                    for (BWAPI::Unit u : enemyUnitsOnTile) {
+                        if (u->getType().isBuilding())
+                        {
+                            emb = NEAT_TileType_Simple::sUNIT;
+                        }
+                        else
+                        {
+                            em = NEAT_TileType_Simple::sUNIT;
+                        }
+                    }
+                    friendlyMapData[x][y] = fm;
+                    friendlyMapBuildingData[x][y] = fmb;
+                    enemyMapData[x][y] = em;
+                    enemyMapBuildingData[x][y] = emb;
+                }
+            }
+        }
+
     }
 
     /// <summary>
@@ -794,5 +941,6 @@ namespace UAlbertaBot
         default:
             return NEAT_TileType::WALKABLE;
         }
+        
     }
 }

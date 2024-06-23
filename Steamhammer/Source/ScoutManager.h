@@ -28,6 +28,8 @@ class ScoutManager
     int                 _previousScoutHP;
     BWAPI::Position		_nextDestination;
 
+    int                 _orderIssuedBy;
+
     ScoutManager();
 
     void				setScoutTargets();
@@ -53,6 +55,8 @@ public:
 
     void update();
 
+    void onUnitDiscover(BWAPI::Unit u);
+
     bool shouldScout();
     
     void setOverlordScout(BWAPI::Unit unit);
@@ -68,5 +72,6 @@ public:
     void setGasStealOver() { _gasStealOver = true; };    // called by BuildingManager when releasing the worker
 
     void setScoutCommand(MacroCommandType cmd);
+    void setScoutCommand(MacroCommandType cmd, int issuedAI);
 };
 }

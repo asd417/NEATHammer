@@ -364,6 +364,7 @@ void BuildingManager::checkForCompletedBuildings()
                 // Done with the building record.
                 toRemove.push_back(b);
             }
+            //Score fitness to whichever AI that ordered this building to be constructed
         }
         else
         {

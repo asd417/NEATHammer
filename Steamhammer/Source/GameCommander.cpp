@@ -416,7 +416,12 @@ void GameCommander::releaseOverlord(BWAPI::Unit overlord)
     _scoutUnits.erase(overlord);
 }
 
-void GameCommander::onUnitShow(BWAPI::Unit unit)			
+void UAlbertaBot::GameCommander::onUnitDiscover(BWAPI::Unit unit)
+{
+    ScoutManager::Instance().onUnitDiscover(unit);
+}
+
+void GameCommander::onUnitShow(BWAPI::Unit unit)
 { 
     InformationManager::Instance().onUnitShow(unit); 
     WorkerManager::Instance().onUnitShow(unit);
