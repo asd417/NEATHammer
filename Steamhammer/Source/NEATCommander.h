@@ -7,23 +7,75 @@
 #include <array>
 namespace UAlbertaBot
 {
-	enum class NetworkProtossUnits {
-		Protoss_Probe,
-		Protoss_Zealot,
-		Protoss_Dragoon,
-		Protoss_High_Templar,
-		Protoss_Archon,
-		Protoss_Dark_Templar,
-		Protoss_Dark_Archon,
-		Protoss_Reaver,
-		Protoss_Shuttle,
-		Protoss_Observer,
-		Protoss_Scout,
-		Protoss_Corsair,
-		Protoss_Arbiter,
-		Protoss_Carrier,
-		NETWORK_UNIT_COUNT
+	enum class NetworkTerranOptions {
+		//units
+		Terran_SCV,
+		Terran_Marine,
+		Terran_Firebat,
+		Terran_Medic,
+		Terran_Ghost,
+		Terran_Vulture, 
+		Terran_Siege_Tank_Tank_Mode, 
+		Terran_Goliath,
+		Terran_Wraith, 
+		Terran_Dropship, 
+		Terran_Science_Vessel, 
+		Terran_Valkyrie, 
+		Terran_Battlecruiser,
+		//buildings
+		Terran_Command_Center, 
+		Terran_Comsat_Station, 
+		Terran_Nuclear_Silo, 
+		Terran_Supply_Depot,
+		Terran_Barracks, 
+		Terran_Refinery, 
+		Terran_Engineering_Bay, 
+		Terran_Bunker, 
+		Terran_Missile_Turret,
+		Terran_Academy, 
+		Terran_Factory,
+		Terran_Armory,
+		Terran_Machine_Shop, 
+		Terran_Starport, 
+		Terran_Control_Tower, 
+		Terran_Science_Facility, 
+		Terran_Covert_Ops,
+		Terran_Physics_Lab, 
+		//Special units and techs that is handled in the macro command
+		//Terran_Siege_Tank_Siege_Mode, 
+		//Terran_Vulture_Spider_Mine,
+		//Nuclear_Strike,
+		//Tech types
+		Cloaking_Field, 
+		Defensive_Matrix,
+		EMP_Shockwave,
+		Lockdown,
+		Optical_Flare,
+		Personnel_Cloaking,
+		Scanner_Sweep,
+		Spider_Mines,
+		Stim_Packs,
+		Tank_Siege_Mode,
+		Yamato_Gun, 
+		//Upgrade types
+		Apollo_Reactor,
+		Caduceus_Reactor,
+		Charon_Boosters, 
+		Colossus_Reactor,
+		Ion_Thrusters,
+		Moebius_Reactor, 
+		Ocular_Implants, 
+		Terran_Infantry_Armor, 
+		Terran_Infantry_Weapons, 
+		Terran_Ship_Plating,
+		Terran_Ship_Weapons, 
+		Terran_Vehicle_Plating,
+		Terran_Vehicle_Weapons, 
+		Titan_Reactor,
+		U_238_Shells,
+		NETWORK_OPTION_COUNT
 	};
+
 	enum class NetworkProtossOptions {
 		//All Units
 		Protoss_Probe,
@@ -66,6 +118,7 @@ namespace UAlbertaBot
 		Mind_Control,
 		Maelstrom,
 		//All upgrades
+		Apial_Sensors,
 		Protoss_Ground_Armor,
 		Protoss_Air_Armor,
 		Protoss_Ground_Weapons,
@@ -79,7 +132,6 @@ namespace UAlbertaBot
 		Sensor_Array,
 		Gravitic_Boosters,
 		Khaydarin_Amulet,
-		Apial_Sensors,
 		Gravitic_Thrusters,
 		Carrier_Capacity,
 		Khaydarin_Core,
@@ -202,6 +254,7 @@ namespace UAlbertaBot
 		Terran_Nuclear_Missile, //This is the only thing that the bot will see when the nuke is fired (if fired within visible range?)
 	};
 
+
 	enum NEAT_TileType_Simple {
 		sFOG = 0,
 		sWALKABLE,
@@ -253,14 +306,20 @@ namespace UAlbertaBot
 
 		void evaluate();
 		void getVisibleMap(int sectionNum);
+		bool canMacro(MacroCommandType command);
 		void getVisibleMapSimple(int sectionNum);
+		bool canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location);
 		bool canBuild(NetworkProtossOptions option, BWAPI::TilePosition& location);
-		bool canBuild(NetworkProtossUnits option);
 		BWAPI::TilePosition getClosestProtossBuildPosition(BWAPI::Position closestTo, BWAPI::UnitType buildingType) const;
+
+		BWAPI::UnitType ToBWAPIUnit(NetworkTerranOptions ut);
+		BWAPI::TechType ToBWAPITech(NetworkTerranOptions tt);
+		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkTerranOptions tt);
+
 		BWAPI::UnitType ToBWAPIUnit(NetworkProtossOptions ut);
-		BWAPI::UnitType ToBWAPIUnit(NetworkProtossUnits ut);
 		BWAPI::TechType ToBWAPITech(NetworkProtossOptions tt);
 		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkProtossOptions ut);
+
 		NEAT_TileType getTileType(BWAPI::UnitType type);
 		std::vector<MacroAct> _actions{};
 		bool initialized = false;

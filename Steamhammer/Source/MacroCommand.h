@@ -21,6 +21,12 @@ enum class MacroCommandType
     , ReleaseWorkers
     , PostWorker
     , UnpostWorkers
+#ifdef TERRAN
+    , SPIDERMINE
+    , SIEGEMODE
+    , UNSIEGEMODE
+    , NUKE
+#endif
     , QueueBarrier
     };
 

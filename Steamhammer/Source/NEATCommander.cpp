@@ -307,6 +307,8 @@ namespace UAlbertaBot
         //  Tile position used by some of the macro command types and building build position
         // 
         //BuilderOutput and MacroCommandTypeOutput will be chosen through strongest node output 
+
+#ifdef PROTOSS
         for (int i = 0; i < (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i++)
         {
             builderOutputs[i] += network->getOutputVector()[i];
@@ -386,6 +388,87 @@ namespace UAlbertaBot
             tilePosX = 0.0f; //0~256
             tilePosY = 0.0f; //0~256
         }
+#else
+        for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)
+        {
+            builderOutputs[i] += network->getOutputVector()[i];
+        }
+        constexpr int outputVectorOffset = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
+        for (int i = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i < outputVectorOffset; i++)
+        {
+            macroCommandTypeOutputs[i] += network->getOutputVector()[i];
+        }
+        tilePosX += network->getOutputVector()[outputVectorOffset];
+        tilePosY += network->getOutputVector()[outputVectorOffset + 1];
+
+        //We scanned through the whole map
+        curSection++;
+        curSection = curSection % maxSections;
+        //Looked through all sections. Make command
+        if (curSection == 0)
+        {
+            std::clamp(tilePosX, (double)0.0f, (double)1.0f);
+            std::clamp(tilePosY, (double)0.0f, (double)1.0f);
+            int posx = int(tilePosX * mapWidth);
+            int posy = int(tilePosY * mapHeight);
+            BWAPI::TilePosition buildPos = { posx,posy };
+
+            int highestBuildOptionOutput = 0;
+            double highestBuildOptionOutputScore = 0;
+            for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)
+            {
+                if (builderOutputs[i] > highestBuildOptionOutputScore && canBuild((NetworkTerranOptions)i, buildPos))
+                {
+                    highestBuildOptionOutput = i;
+                    highestBuildOptionOutputScore = builderOutputs[i];
+                }
+            }
+
+            int highestMacroCommandTypeOutput = 0;
+            double highestMacroCommandTypeOutputScore = 0;
+            for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)
+            {
+                //Check if unit exists
+                if (macroCommandTypeOutputs[i] > highestMacroCommandTypeOutputScore && canMacro((MacroCommandType)i))
+                {
+                    highestMacroCommandTypeOutput = i;
+                    highestMacroCommandTypeOutputScore = macroCommandTypeOutputs[i];
+                }
+            }
+
+            MacroAct ma;
+            // compare score between build option score and macro command type score
+            if (highestBuildOptionOutputScore > highestMacroCommandTypeOutputScore)
+            {
+                //BuildOutput has stronger signal than MacroCommandUnitType signal
+                if ((NetworkTerranOptions)highestBuildOptionOutput < NetworkTerranOptions::Cloaking_Field) //unit or building
+                {
+                    ma = MacroAct(ToBWAPIUnit((NetworkTerranOptions)highestBuildOptionOutput), buildPos);
+                }
+                else if ((NetworkTerranOptions)highestBuildOptionOutput < NetworkTerranOptions::Apollo_Reactor) //tech
+                {
+                    ma = MacroAct(ToBWAPITech((NetworkTerranOptions)highestBuildOptionOutput));
+                }
+                else //upgrade
+                {
+                    ma = MacroAct(ToBWAPIUpgrade((NetworkTerranOptions)highestBuildOptionOutput));
+                }
+                ma.confidence = highestBuildOptionOutputScore;
+            }
+            else {
+                ma = MacroAct((MacroCommandType)highestMacroCommandTypeOutput, { posx,posy });
+                ma.confidence = highestMacroCommandTypeOutputScore;
+            }
+
+            _actions.push_back(ma);
+            //std::cout << "Network Evaluated " << std::to_string(_actions.size()) << " actions\n";
+            //Reset output vector
+            builderOutputs.fill(0.0f);
+            macroCommandTypeOutputs.fill(0.0f);
+            tilePosX = 0.0f; //0~256
+            tilePosY = 0.0f; //0~256
+        }
+#endif
     }
 
 
@@ -439,8 +522,6 @@ namespace UAlbertaBot
                         BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field_Type_3);
                     BWAPI::Unitset gasOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, 
                         BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Vespene_Geyser);
-
-                    
 
                     NEAT_TileType_Simple fm     = NEAT_TileType_Simple::sNOTWALKABLE;
                     NEAT_TileType_Simple fmb    = NEAT_TileType_Simple::sNOTWALKABLE;
@@ -549,6 +630,53 @@ namespace UAlbertaBot
         }
     }
     
+    bool NEATCommander::canMacro(MacroCommandType command)
+    {
+        if (command == MacroCommandType::SPIDERMINE)
+        {
+            return the.my.completed.count(BWAPI::UnitTypes::Terran_Vulture) > 0 && BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Spider_Mines);
+        }
+        if (command == MacroCommandType::SIEGEMODE)
+        {
+            return the.my.completed.count(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode) > 0 && BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Tank_Siege_Mode);
+        }
+        if (command == MacroCommandType::UNSIEGEMODE)
+        {
+            return the.my.completed.count(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode) > 0 && BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Tank_Siege_Mode);
+        }
+        if (command == MacroCommandType::NUKE)
+        {
+            return the.my.completed.count(BWAPI::UnitTypes::Terran_Nuclear_Missile) > 0;
+        }
+        return true;
+    }
+
+    bool NEATCommander::canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location)
+    {
+        if (option < NetworkTerranOptions::Cloaking_Field && location.isValid())
+        {
+            //unit or building
+            BWAPI::UnitType type = ToBWAPIUnit(option);
+
+            if (type.isRefinery()) return BWAPI::Broodwar->canMake(type);
+            else if (type.isAddon()) return BWAPI::Broodwar->canMake(type);
+            else if (type.isBuilding()) {
+                return BWAPI::Broodwar->canMake(type) && BWAPI::Broodwar->canBuildHere(location, type);
+            }
+            else return BWAPI::Broodwar->canMake(type);
+        }
+        else if (option < NetworkTerranOptions::Apollo_Reactor)
+        {
+            //tech
+            return BWAPI::Broodwar->canResearch(ToBWAPITech(option));
+        }
+        else
+        {
+            //upgrade
+            return BWAPI::Broodwar->canUpgrade(ToBWAPIUpgrade(option));
+        }
+    }
+
     bool NEATCommander::canBuild(NetworkProtossOptions option, BWAPI::TilePosition& location)
     {
         if (option < NetworkProtossOptions::Psionic_Storm && location.isValid())
@@ -586,11 +714,6 @@ namespace UAlbertaBot
         }
     }
 
-    bool NEATCommander::canBuild(NetworkProtossUnits option)
-    {
-        return BWAPI::Broodwar->canMake(ToBWAPIUnit(option));
-    }
-
     BWAPI::TilePosition NEATCommander::getClosestProtossBuildPosition(BWAPI::Position closestTo, BWAPI::UnitType buildingType) const
     {
         BWAPI::Unit targetPylon = BWAPI::Broodwar->getClosestUnit(closestTo, BWAPI::Filter::GetType == BWAPI::UnitTypes::Protoss_Pylon);
@@ -619,41 +742,144 @@ namespace UAlbertaBot
         }
         return BWAPI::TilePositions::None;
     }
-
-    BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkProtossUnits ut) {
+    BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkTerranOptions ut)
+    {
         switch (ut) {
-        case NetworkProtossUnits::Protoss_Probe:
-            return BWAPI::UnitTypes::Protoss_Probe;
-        case NetworkProtossUnits::Protoss_Zealot:
-            return BWAPI::UnitTypes::Protoss_Zealot;
-        case NetworkProtossUnits::Protoss_Dragoon:
-            return BWAPI::UnitTypes::Protoss_Dragoon;
-        case NetworkProtossUnits::Protoss_High_Templar:
-            return BWAPI::UnitTypes::Protoss_High_Templar;
-        case NetworkProtossUnits::Protoss_Archon:
-            return BWAPI::UnitTypes::Protoss_Archon;
-        case NetworkProtossUnits::Protoss_Dark_Templar:
-            return BWAPI::UnitTypes::Protoss_Dark_Templar;
-        case NetworkProtossUnits::Protoss_Dark_Archon:
-            return BWAPI::UnitTypes::Protoss_Dark_Archon;
-        case NetworkProtossUnits::Protoss_Reaver:
-            return BWAPI::UnitTypes::Protoss_Reaver;
-        case NetworkProtossUnits::Protoss_Shuttle:
-            return BWAPI::UnitTypes::Protoss_Shuttle;
-        case NetworkProtossUnits::Protoss_Observer:
-            return BWAPI::UnitTypes::Protoss_Observer;
-        case NetworkProtossUnits::Protoss_Scout:
-            return BWAPI::UnitTypes::Protoss_Scout;
-        case NetworkProtossUnits::Protoss_Corsair:
-            return BWAPI::UnitTypes::Protoss_Corsair;
-        case NetworkProtossUnits::Protoss_Arbiter:
-            return BWAPI::UnitTypes::Protoss_Arbiter;
-        case NetworkProtossUnits::Protoss_Carrier:
-            return BWAPI::UnitTypes::Protoss_Carrier;
-        case NetworkProtossUnits::NETWORK_UNIT_COUNT:
-            return BWAPI::UnitTypes::None;
+        case NetworkTerranOptions::Terran_SCV:
+            return BWAPI::UnitTypes::Terran_SCV;
+        case NetworkTerranOptions::Terran_Marine:
+            return BWAPI::UnitTypes::Terran_Marine;
+        case NetworkTerranOptions::Terran_Firebat:
+            return BWAPI::UnitTypes::Terran_Firebat;
+        case NetworkTerranOptions::Terran_Medic:
+            return BWAPI::UnitTypes::Terran_Medic;
+        case NetworkTerranOptions::Terran_Ghost:
+            return BWAPI::UnitTypes::Terran_Ghost;
+        case NetworkTerranOptions::Terran_Vulture:
+            return BWAPI::UnitTypes::Terran_Vulture;
+        case NetworkTerranOptions::Terran_Siege_Tank_Tank_Mode:
+            return BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode;
+        case NetworkTerranOptions::Terran_Goliath:
+            return BWAPI::UnitTypes::Terran_Goliath;
+        case NetworkTerranOptions::Terran_Wraith:
+            return BWAPI::UnitTypes::Terran_Wraith;
+        case NetworkTerranOptions::Terran_Dropship:
+            return BWAPI::UnitTypes::Terran_Dropship;
+        case NetworkTerranOptions::Terran_Science_Vessel:
+            return BWAPI::UnitTypes::Terran_Science_Vessel;
+        case NetworkTerranOptions::Terran_Valkyrie:
+            return BWAPI::UnitTypes::Terran_Valkyrie;
+        case NetworkTerranOptions::Terran_Battlecruiser:
+            return BWAPI::UnitTypes::Terran_Battlecruiser;
+
+        case NetworkTerranOptions::Terran_Command_Center:
+            return BWAPI::UnitTypes::Terran_Command_Center;
+        case NetworkTerranOptions::Terran_Comsat_Station:
+            return BWAPI::UnitTypes::Terran_Comsat_Station;
+        case NetworkTerranOptions::Terran_Nuclear_Silo:
+            return BWAPI::UnitTypes::Terran_Nuclear_Silo;
+        case NetworkTerranOptions::Terran_Supply_Depot:
+            return BWAPI::UnitTypes::Terran_Supply_Depot;
+        case NetworkTerranOptions::Terran_Refinery:
+            return BWAPI::UnitTypes::Terran_Refinery;
+        case NetworkTerranOptions::Terran_Barracks:
+            return BWAPI::UnitTypes::Terran_Barracks;
+        case NetworkTerranOptions::Terran_Engineering_Bay:
+            return BWAPI::UnitTypes::Terran_Engineering_Bay;
+        case NetworkTerranOptions::Terran_Bunker:
+            return BWAPI::UnitTypes::Terran_Bunker;
+        case NetworkTerranOptions::Terran_Missile_Turret:
+            return BWAPI::UnitTypes::Terran_Missile_Turret;
+        case NetworkTerranOptions::Terran_Academy:
+            return BWAPI::UnitTypes::Terran_Academy;
+        case NetworkTerranOptions::Terran_Factory:
+            return BWAPI::UnitTypes::Terran_Factory;
+        case NetworkTerranOptions::Terran_Machine_Shop:
+            return BWAPI::UnitTypes::Terran_Machine_Shop;
+        case NetworkTerranOptions::Terran_Starport:
+            return BWAPI::UnitTypes::Terran_Starport;
+        case NetworkTerranOptions::Terran_Control_Tower:
+            return BWAPI::UnitTypes::Terran_Control_Tower;
+        case NetworkTerranOptions::Terran_Science_Facility:
+            return BWAPI::UnitTypes::Terran_Science_Facility;
+        case NetworkTerranOptions::Terran_Covert_Ops:
+            return BWAPI::UnitTypes::Terran_Covert_Ops;
+        case NetworkTerranOptions::Terran_Physics_Lab:
+            return BWAPI::UnitTypes::Terran_Physics_Lab;
+        case NetworkTerranOptions::Terran_Armory:
+            return BWAPI::UnitTypes::Terran_Armory;
         default:
-            return BWAPI::UnitTypes::Protoss_Probe;
+            return BWAPI::UnitTypes::Terran_SCV;
+        }
+    }
+    BWAPI::TechType NEATCommander::ToBWAPITech(NetworkTerranOptions tt)
+    {
+        switch (tt) {
+        case NetworkTerranOptions::Cloaking_Field:
+            return BWAPI::TechTypes::Cloaking_Field;
+        case NetworkTerranOptions::Defensive_Matrix:
+            return BWAPI::TechTypes::Defensive_Matrix;
+        case NetworkTerranOptions::EMP_Shockwave:
+            return BWAPI::TechTypes::EMP_Shockwave;
+        case NetworkTerranOptions::Lockdown:
+            return BWAPI::TechTypes::Lockdown;
+        case NetworkTerranOptions::Optical_Flare:
+            return BWAPI::TechTypes::Optical_Flare;
+        case NetworkTerranOptions::Personnel_Cloaking:
+            return BWAPI::TechTypes::Personnel_Cloaking;
+        case NetworkTerranOptions::Scanner_Sweep:
+            return BWAPI::TechTypes::Scanner_Sweep;
+        case NetworkTerranOptions::Spider_Mines:
+            return BWAPI::TechTypes::Spider_Mines;
+        case NetworkTerranOptions::Stim_Packs:
+            return BWAPI::TechTypes::Stim_Packs;
+        case NetworkTerranOptions::Tank_Siege_Mode:
+            return BWAPI::TechTypes::Tank_Siege_Mode;
+        case NetworkTerranOptions::Yamato_Gun:
+            return BWAPI::TechTypes::Yamato_Gun;
+        case NetworkTerranOptions::NETWORK_OPTION_COUNT:
+            return BWAPI::TechTypes::None;
+        default:
+            return BWAPI::TechTypes::None;
+        }
+    }
+    BWAPI::UpgradeType NEATCommander::ToBWAPIUpgrade(NetworkTerranOptions tt)
+    {
+        switch (tt) {
+        case NetworkTerranOptions::Apollo_Reactor:
+            return BWAPI::UpgradeTypes::Apollo_Reactor;
+        case NetworkTerranOptions::Caduceus_Reactor:
+            return BWAPI::UpgradeTypes::Caduceus_Reactor;
+        case NetworkTerranOptions::Charon_Boosters:
+            return BWAPI::UpgradeTypes::Charon_Boosters;
+        case NetworkTerranOptions::Colossus_Reactor:
+            return BWAPI::UpgradeTypes::Colossus_Reactor;
+        case NetworkTerranOptions::Ion_Thrusters:
+            return BWAPI::UpgradeTypes::Ion_Thrusters;
+        case NetworkTerranOptions::Moebius_Reactor:
+            return BWAPI::UpgradeTypes::Moebius_Reactor;
+        case NetworkTerranOptions::Ocular_Implants:
+            return BWAPI::UpgradeTypes::Ocular_Implants;
+        case NetworkTerranOptions::Terran_Infantry_Armor:
+            return BWAPI::UpgradeTypes::Terran_Infantry_Armor;
+        case NetworkTerranOptions::Terran_Infantry_Weapons:
+            return BWAPI::UpgradeTypes::Terran_Infantry_Weapons;
+        case NetworkTerranOptions::Terran_Ship_Plating:
+            return BWAPI::UpgradeTypes::Terran_Ship_Plating;
+        case NetworkTerranOptions::Terran_Ship_Weapons:
+            return BWAPI::UpgradeTypes::Terran_Ship_Weapons;
+        case NetworkTerranOptions::Terran_Vehicle_Plating:
+            return BWAPI::UpgradeTypes::Terran_Vehicle_Plating;
+        case NetworkTerranOptions::Terran_Vehicle_Weapons:
+            return BWAPI::UpgradeTypes::Terran_Vehicle_Weapons;
+        case NetworkTerranOptions::Titan_Reactor:
+            return BWAPI::UpgradeTypes::Titan_Reactor;
+        case NetworkTerranOptions::U_238_Shells:
+            return BWAPI::UpgradeTypes::U_238_Shells;
+        case NetworkTerranOptions::NETWORK_OPTION_COUNT:
+            return BWAPI::UpgradeTypes::None;
+        default:
+            return BWAPI::UpgradeTypes::None;
         }
     }
     BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkProtossOptions ut) {

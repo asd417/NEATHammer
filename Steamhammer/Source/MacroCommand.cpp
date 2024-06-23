@@ -34,6 +34,10 @@ MacroCommand::MacroCommand(MacroCommandType type, BWAPI::UnitType unitType)
     UAB_ASSERT(hasUnitArgument(type), "extra MacroCommand argument");
 }
 
+/// <summary>
+/// Not really used by NEAT or HyperNEAT
+/// </summary>
+/// <returns></returns>
 const std::list<MacroCommandType> MacroCommand::allCommandTypes()
 {
     return std::list<MacroCommandType>
