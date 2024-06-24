@@ -327,6 +327,7 @@ namespace UAlbertaBot
 		std::vector<MacroAct> _actions{};
 		bool initialized = false;
 		int frame = 0;
+		int _lastUpdateFrame = 0;
 		int maxSections;
 		int curSection = 0;
 		std::vector<std::array<int, 2>> sectionsCoords{};

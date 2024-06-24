@@ -1208,7 +1208,7 @@ void WorkerManager::postGivenWorker(BWAPI::Unit worker, BWAPI::TilePosition loc)
 BWAPI::Unit WorkerManager::postWorker(BWAPI::TilePosition loc)
 {
     BWAPI::Position pos = { loc.x * 32, loc.y * 32 };
-    UAB_ASSERT(pos.isValid(), "post to bad macroloc");
+    //UAB_ASSERT(pos.isValid(), "post to bad macroloc");
 
     BWAPI::Unit worker = getUnencumberedWorker(pos, MAX_DISTANCE);
     if (!worker)

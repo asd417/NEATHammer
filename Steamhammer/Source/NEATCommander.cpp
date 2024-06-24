@@ -52,7 +52,7 @@ namespace UAlbertaBot
     }
     void NEATCommander::incrementFrame()
     {
-        frame++;
+        frame = the.now();
         if (initialized && frame > 171432) BWAPI::Broodwar->leaveGame(); //Game has been going for 2 hours... something probably went wrong
     }
     double NEATCommander::getFitness()
@@ -61,7 +61,6 @@ namespace UAlbertaBot
     }
     void NEATCommander::scoreFitness(double add)
     {
-
         //UAB_ASSERT(fitness > 0.0f, "Negative Fitness: %s", std::to_string(fitness).c_str());
         fitness += add;
     }
@@ -279,6 +278,11 @@ namespace UAlbertaBot
         //Something went wrong if you have this much mineral or gas
         if ((min > 10000 || gas > 10000) && Config::NEAT::AutoSurrender) BWAPI::Broodwar->leaveGame();
         if (!network) return;
+
+        if (the.now() == _lastUpdateFrame) return;
+        //Make sure to only call this once per frame
+        _lastUpdateFrame = the.now();
+
         inputVector.clear();
         
         getVisibleMap(curSection);
