@@ -505,9 +505,9 @@ namespace UAlbertaBot
             builderOutputs[i] += network->getOutputVector()[i];
         }
         constexpr int outputVectorOffset = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
-        for (int i = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i < outputVectorOffset; i++)
+        for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)
         {
-            macroCommandTypeOutputs[i] += network->getOutputVector()[i];
+            macroCommandTypeOutputs[i] += network->getOutputVector()[(int)NetworkTerranOptions::NETWORK_OPTION_COUNT + i];
         }
         tilePosX += network->getOutputVector()[outputVectorOffset];
         tilePosY += network->getOutputVector()[outputVectorOffset + 1];

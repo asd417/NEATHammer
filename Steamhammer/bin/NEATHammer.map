@@ -1,6 +1,6 @@
  NEATHammer
 
- Timestamp is 6679d615 (Mon Jun 24 16:24:53 2024)
+ Timestamp is 6679de4a (Mon Jun 24 16:59:54 2024)
 
  Preferred load address is 10000000
 
@@ -4051,7 +4051,7 @@
  0002:00015618       __real@3e7ad7f29abcaf48    100bb618     NodeEval.obj
  0002:00015620       __real@3ee4f8b588e368f1    100bb620     Micro.obj
  0002:00015628       __real@3f1a36e2eb1c432d    100bb628     NEATCommander.obj
- 0002:00015630       __real@3f50624dd2f1a9fc    100bb630     GameCommander.obj
+ 0002:00015630       __real@3f50624dd2f1a9fc    100bb630     TimerManager.obj
  0002:00015638       __real@3f647ae147ae147b    100bb638     MapTools.obj
  0002:00015640       __real@3f747ae147ae147b    100bb640     NEATCommander.obj
  0002:00015648       __real@3f847ae147ae147b    100bb648     CombatSimulation.obj
@@ -4084,7 +4084,7 @@
  0002:00015720       __real@40d4400000000000    100bb720     MicroManager.obj
  0002:00015728       __real@40d9000000000000    100bb728     WorkerManager.obj
  0002:00015730       __real@412e847fcccccccd    100bb730     MicroTransports.obj
- 0002:00015738       __real@412e848000000000    100bb738     GameCommander.obj
+ 0002:00015738       __real@412e848000000000    100bb738     TimerManager.obj
  0002:00015740       __real@7fb9999999999999    100bb740     ParseUtils.obj
  0002:00015748       __real@bf8ff2e48e8a71de    100bb748     UnitData.obj
  0002:00015750       __real@bf9eb851eb851eb8    100bb750     CombatSimulation.obj
