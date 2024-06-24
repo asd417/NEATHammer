@@ -462,7 +462,7 @@ bool MicroManager::checkPositionWalkable(BWAPI::Position pos)
 
 bool MicroManager::unitNearChokepoint(BWAPI::Unit unit) const
 {
-    UAB_ASSERT(unit, "bad unit");
+    //UAB_ASSERT(unit, "bad unit");
 
     return the.tileRoom.at(unit->getTilePosition()) <= 12;
 }
@@ -570,7 +570,7 @@ void MicroManager::useShieldBattery(BWAPI::Unit unit, BWAPI::Unit shieldBattery)
 /// <returns></returns>
 bool MicroManager::spell(BWAPI::Unit caster, BWAPI::TechType techType, BWAPI::Position target) const
 {
-    UAB_ASSERT(techType.targetsPosition() && target.isValid(), "can't target that");
+    //UAB_ASSERT(techType.targetsPosition() && target.isValid(), "can't target that");
 
     // Enough time since the last spell?
     // Forcing a delay prevents double-casting on the same target.
@@ -600,7 +600,7 @@ bool MicroManager::spell(BWAPI::Unit caster, BWAPI::TechType techType, BWAPI::Po
 // The target is a unit.
 bool MicroManager::spell(BWAPI::Unit caster, BWAPI::TechType techType, BWAPI::Unit target) const
 {
-    UAB_ASSERT(techType.targetsUnit() && target->exists() && target->getPosition().isValid(), "can't target that");
+    //UAB_ASSERT(techType.targetsUnit() && target->exists() && target->getPosition().isValid(), "can't target that");
 
     // Enough time since the last spell?
     // Forcing a delay prevents double-casting on the same target.

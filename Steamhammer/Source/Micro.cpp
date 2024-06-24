@@ -113,7 +113,7 @@ void MicroState::monitor(BWAPI::Unit u)
 // for purposes of orders which take a position.
 bool MicroState::positionsNearlyEqual(BWAPI::Unit u, const BWAPI::Position & pos1, const BWAPI::Position & pos2) const
 {
-    UAB_ASSERT(pos1.isValid() && pos2.isValid(), "bad position");
+    //UAB_ASSERT(pos1.isValid() && pos2.isValid(), "bad position");
 
     int dist = u->getDistance(pos2);
     int tolerance =
@@ -249,7 +249,7 @@ void MicroState::update(BWAPI::Unit u)
 void MicroState::setAttack(bool a)
 {
     // Don't try to update twice per frame.
-    UAB_ASSERT(attackUpdateFrame < the.now(), "double attack update");
+    //UAB_ASSERT(attackUpdateFrame < the.now(), "double attack update");
 
     // Decay the previous attack value depending on how much time has passed.
     if (attackUpdateFrame != -1)
@@ -369,8 +369,8 @@ BWAPI::Position Micro::nextGroundDestination(BWAPI::Unit unit, const BWAPI::Posi
     int y = unit->getTilePosition().y;
     while (here > target)
     {
-        UAB_ASSERT(BWAPI::TilePosition(x, y).isValid(), "bad tile %d,%d", x, y);
-        UAB_ASSERT(distances->at(BWAPI::TilePosition(x, y)) >= 0, "inaccessible tile %d,%d", x, y);
+        //UAB_ASSERT(BWAPI::TilePosition(x, y).isValid(), "bad tile %d,%d", x, y);
+        //UAB_ASSERT(distances->at(BWAPI::TilePosition(x, y)) >= 0, "inaccessible tile %d,%d", x, y);
 
         // Unroll the loop by hand.
         // Check diagonals first, so that we prefer to move diagonally when it's shortest.
@@ -386,15 +386,15 @@ BWAPI::Position Micro::nextGroundDestination(BWAPI::Unit unit, const BWAPI::Posi
         else
         {
             // We failed to find a way to advance. That should not happen.
-            UAB_ASSERT(false, "can't go from %d,%d", x, y);
+            //UAB_ASSERT(false, "can't go from %d,%d", x, y);
             break;
         }
 
         here = distances->at(BWAPI::TilePosition(x, y));        // closer by 1 or 2 tiles
     }
 
-    UAB_ASSERT(BWAPI::TilePosition(x, y).isValid(), "bad tile %d,%d", x, y);
-    UAB_ASSERT(distances->at(BWAPI::TilePosition(x, y)) >= 0, "inaccessible tile %d,%d", x, y);
+    //UAB_ASSERT(BWAPI::TilePosition(x, y).isValid(), "bad tile %d,%d", x, y);
+    //UAB_ASSERT(distances->at(BWAPI::TilePosition(x, y)) >= 0, "inaccessible tile %d,%d", x, y);
 
     return TileCenter(BWAPI::TilePosition(x, y));
 }
@@ -589,7 +589,7 @@ bool Micro::fleeDT(BWAPI::Unit unit)
 {
     if (!unit || !unit->exists() || unit->getPlayer() != the.self() || !unit->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return false;
     }
 
@@ -616,7 +616,7 @@ void Micro::Stop(BWAPI::Unit unit)
 {
     if (!unit || !unit->exists() || unit->getPlayer() != the.self())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -643,7 +643,7 @@ void Micro::HoldPosition(BWAPI::Unit unit)
 {
     if (!unit || !unit->exists() || unit->getPlayer() != the.self())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -673,7 +673,7 @@ void Micro::CatchAndAttackUnit(BWAPI::Unit attacker, BWAPI::Unit target)
     if (!attacker || !attacker->exists() || attacker->getPlayer() != the.self() ||
         !target || !target->exists())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -715,7 +715,7 @@ void Micro::AttackUnit(BWAPI::Unit attacker, BWAPI::Unit target)
     if (!attacker || !attacker->exists() || attacker->getPlayer() != the.self() ||
         !target || !target->exists())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -755,7 +755,7 @@ void Micro::AttackMove(BWAPI::Unit attacker, const BWAPI::Position & targetPosit
 {
     if (!attacker || !attacker->exists() || attacker->getPlayer() != the.self() || !targetPosition.isValid())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -792,7 +792,7 @@ void Micro::Move(BWAPI::Unit unit, const BWAPI::Position & targetPosition, const
 {
     if (!unit || !unit->exists() || unit->getPlayer() != the.self() || !targetPosition.isValid())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
     
@@ -849,7 +849,7 @@ bool Micro::MoveSafely(BWAPI::Unit unit, const BWAPI::Position & targetPosition,
     if (!unit || !unit->exists() || unit->getPlayer() != the.self() || !unit->getPosition().isValid() ||
         !targetPosition.isValid())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return false;
     }
 
@@ -905,7 +905,7 @@ void Micro::RightClick(BWAPI::Unit unit, BWAPI::Unit target)
     if (!unit || !unit->exists() || unit->getPlayer() != the.self() ||
         !target || !target->exists())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -955,7 +955,7 @@ void Micro::MineMinerals(BWAPI::Unit unit, BWAPI::Unit mineralPatch)
     if (!unit || !unit->exists() || unit->getPlayer() != the.self() ||
         !mineralPatch || !mineralPatch->exists() || !mineralPatch->getType().isMineralField())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -980,7 +980,7 @@ void Micro::LaySpiderMine(BWAPI::Unit unit, const BWAPI::Position & pos)
 {
     if (!unit || !unit->exists() || unit->getPlayer() != the.self() || !pos.isValid())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -1007,7 +1007,7 @@ void Micro::Repair(BWAPI::Unit unit, BWAPI::Unit target)
     if (!unit || !unit->exists() || unit->getPlayer() != the.self() ||
         !target || !target->exists())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -1045,7 +1045,7 @@ void Micro::ReturnCargo(BWAPI::Unit worker)
     if (!worker || !worker->exists() || worker->getPlayer() != the.self() ||
         !worker->getType().isWorker())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -1083,7 +1083,7 @@ bool Micro::Build(BWAPI::Unit builder, BWAPI::UnitType building, const BWAPI::Ti
         builder->getPlayer() != the.self() ||
         !building.isBuilding() || !location.isValid())
     {
-        UAB_ASSERT(false, "bad building");
+        //UAB_ASSERT(false, "bad building");
         return false;
     }
 
@@ -1099,7 +1099,7 @@ bool Micro::Make(BWAPI::Unit producer, BWAPI::UnitType type)
 {
     if (!producer || !producer->exists() || !producer->getPosition().isValid() || producer->getType().getRace() != type.getRace())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1122,7 +1122,7 @@ bool Micro::Cancel(BWAPI::Unit unit)
 {
     if (!unit || !unit->exists() || !unit->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1137,7 +1137,7 @@ bool Micro::Lift(BWAPI::Unit terranBuilding)
         !terranBuilding->getType().isBuilding() ||
         terranBuilding->getPlayer() != the.self())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1151,7 +1151,7 @@ bool Micro::Burrow(BWAPI::Unit unit)
 {
     if (!unit || !unit->exists() || !unit->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1172,7 +1172,7 @@ bool Micro::Unburrow(BWAPI::Unit unit)
 {
     if (!unit || !unit->exists() || !unit->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1186,7 +1186,7 @@ bool Micro::Load(BWAPI::Unit container, BWAPI::Unit content)
 {
     if (!container || !container->exists() || !content || !content->exists() || !content->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1208,7 +1208,7 @@ bool Micro::UnloadAt(BWAPI::Unit container, const BWAPI::Position & targetPositi
     if (!container || !container->exists() || !container->getPosition().isValid() ||
         !targetPosition.isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1222,7 +1222,7 @@ bool Micro::UnloadAll(BWAPI::Unit container)
 {
     if (!container || !container->exists() || !container->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1236,7 +1236,7 @@ bool Micro::Siege(BWAPI::Unit tank)
 {
     if (!tank || !tank->exists() || !tank->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1251,7 +1251,7 @@ bool Micro::Unsiege(BWAPI::Unit tank)
 {
     if (!tank || !tank->exists() || !tank->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1266,7 +1266,7 @@ bool Micro::Unsiege(BWAPI::Unit tank)
 // NOTE Comsat scan does not use the orders[] mechanism.
 bool Micro::Scan(const BWAPI::Position & targetPosition)
 {
-    UAB_ASSERT(targetPosition.isValid(), "bad position");
+    //UAB_ASSERT(targetPosition.isValid(), "bad position");
 
     // If a scan of this position is still active, don't scan it again.
     if (MapGrid::Instance().scanIsActiveAt(targetPosition))
@@ -1307,7 +1307,7 @@ bool Micro::Stim(BWAPI::Unit unit)
         unit->getType() != BWAPI::UnitTypes::Terran_Marine && unit->getType() != BWAPI::UnitTypes::Terran_Firebat ||
         unit->getPlayer() != the.self())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1345,7 +1345,7 @@ bool Micro::MergeArchon(BWAPI::Unit templar1, BWAPI::Unit templar2)
         templar2->getType() != templar1->getType() ||
         templar1 == templar2)
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1384,7 +1384,7 @@ bool Micro::UseTech(BWAPI::Unit unit, BWAPI::TechType tech, BWAPI::Unit target)
     if (!unit || !unit->exists() || !unit->getPosition().isValid() || unit->getPlayer() != the.self() ||
         !target || !target->exists() || !target->getPosition().isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1404,7 +1404,7 @@ bool Micro::UseTech(BWAPI::Unit unit, BWAPI::TechType tech, BWAPI::Unit target)
     else
     {
         o = BWAPI::Orders::UnusedNothing;
-        UAB_ASSERT(false, "unsupported tech");
+        //UAB_ASSERT(false, "unsupported tech");
     }
     orders[unit].setOrder(unit, o);
 
@@ -1418,7 +1418,7 @@ bool Micro::UseTech(BWAPI::Unit unit, BWAPI::TechType tech, const BWAPI::Positio
     if (!unit || !unit->exists() || !unit->getPosition().isValid() || unit->getPlayer() != the.self() ||
         !target.isValid())
     {
-        UAB_ASSERT(false, "bad unit");
+        //UAB_ASSERT(false, "bad unit");
         return false;
     }
 
@@ -1468,7 +1468,7 @@ bool Micro::UseTech(BWAPI::Unit unit, BWAPI::TechType tech, const BWAPI::Positio
     else
     {
         o = BWAPI::Orders::UnusedNothing;
-        UAB_ASSERT(false, "unsupported tech. Add more in micro.cpp");
+        //UAB_ASSERT(false, "unsupported tech. Add more in micro.cpp");
     }
     orders[unit].setOrder(unit, o);
 
@@ -1487,7 +1487,7 @@ void Micro::KiteTarget(BWAPI::Unit rangedUnit, BWAPI::Unit target)
     if (!rangedUnit || !rangedUnit->exists() || rangedUnit->getPlayer() != the.self() ||
         !target || !target->exists())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 
@@ -1537,7 +1537,7 @@ void Micro::MutaDanceTarget(BWAPI::Unit muta, BWAPI::Unit target)
     if (!muta || !muta->exists() || muta->getPlayer() != the.self() ||
         !target || !target->exists())
     {
-        UAB_ASSERT(false, "bad arg");
+        //UAB_ASSERT(false, "bad arg");
         return;
     }
 

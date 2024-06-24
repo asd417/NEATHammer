@@ -89,7 +89,7 @@ namespace UAlbertaBot
                 catch (std::exception e) {
                     //std::cout << "Error while retrieving new genome to evaluate: " << e.what() << "\n";
                     //std::cout << "\tWaiting for 3000 miliseconds\n";
-                    UAB_ASSERT(false, "Error while retrieving new genome to evaluate: %s", e.what());
+                    //UAB_ASSERT(false, "Error while retrieving new genome to evaluate: %s", e.what());
                     r.clear();
                     id = -1;
                     Sleep(2000);

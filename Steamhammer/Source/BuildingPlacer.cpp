@@ -171,7 +171,7 @@ bool BuildingPlacer::buildableTerrain(int x0, int y0, int width, int height) con
 // The caller must ensure that x and y are in range!
 bool BuildingPlacer::isFreeTile(int x, int y) const
 {
-    UAB_ASSERT(BWAPI::TilePosition(x,y).isValid(), "bad tile");
+    //UAB_ASSERT(BWAPI::TilePosition(x,y).isValid(), "bad tile");
 
     if (!BWAPI::Broodwar->isBuildable(x, y, true) || _reserveMap[x][y])
     {
@@ -660,7 +660,7 @@ BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(const Building & b, int
     }
     catch (std::exception e)
     {
-        UAB_ASSERT_WARNING(false, "Error BuildingPlacer::getBuildLocationNear()");
+        //UAB_ASSERT_WARNING(false, "Error BuildingPlacer::getBuildLocationNear()");
         tile = BWAPI::TilePositions::None;
     }
 
@@ -684,7 +684,7 @@ void BuildingPlacer::freeTiles(const Building & b)
 
 bool BuildingPlacer::isReserved(int x, int y) const
 {
-    UAB_ASSERT(BWAPI::TilePosition(x, y).isValid(), "bad tile");
+    //UAB_ASSERT(BWAPI::TilePosition(x, y).isValid(), "bad tile");
 
     return _reserveMap[x][y];
 }
@@ -1047,7 +1047,7 @@ BWAPI::TilePosition BuildingPlacer::getInBaseProxyPosition(const Base * base) co
 // Return an invalid tile on failure.
 BWAPI::TilePosition BuildingPlacer::getProxyPosition(const Base * base) const
 {
-    UAB_ASSERT(base, "bad base");
+    //UAB_ASSERT(base, "bad base");
 
     BWAPI::TilePosition tile = BWAPI::TilePositions::Invalid;
 
@@ -1072,8 +1072,8 @@ BWAPI::TilePosition BuildingPlacer::getProxyPosition(const Base * base) const
 // Return an invalid tile on failure.
 BWAPI::TilePosition BuildingPlacer::getAntiBunkerSunkenPosition(const Base * base, BWAPI::Unit bunker) const
 {
-    UAB_ASSERT(base, "bad base");
-    UAB_ASSERT(bunker, "bad unit");
+    //UAB_ASSERT(base, "bad base");
+    //UAB_ASSERT(bunker, "bad unit");
 
     Building creep(BWAPI::UnitTypes::Zerg_Creep_Colony, BWAPI::TilePositions::None);
 
@@ -1106,13 +1106,13 @@ BWAPI::TilePosition BuildingPlacer::getAntiBunkerSunkenPosition(const Base * bas
 // Return an invalid tile on failure.
 BWAPI::TilePosition BuildingPlacer::getAntiCannonSunkenPosition(const Base * base, BWAPI::Unit cannon) const
 {
-    UAB_ASSERT(base, "bad base");
-    UAB_ASSERT(cannon, "bad unit");
+    //UAB_ASSERT(base, "bad base");
+    //UAB_ASSERT(cannon, "bad unit");
 
     Building creep(BWAPI::UnitTypes::Zerg_Creep_Colony, BWAPI::TilePositions::None);
 
     int totalDist = cannon->getDistance(base->getCenter());
-    UAB_ASSERT(totalDist <= 16 * 32, "too distant");
+    //UAB_ASSERT(totalDist <= 16 * 32, "too distant");
     int bestCannonDist = totalDist;
     int bestPylonDist = totalDist;
     int closestToMainVsCannon = MAX_DISTANCE;

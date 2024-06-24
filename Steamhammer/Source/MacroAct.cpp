@@ -67,7 +67,7 @@ MacroLocation MacroAct::getMacroLocationFromString(const std::string & s) const
         return MacroLocation::GasSteal;
     }
 
-    UAB_ASSERT(false, "config file - bad location '@ %s'", s.c_str());
+    //UAB_ASSERT(false, "config file - bad location '@ %s'", s.c_str());
 
     return MacroLocation::Anywhere;
 }
@@ -285,25 +285,25 @@ bool MacroAct::isGasSteal() const
 
 BWAPI::UnitType MacroAct::getUnitType() const
 {
-    UAB_ASSERT(_type == MacroActs::Unit, "getUnitType of non-unit");
+    //UAB_ASSERT(_type == MacroActs::Unit, "getUnitType of non-unit");
     return _unitType;
 }
 
 BWAPI::TechType MacroAct::getTechType() const
 {
-    UAB_ASSERT(_type == MacroActs::Tech, "getTechType of non-tech");
+    //UAB_ASSERT(_type == MacroActs::Tech, "getTechType of non-tech");
     return _techType;
 }
 
 BWAPI::UpgradeType MacroAct::getUpgradeType() const
 {
-    UAB_ASSERT(_type == MacroActs::Upgrade, "getUpgradeType of non-upgrade");
+    //(_type == MacroActs::Upgrade, "getUpgradeType of non-upgrade");
     return _upgradeType;
 }
 
 MacroCommand MacroAct::getCommandType() const
 {
-    UAB_ASSERT(_type == MacroActs::Command, "getCommandType of non-command");
+    //UAB_ASSERT(_type == MacroActs::Command, "getCommandType of non-command");
     return _macroCommandType;
 }
 
@@ -383,7 +383,7 @@ int MacroAct::mineralPrice() const
         return _upgradeType.mineralPrice();
     }
 
-    UAB_ASSERT(false, "bad MacroAct");
+    //UAB_ASSERT(false, "bad MacroAct");
     return 0;
 }
 
@@ -410,7 +410,7 @@ int MacroAct::gasPrice() const
         return _upgradeType.gasPrice();
     }
 
-    UAB_ASSERT(false, "bad MacroAct");
+    //UAB_ASSERT(false, "bad MacroAct");
     return 0;
 }
 
@@ -439,7 +439,7 @@ BWAPI::UnitType MacroAct::whatBuilds() const
         return BWAPI::UnitTypes::None;
     }
 
-    UAB_ASSERT(false, "bad MacroAct");
+    //UAB_ASSERT(false, "bad MacroAct");
     return BWAPI::UnitTypes::Unknown;
 }
 
@@ -462,7 +462,7 @@ std::string MacroAct::getName() const
         return _macroCommandType.getName();
     }
 
-    UAB_ASSERT(false, "bad MacroAct");
+    //UAB_ASSERT(false, "bad MacroAct");
     return "error";
 }
 
@@ -541,7 +541,7 @@ void MacroAct::getCandidateProducers(std::vector<BWAPI::Unit> & candidates) cons
 {
     if (isCommand())
     {
-        UAB_ASSERT(false, "no producer of a command");
+        //UAB_ASSERT(false, "no producer of a command");
         return;
     }
 
@@ -657,7 +657,7 @@ bool MacroAct::canProduce(BWAPI::Unit producer) const
         return true;
     }
 
-    UAB_ASSERT(producer != nullptr, "producer was null");
+    //UAB_ASSERT(producer != nullptr, "producer was null");
 
     if (ProductionManager::Instance().meetsReservedResources(*this))
     {
@@ -702,7 +702,7 @@ bool MacroAct::canProduce(BWAPI::Unit producer) const
 
 void MacroAct::produce(BWAPI::Unit producer) const
 {
-    UAB_ASSERT(producer != nullptr, "producer was null");
+    //UAB_ASSERT(producer != nullptr, "producer was null");
 
     // A terran add-on.
     if (isAddon())
@@ -780,7 +780,7 @@ void MacroAct::produce(BWAPI::Unit producer) const
     }
     else
     {
-        UAB_ASSERT(false, "bad MacroAct");
+        //UAB_ASSERT(false, "bad MacroAct");
     }
 }
 

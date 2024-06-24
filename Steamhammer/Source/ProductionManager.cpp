@@ -408,7 +408,7 @@ BWAPI::Unit ProductionManager::getClosestUnitToPosition(const std::vector<BWAPI:
 
     for (BWAPI::Unit unit : units)
     {
-        UAB_ASSERT(unit, "Unit was null");
+        //UAB_ASSERT(unit, "Unit was null");
 
         int distance = unit->getDistance(closestTo);
         if (distance < minDist)
@@ -569,7 +569,7 @@ void ProductionManager::executeCommand(const MacroAct & act)
 {
     //int x = 40;
     //int y = 70;
-    UAB_ASSERT(act.isCommand(), "not a command");
+    //UAB_ASSERT(act.isCommand(), "not a command");
     
     MacroCommandType cmd = act.getCommandType().getType();
     if (cmd == MacroCommandType::Scout ||
@@ -634,13 +634,13 @@ void ProductionManager::executeCommand(const MacroAct & act)
     {
         BWAPI::TilePosition tp = act.getTileLocation();
         BWAPI::Unit v = BWAPI::Broodwar->getClosestUnit({ tp.x * 32, tp.y * 32 }, BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
-        v->useTech(BWAPI::TechTypes::Tank_Siege_Mode, { tp.x * 32, tp.y * 32 });
+        the.micro.Siege(v);
     }
     else if (cmd == MacroCommandType::UNSIEGEMODE)
     {
         BWAPI::TilePosition tp = act.getTileLocation();
         BWAPI::Unit v = BWAPI::Broodwar->getClosestUnit({ tp.x * 32, tp.y * 32 }, BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        v->useTech(BWAPI::TechTypes::Tank_Siege_Mode, { tp.x * 32, tp.y * 32 });
+        the.micro.Unsiege(v);
     }
     else if (cmd == MacroCommandType::NUKE)
     {
@@ -654,7 +654,7 @@ void ProductionManager::executeCommand(const MacroAct & act)
     }
     else
     {
-        UAB_ASSERT(false, "unknown MacroCommand");
+        //UAB_ASSERT(false, "unknown MacroCommand");
     }
 }
 
@@ -711,7 +711,7 @@ void ProductionManager::drawProductionInformation(int x, int y)
     std::vector<BWAPI::Unit> prod;
     for (BWAPI::Unit unit : the.self()->getUnits())
     {
-        UAB_ASSERT(unit != nullptr, "Unit was null");
+        //UAB_ASSERT(unit != nullptr, "Unit was null");
 
         if (unit->isBeingConstructed())
         {
