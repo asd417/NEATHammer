@@ -34,31 +34,6 @@ MacroCommand::MacroCommand(MacroCommandType type, BWAPI::UnitType unitType)
     UAB_ASSERT(hasUnitArgument(type), "extra MacroCommand argument");
 }
 
-/// <summary>
-/// Not really used by NEAT or HyperNEAT
-/// </summary>
-/// <returns></returns>
-const std::list<MacroCommandType> MacroCommand::allCommandTypes()
-{
-    return std::list<MacroCommandType>
-    { MacroCommandType::Scout
-    , MacroCommandType::ScoutIfNeeded
-    , MacroCommandType::ScoutLocation
-    , MacroCommandType::ScoutOnceOnly
-    , MacroCommandType::StartGas
-    , MacroCommandType::StopGas
-    , MacroCommandType::StealGas
-    , MacroCommandType::Aggressive
-    , MacroCommandType::Defensive
-    , MacroCommandType::PullWorkers
-    , MacroCommandType::PullWorkersLeaving
-    , MacroCommandType::ReleaseWorkers
-    , MacroCommandType::PostWorker
-    , MacroCommandType::UnpostWorkers
-    , MacroCommandType::QueueBarrier
-    };
-}
-
 // The command has a numeric argument, the _amount.
 bool MacroCommand::hasNumericArgument(MacroCommandType t)
 {

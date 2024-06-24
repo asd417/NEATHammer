@@ -279,7 +279,6 @@ namespace UAlbertaBot
         //Something went wrong if you have this much mineral or gas
         if ((min > 10000 || gas > 10000) && Config::NEAT::AutoSurrender) BWAPI::Broodwar->leaveGame();
         if (!network) return;
-        if (_actions.size() > 2) return;
         inputVector.clear();
         
         getVisibleMap(curSection);
@@ -547,9 +546,11 @@ namespace UAlbertaBot
                 ma = MacroAct((MacroCommandType)maxCommandType, { posx,posy });
                 ma.confidence = maxCommandScore;
             }
-            UAB_ASSERT(false, "MacroCommand %d with %4.8f, TerranOptionID: %d with %4.8f, ", maxCommandType, maxCommandScore, maxBuildChoice, maxBuildScore);
+            //UAB_ASSERT(false, "MacroCommand %d with %4.8f, TerranOptionID: %d with %4.8f, ", maxCommandType, maxCommandScore, maxBuildChoice, maxBuildScore);
 
-            _actions.push_back(ma);
+            //Always keep just 1 in the build queue
+            if (_actions.size() > 0) _actions[0] = ma;
+            else _actions.push_back(ma);
             //std::cout << "Network Evaluated " << std::to_string(_actions.size()) << " actions\n";
             //Reset output vector
             builderOutputs.fill(0.0f);
@@ -721,6 +722,19 @@ namespace UAlbertaBot
     
     bool NEATCommander::canMacro(MacroCommandType command)
     {
+        if (command == MacroCommandType::SCAN)
+        {
+            BWAPI::Unitset comsats = BWAPI::Broodwar->self()->getUnits();
+            bool r = false;
+            for (auto& u : comsats)
+            {
+                if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station && u->getEnergy() >= 50)
+                {
+                    r = true;
+                }
+            }
+            return r;
+        }
         if (command == MacroCommandType::SPIDERMINE)
         {
             return the.my.completed.count(BWAPI::UnitTypes::Terran_Vulture) > 0 && BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Spider_Mines);

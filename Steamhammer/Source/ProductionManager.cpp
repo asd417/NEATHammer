@@ -172,7 +172,9 @@ void ProductionManager::manageBuildOrderQueue()
         if (!canMake &&
             nextIsBuilding() &&
             the.now() >= _delayBuildingPredictionUntilFrame &&
-            !BuildingManager::Instance().typeIsStalled(currentItem.macroAct.getUnitType()))
+            !BuildingManager::Instance().typeIsStalled(currentItem.macroAct.getUnitType()) && 
+            !currentItem.macroAct.getUnitType().isRefinery() //Refinery seems to not get cleared out of the temporary state...
+            )
         {
             // construct a temporary building object
             Building b(currentItem.macroAct.getUnitType(), currentItem.macroAct.getTileLocation());
@@ -188,6 +190,7 @@ void ProductionManager::manageBuildOrderQueue()
         // if we can make the current item
         if (canMake)
         {
+            //check if same as last
             create(producer, currentItem);
             _assignedWorkerForThisBuilding = nullptr;
             _typeOfUpcomingBuilding = BWAPI::UnitTypes::None;
@@ -615,6 +618,11 @@ void ProductionManager::executeCommand(const MacroAct & act)
     else if (cmd == MacroCommandType::UnpostWorkers)
     {
         WorkerManager::Instance().unpostWorkers(act.getTileLocation());
+    }
+    else if (cmd == MacroCommandType::SCAN)
+    {
+        BWAPI::TilePosition tp = act.getTileLocation();
+        the.micro.Scan({ tp.x * 32, tp.y * 32 });
     }
     else if (cmd == MacroCommandType::SPIDERMINE)
     {

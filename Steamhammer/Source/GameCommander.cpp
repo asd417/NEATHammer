@@ -103,8 +103,8 @@ void GameCommander::update()
     NEATCommander::Instance().incrementFrame();
     _timerManager.stopTimer(TimerManager::Total);
     
-    NEATCommander::Instance().drawDebug(380, 30);
-    drawDebugInterface();
+    //NEATCommander::Instance().drawDebug(380, 30);
+    //drawDebugInterface();
 }
 
 void GameCommander::onEnd(bool isWinner)

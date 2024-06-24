@@ -21,12 +21,12 @@ enum class MacroCommandType
     , ReleaseWorkers
     , PostWorker
     , UnpostWorkers
-#ifdef TERRAN
+    //Terran specific macrocommands
+    , SCAN
     , SPIDERMINE
     , SIEGEMODE
     , UNSIEGEMODE
     , NUKE
-#endif
     , QueueBarrier
     };
 
