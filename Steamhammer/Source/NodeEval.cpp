@@ -110,12 +110,12 @@ double cube_activation(double x) {
 }
 
 double exp_activation(double x) {
-    x = std::max((double)-60.0, std::min((double)60.0, x));
+    //x = std::max((double)-60.0, std::min((double)60.0, x));
     return std::exp(x);
 }
 
 double gauss_activation(double x) {
-    x = std::max((double)-3.4f, std::min((double)3.4f, x));
+    //x = std::max((double)-3.4f, std::min((double)3.4f, x));
     return exp(-5.0f * x * x);
 }
 
@@ -148,17 +148,17 @@ double relu_activation(double x) {
 }
 
 double sigmoid_activation(double x) {
-    x = std::max((double) -60.0f, std::min((double) 60.0f, 5.0f * x));
-    return 1.0f / (1.0f + std::exp(-x));
+    //x = std::max((double) -60.0f, std::min((double) 60.0f, 5.0f * x));
+    return (double)1.0f / ((double)1.0f + std::exp(-x));
 }
 
 double sin_activation(double x) {
-    x = std::max((double)-60.0f, std::min((double)60.0f, 5.0 * x));
+    //x = std::max((double) -60.0f, std::min((double)60.0f, 5.0 * x));
     return std::sin(x);
 }
 
 double softplus_activation(double x) {
-    x = std::max(-60.0, std::min(60.0, 5.0 * x));
+    //x = std::max(-60.0, std::min(60.0, 5.0 * x));
     return 0.2 * log(1 + exp(x));
 }
 
@@ -167,7 +167,7 @@ double square_activation(double x) {
 }
 
 double tanh_activation(double x) {
-    x = std::max((double)-60.0f, std::min((double)60.0f, 2.5f * x));
+    //x = std::max((double)-60.0f, std::min((double)60.0f, 2.5f * x));
     return std::tanh(x);
 }
 

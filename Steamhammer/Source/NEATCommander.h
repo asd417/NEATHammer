@@ -262,7 +262,8 @@ namespace UAlbertaBot
 		sNOTWALKABLE,
 		sMINERAL,
 		sGAS,
-		sUNIT=10
+		sUNIT,
+		MAX
 	};
 	class NEATCommander {
 	public:

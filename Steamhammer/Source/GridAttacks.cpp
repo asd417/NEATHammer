@@ -137,7 +137,7 @@ bool GridAttacks::inRange(const BWAPI::TilePosition & topLeft, const BWAPI::Tile
 // Assume that the building is entirely on the map.
 bool GridAttacks::inRange(BWAPI::UnitType buildingType, const BWAPI::TilePosition & topLeftTile) const
 {
-    UAB_ASSERT(buildingType.isBuilding(), "bad type");
+    //UAB_ASSERT(buildingType.isBuilding(), "bad type");
 
     BWAPI::TilePosition bottomRightTile(
         topLeftTile.x + buildingType.tileWidth() - 1,
