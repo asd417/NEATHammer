@@ -106,7 +106,6 @@ public:
     void        stopRepairing(BWAPI::Unit worker);
     void        setCombatWorker(BWAPI::Unit worker);
     void        postGivenWorker(BWAPI::Unit worker, BWAPI::TilePosition loc);
-    void        postGivenWorker(BWAPI::Unit worker, MacroLocation loc);
     BWAPI::Unit postWorker(BWAPI::TilePosition loc);
     void        unpostWorkers(BWAPI::TilePosition loc);
 

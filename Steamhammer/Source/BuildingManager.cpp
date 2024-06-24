@@ -463,8 +463,6 @@ Building & BuildingManager::addTrackedBuildingTask(const MacroAct & act, BWAPI::
     _reservedGas += type.gasPrice();
 
     Building b(type, desiredLocation);
-    b.macroLocation = act.getMacroLocation();
-    
     b.desiredPosition = b.finalPosition = act.getTileLocation();
     
     b.isGasSteal = false;
@@ -818,7 +816,6 @@ void BuildingManager::cancelBuildingType(BWAPI::UnitType t)
 
 BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
 {
-   
     int numPylons = the.my.completed.count(BWAPI::UnitTypes::Protoss_Pylon);
     if (b.type.requiresPsi() && numPylons == 0)
     {
@@ -830,31 +827,7 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
         return the.placer.getRefineryPosition(b.desiredPosition);
     }
 
-    if (b.finalPosition.isValid())
-    {
-        return the.placer.getBuildLocationNear(b, 0);
-    }
-
-
-    MacroLocation loc = b.macroLocation;
-    // A resource depot going Anywhere is really going to an expansion.
-    // A resource depot goes at an expansion location, except for certain non-base hatchery locations.
-    // Only zerg macro hatcheries and proxy hatcheries are placed away from expo locations.
-    if (b.type.isResourceDepot() &&
-        b.macroLocation != MacroLocation::Main &&
-        b.macroLocation != MacroLocation::Macro &&
-        b.macroLocation != MacroLocation::Proxy &&
-        b.macroLocation != MacroLocation::Front &&
-        b.macroLocation != MacroLocation::Center)
-    {
-        BWAPI::TilePosition pos = the.placer.getExpoLocationTile(MacroLocation::Expo);
-        if (the.placer.buildingOK(b, pos) && !the.groundAttacks.inRange(b.type, pos))
-        {
-            return pos;
-        }
-        return BWAPI::TilePositions::None;
-    }
-    int distance = 1;
+    int distance = 0;
     if (b.type == BWAPI::UnitTypes::Protoss_Pylon) distance = 2;
 
     // The building placer does the rest.
@@ -868,7 +841,7 @@ void BuildingManager::undoBuildings(const std::vector< std::reference_wrapper<Bu
     for (Building & b : toRemove)
     {
         // If the building was to establish a base, unreserve the base location.
-        if (b.type.isResourceDepot() && b.macroLocation != MacroLocation::Main && b.finalPosition.isValid())
+        if (b.type.isResourceDepot() && b.finalPosition.isValid())
         {
             Base * base = the.bases.getBaseAtTilePosition(b.finalPosition);
             if (base)

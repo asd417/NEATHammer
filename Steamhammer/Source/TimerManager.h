@@ -25,7 +25,6 @@ public:
         InformationManager, 
         MapGrid, 
         Skill, 
-        Search, 
         Worker, 
         Production, 
         Building, 
@@ -33,6 +32,9 @@ public:
         Micro, 
         Scout,
         NetworkEvaluation,
+        net_ev1,
+        net_ev2,
+        net_ev3,
         NumTypes };
 
     TimerManager();

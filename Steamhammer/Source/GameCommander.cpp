@@ -28,6 +28,7 @@ GameCommander::GameCommander()
 
 void GameCommander::update()
 {
+    NEATCommander::Instance().setTimeManager(&_timerManager);
     _timerManager.startTimer(TimerManager::Total);
 
     // populate the unit vectors we will pass into various managers
@@ -90,7 +91,7 @@ void GameCommander::update()
     _timerManager.startTimer(TimerManager::Combat);
     _combatCommander.update(_combatUnits);
     _timerManager.stopTimer(TimerManager::Combat);
-
+    
     _timerManager.startTimer(TimerManager::Scout);
     ScoutManager::Instance().update();
     _timerManager.stopTimer(TimerManager::Scout);
@@ -102,9 +103,10 @@ void GameCommander::update()
 
     NEATCommander::Instance().incrementFrame();
     _timerManager.stopTimer(TimerManager::Total);
-    
-    //NEATCommander::Instance().drawDebug(380, 30);
+   
+    //NEATCommander::Instance().drawDebug(180, 150);
     //drawDebugInterface();
+    //_timerManager.drawModuleTimers(490, 180);
 }
 
 void GameCommander::onEnd(bool isWinner)

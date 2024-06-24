@@ -4,6 +4,7 @@
 #include "The.h"
 #include <windows.h> 
 
+#define HyperNEAT
 namespace UAlbertaBot
 {
     NEATCommander& NEATCommander::Instance()
@@ -99,18 +100,23 @@ namespace UAlbertaBot
 
             try {
                 json networkJson = json::parse(std::string(r[0]["Network"]));
-                //Delete existing network
                 if (!network) delete network;
+#ifdef HyperNEAT
+                network = new RecurrentNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+#else
                 network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+#endif
                 for (const json& ne : networkJson["node_evals"]) {
                     network->AddNodeEval(ne);
                 }
-                if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Gene");//Faulty Gene. Surrender immediately;
+                if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Gene");
+                network->FinishInitializing();
             }
             catch (std::exception e) {
                 std::cout << "Error creating Network Structure: " << e.what() << "\n";
                 BWAPI::Broodwar->leaveGame();
             }
+
             genomeID = id;
             initialized = true;
         }
@@ -194,58 +200,58 @@ namespace UAlbertaBot
         int c = 0;
         for (const double& bo : builderOutputs)
         {
-            BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", bo);
+            BWAPI::Broodwar->drawTextScreen(x, y, "%4.2f", bo);
             y += 12;
             c++;
             if (c == 20)
             {
-                x += 60;
+                x += 120;
                 y = startY;
             }
             if (c == 40)
             {
-                x += 60;
+                x += 120;
                 y = startY;
             }
         }
 
         for (const double& bo : builderOutputs)
         {
-            BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", bo);
+            BWAPI::Broodwar->drawTextScreen(x, y, "%4.2f", bo);
             y += 12;
             c++;
             if (c == 20)
             {
-                x += 60;
+                x += 120;
                 y = startY;
             }
             if (c == 40)
             {
-                x += 60;
+                x += 120;
                 y = startY;
             }
         }
         
         for (const double& bo : macroCommandTypeOutputs)
         {
-            BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", bo);
+            BWAPI::Broodwar->drawTextScreen(x, y, "%4.2f", bo);
             y += 12;
             c++;
             if (c == 20)
             {
-                x += 60;
+                x += 120;
                 y = startY;
             }
             if (c == 40)
             {
-                x += 60;
+                x += 120;
                 y = startY;
             }
         }
         
-        BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", tilePosX);
+        BWAPI::Broodwar->drawTextScreen(x, y, "%4.2f", tilePosX);
         y += 12;
-        BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", tilePosY);
+        BWAPI::Broodwar->drawTextScreen(x, y, "%4.2f", tilePosY);
 
         //for (int i = 0; i < network->getOutputCount(); i++) {
         //    double v = network->getOutputVector()[i];
@@ -268,6 +274,10 @@ namespace UAlbertaBot
         //    }
         //}
     
+    }
+    void NEATCommander::setTimeManager(TimerManager* t)
+    {
+        timer = t;
     }
     void NEATCommander::evaluate()
     {   
@@ -307,7 +317,6 @@ namespace UAlbertaBot
         int workerCount = getWorkerCount(myUnits);
         int enemyRace = BWAPI::Broodwar->enemy()->getRace();
 
-#define HyperNEAT
 
 #ifndef HyperNEAT
         //NEAT Input: 16x16 + 16x16 + 12 = 524
@@ -494,27 +503,45 @@ namespace UAlbertaBot
         curSection++;
         curSection = curSection % maxSections;
         //Looked through all sections. Make command
+        drawDebug(180, 150);
         if (curSection == 0)
         {
+            //This part apparently can cause a lot of lag...
             tilePosX = tilePosX / (double) maxSections;
             tilePosY = tilePosY / (double) maxSections;
-            std::clamp(tilePosX, (double)0.0f, (double)1.0f);
-            std::clamp(tilePosY, (double)0.0f, (double)1.0f);
             int posx = int(tilePosX * mapWidth);
             int posy = int(tilePosY * mapHeight);
+            posx = std::clamp(posx, 1, mapWidth-4);
+            posy = std::clamp(posy, 1, mapHeight-4);
             BWAPI::TilePosition buildPos = { posx,posy };
 
             int maxBuildChoice = 0;
             double maxBuildScore = 0.0f;
+            if (timer != nullptr)
+            {
+                timer->startTimer(TimerManager::net_ev1);
+            }
             for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)
             {
-                if (builderOutputs[i] > maxBuildScore && canBuild((NetworkTerranOptions)i, buildPos))
+                //UAB_ASSERT(i != (int)NetworkTerranOptions::Terran_Barracks, "Barrack score: %4.8f", builderOutputs[i]);
+                if (
+                    //i != (int)NetworkTerranOptions::Terran_Command_Center && 
+                    //i != (int)NetworkTerranOptions::Terran_Supply_Depot &&
+                    //i != (int)NetworkTerranOptions::Terran_Refinery &&
+                    builderOutputs[i] > maxBuildScore && canBuild((NetworkTerranOptions)i, buildPos))
                 {
                     maxBuildChoice = i;
                     maxBuildScore = builderOutputs[i];
                 }
             }
-
+            if (timer != nullptr)
+            {
+                timer->stopTimer(TimerManager::net_ev1);
+            }
+            if (timer != nullptr)
+            {
+                timer->startTimer(TimerManager::net_ev2);
+            }
             int maxCommandType = 0;
             double maxCommandScore = 0.0f;
             for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)
@@ -526,14 +553,30 @@ namespace UAlbertaBot
                     maxCommandScore = macroCommandTypeOutputs[i];
                 }
             }
-
+            if (timer != nullptr)
+            {
+                timer->stopTimer(TimerManager::net_ev2);
+            }
+            if (timer != nullptr)
+            {
+                timer->startTimer(TimerManager::net_ev3);
+            }
             MacroAct ma;
+            bool failed = false;
             // compare score between build option score and macro command type score
-            if (maxBuildScore > maxCommandScore)
+            if (maxBuildScore >= maxCommandScore)
             {
                 //BuildOutput has stronger signal than MacroCommandUnitType signal
                 if ((NetworkTerranOptions)maxBuildChoice < NetworkTerranOptions::Cloaking_Field) //unit or building
                 {
+                    BWAPI::UnitType t = ToBWAPIUnit((NetworkTerranOptions)maxBuildChoice);
+                    //UAB_ASSERT(t.isBuilding() && t == BWAPI::UnitTypes::Terran_Supply_Depot || t == BWAPI::UnitTypes::Terran_Command_Center || t == BWAPI::UnitTypes::Terran_Refinery, "Tried to build %s", t.c_str());
+                    Building b = Building(t, buildPos);
+                    //found may be None
+                    BWAPI::TilePosition found = the.placer.getBuildLocationNear(b, 2);
+                    if (!found.isValid()) failed = true;
+                    UAB_ASSERT(!buildPos.isValid(), "Trying to build at %d, %d", buildPos.x, buildPos.y);
+
                     ma = MacroAct(ToBWAPIUnit((NetworkTerranOptions)maxBuildChoice), buildPos);
                 }
                 else if ((NetworkTerranOptions)maxBuildChoice < NetworkTerranOptions::Apollo_Reactor) //tech
@@ -551,16 +594,25 @@ namespace UAlbertaBot
                 ma.confidence = maxCommandScore;
             }
             //UAB_ASSERT(false, "MacroCommand %d with %4.8f, TerranOptionID: %d with %4.8f, ", maxCommandType, maxCommandScore, maxBuildChoice, maxBuildScore);
-
+            if (timer != nullptr)
+            {
+                timer->stopTimer(TimerManager::net_ev3);
+            }
+            
             //Always keep just 1 in the build queue
-            if (_actions.size() > 0) _actions[0] = ma;
-            else _actions.push_back(ma);
+            if (!failed)
+            {
+                if (_actions.size() > 0) _actions[0] = ma;
+                else _actions.push_back(ma);
+            }
             //std::cout << "Network Evaluated " << std::to_string(_actions.size()) << " actions\n";
             //Reset output vector
             builderOutputs.fill(0.0f);
             macroCommandTypeOutputs.fill(0.0f);
             tilePosX = 0.0f; //0~256
             tilePosY = 0.0f; //0~256
+            //when using recurrent network, resets the network
+            network->Reset();
         }
 #endif
     }
@@ -608,8 +660,10 @@ namespace UAlbertaBot
                 else
                 {
                     //BWAPI::UnitFilter uf = BWAPI::UnitFilter(the.self());
-                    BWAPI::Unitset allyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsAlly);
-                    BWAPI::Unitset enemyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsEnemy);
+                    BWAPI::Unitset allyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsAlly && !BWAPI::Filter::IsBuilding);
+                    BWAPI::Unitset allyBuildingOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsAlly && BWAPI::Filter::IsBuilding);
+                    BWAPI::Unitset enemyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsEnemy && !BWAPI::Filter::IsBuilding);
+                    BWAPI::Unitset enemyBuildingsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsEnemy && BWAPI::Filter::IsBuilding);
                     BWAPI::Unitset mineralOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, 
                         BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field ||
                         BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field_Type_2 ||
@@ -642,26 +696,21 @@ namespace UAlbertaBot
                         em  = NEAT_TileType_Simple::sGAS;
                         emb = NEAT_TileType_Simple::sGAS;
                     }
-
-                    for (BWAPI::Unit u : allyUnitsOnTile) {
-                        if (u->getType().isBuilding())
-                        {
-                            fmb = NEAT_TileType_Simple::sUNIT;
-                        }
-                        else
-                        {
-                            fm = NEAT_TileType_Simple::sUNIT;
-                        }
+                    if (allyUnitsOnTile.size() > 0)
+                    {
+                        fm = NEAT_TileType_Simple::sUNIT;
                     }
-                    for (BWAPI::Unit u : enemyUnitsOnTile) {
-                        if (u->getType().isBuilding())
-                        {
-                            emb = NEAT_TileType_Simple::sUNIT;
-                        }
-                        else
-                        {
-                            em = NEAT_TileType_Simple::sUNIT;
-                        }
+                    if (allyBuildingOnTile.size() > 0)
+                    {
+                        fmb = NEAT_TileType_Simple::sUNIT;
+                    }
+                    if (enemyUnitsOnTile.size() > 0)
+                    {
+                        em = NEAT_TileType_Simple::sUNIT;
+                    }
+                    if (enemyBuildingsOnTile.size() > 0)
+                    {
+                        emb = NEAT_TileType_Simple::sUNIT;
                     }
                     friendlyMapData[x][y] = fm;
                     friendlyMapBuildingData[x][y] = fmb;
@@ -760,18 +809,21 @@ namespace UAlbertaBot
 
     bool NEATCommander::canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location)
     {
+        
         if (option < NetworkTerranOptions::Cloaking_Field)
         {
             //unit or building
             BWAPI::UnitType type = ToBWAPIUnit(option);
-
-            if (type.isRefinery()) return BWAPI::Broodwar->canMake(type);
-            else if (type.isAddon()) return BWAPI::Broodwar->canMake(type);
-            else if (type.isBuilding()) {
-                location = the.placer.getBuildLocationNear(Building(type, location), 5);
-                return BWAPI::Broodwar->canMake(type) && BWAPI::Broodwar->canBuildHere(location, type);
+            
+            if (type.isAddon()) return BWAPI::Broodwar->canMake(type);
+            else if (type.isRefinery()) {
+                //Building b = Building(type, location);
+                //location = the.placer.getBuildLocationNear(b, 5);
+                //return BWAPI::Broodwar->canMake(type) && BWAPI::Broodwar->canBuildHere(location, type);
+                auto tp = the.placer.getRefineryPosition();
+                return tp != BWAPI::TilePositions::None;
             }
-            else return BWAPI::Broodwar->canMake(type);
+            return BWAPI::Broodwar->canMake(type);
         }
         else if (option < NetworkTerranOptions::Apollo_Reactor)
         {
@@ -850,7 +902,6 @@ namespace UAlbertaBot
         }
         return BWAPI::TilePositions::None;
     }
-
 
     BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkTerranOptions ut)
     {

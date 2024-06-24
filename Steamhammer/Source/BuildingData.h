@@ -17,7 +17,6 @@ class Building
 {
 public:
     
-    MacroLocation			macroLocation;
     BWAPI::TilePosition     desiredPosition;
     BWAPI::TilePosition     finalPosition;
     BWAPI::UnitType         type;
@@ -34,8 +33,7 @@ public:
     int						buildersSent;		// count workers lost in construction
 
     Building() 
-        : macroLocation		(MacroLocation::Anywhere)
-        , desiredPosition	(BWAPI::TilePositions::None)
+        : desiredPosition	(BWAPI::TilePositions::None)
         , finalPosition     (BWAPI::TilePositions::None)
         , type              (BWAPI::UnitTypes::Unknown)
         , buildingUnit      (nullptr)
@@ -52,8 +50,7 @@ public:
 
     // constructor we use most often
     Building(BWAPI::UnitType t, BWAPI::TilePosition desired)
-        : macroLocation		(MacroLocation::Anywhere)
-        , desiredPosition	(desired)
+        : desiredPosition	(desired)
         , finalPosition		(desired)
         , type              (t)
         , buildingUnit      (nullptr)

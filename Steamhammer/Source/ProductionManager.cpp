@@ -176,13 +176,14 @@ void ProductionManager::manageBuildOrderQueue()
             !currentItem.macroAct.getUnitType().isRefinery() //Refinery seems to not get cleared out of the temporary state...
             )
         {
+            if (!currentItem.macroAct.getTileLocation().isValid()) throw std::exception("wrong coordinate");
             // construct a temporary building object
             Building b(currentItem.macroAct.getUnitType(), currentItem.macroAct.getTileLocation());
-            b.macroLocation = MacroLocation::Tile;
 
             // predict the worker movement to that building location
             // NOTE If the worker is set moving, this sets flag _movingToThisBuildingLocation = true
             //      so that we don't 
+            //Why is this function causing isse?????
             predictWorkerMovement(b);
             break;
         }
@@ -360,10 +361,8 @@ BWAPI::Unit ProductionManager::getProducer(MacroAct act) const
         {
             return _assignedWorkerForThisBuilding;
         }
-        MacroLocation loc = act.getMacroLocation();
-        Building b(act.getUnitType(), the.placer.getMacroLocationTile(loc));
-        b.macroLocation = loc;
-        b.isGasSteal = act.isGasSteal();
+        Building b(act.getUnitType(), act.getTileLocation());
+        b.isGasSteal = false;
         return WorkerManager::Instance().getBuilder(b);
     }
 
@@ -469,11 +468,6 @@ bool ProductionManager::canMakeNow(BWAPI::Unit producer, MacroAct act)
 //      a specific building instance.
 void ProductionManager::predictWorkerMovement(Building & b)
 {
-    if (b.isGasSteal)
-    {
-        return;
-    }
-
     _typeOfUpcomingBuilding = b.type;
 
     // get a possible building location for the building
@@ -489,7 +483,6 @@ void ProductionManager::predictWorkerMovement(Building & b)
     else
     {
         // BWAPI::Broodwar->printf("can't place building %s", UnitTypeName(b.type).c_str());
-
         // If we can't place the building now, we probably can't place it next frame either.
         // Delay for a while before trying again. We could overstep the time limit.
         _delayBuildingPredictionUntilFrame = 13 + the.now();
@@ -567,10 +560,6 @@ int ProductionManager::getFreeGas() const
 //Why is productionManager executing non-production macro commands...
 void ProductionManager::executeCommand(const MacroAct & act)
 {
-    //int x = 40;
-    //int y = 70;
-    //UAB_ASSERT(act.isCommand(), "not a command");
-    
     MacroCommandType cmd = act.getCommandType().getType();
     if (cmd == MacroCommandType::Scout ||
         cmd == MacroCommandType::ScoutIfNeeded ||

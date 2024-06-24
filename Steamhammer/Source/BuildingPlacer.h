@@ -19,7 +19,6 @@ class BuildingPlacer
 
     BWAPI::TilePosition connectedWalkableTileNear(const BWAPI::TilePosition & start) const;
 
-    bool    enemyMacroLocation(MacroLocation loc) const;
     bool	boxOverlapsBase(int x1, int y1, int x2, int y2) const;
     bool	tileBlocksAddon(const BWAPI::TilePosition & position) const;
 
@@ -63,9 +62,6 @@ public:
     bool                buildingOK(const Building & b) const;
     bool                buildingOK(const Building & b, const BWAPI::TilePosition & pos) const;
 
-    BWAPI::TilePosition getExpoLocationTile(MacroLocation loc) const;
-    BWAPI::TilePosition getMacroLocationTile(MacroLocation loc) const;
-    BWAPI::Position     getMacroLocationPos(MacroLocation loc) const;
     BWAPI::TilePosition getRefineryPosition(BWAPI::TilePosition targetPosition) const;
     BWAPI::TilePosition	getRefineryPosition() const;
 

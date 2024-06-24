@@ -27,47 +27,6 @@ StrategyManager & StrategyManager::Instance()
     return instance;
 }
 
-// This is used for terran and protoss.
-const bool StrategyManager::shouldExpandNow() const
-{
-    // if there is no place to expand to, we can't expand
-    // We check mineral expansions only.
-    if (the.map.getNextExpansion(false, true, false) == BWAPI::TilePositions::None)
-    {
-        return false;
-    }
-
-    // if we have idle workers then we need a new expansion
-    if (WorkerManager::Instance().getNumIdleWorkers() > 3)
-    {
-        return true;
-    }
-
-    // if we have excess minerals, expand
-    if (the.self()->minerals() > 600)
-    {
-        return true;
-    }
-
-    size_t numDepots =
-        the.my.all.count(BWAPI::UnitTypes::Terran_Command_Center) +
-        the.my.all.count(BWAPI::UnitTypes::Protoss_Nexus);
-    int minute = the.now() / (24 * 60);
-
-    // we will make expansion N after array[N] minutes have passed
-    std::vector<int> expansionTimes = {4, 10, 15, 20, 24, 28, 35, 40};
-
-    for (size_t i(0); i < expansionTimes.size(); ++i)
-    {
-        if (numDepots < (i+2) && minute > expansionTimes[i])
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void StrategyManager::addStrategy(const std::string & name, Strategy & strategy)
 {
     _strategies[name] = strategy;

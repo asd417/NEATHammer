@@ -88,7 +88,6 @@ void UAlbertaBotModule::onFrame()
         BWAPI::Broodwar->drawTextScreen(10, 60, "%cFile Not Parsed: %c %s", white, green, Config::ConfigFile::ConfigFileLocation.c_str());
         return;
     }
-
     GameCommander::Instance().update();
 }
 

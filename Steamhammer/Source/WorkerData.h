@@ -4,7 +4,6 @@
 
 namespace UAlbertaBot
 {
-enum class MacroLocation;
 
 class WorkerData
 {
@@ -16,10 +15,8 @@ class WorkerPost
 {
 public:
     WorkerPost();
-    WorkerPost(MacroLocation loc);
-    WorkerPost(BWAPI::TilePosition loc);
+    WorkerPost(BWAPI::Position loc);
 
-    MacroLocation location;
     BWAPI::Position position;
 };
 
@@ -70,7 +67,6 @@ public:
     void			setWorkerJob(BWAPI::Unit unit, WorkerJob job);
     void			setWorkerJob(BWAPI::Unit unit, const BWAPI::TilePosition & tile);
 
-    void			setWorkerPost(BWAPI::Unit unit, MacroLocation loc);
     void            setWorkerPost(BWAPI::Unit unit, BWAPI::TilePosition loc);
     void            resetWorkerPost(BWAPI::Unit unit, WorkerJob job);
 

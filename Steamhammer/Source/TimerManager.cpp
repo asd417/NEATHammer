@@ -15,8 +15,6 @@ TimerManager::TimerManager()
     _timerNames.push_back("UnitInfo");	// InformationManager
     _timerNames.push_back("MapGrid");
     _timerNames.push_back("Skill");
-
-    _timerNames.push_back("Search");
     _timerNames.push_back("Worker");
     _timerNames.push_back("Production");
     _timerNames.push_back("Building");
@@ -24,6 +22,9 @@ TimerManager::TimerManager()
     _timerNames.push_back("Micro");
     _timerNames.push_back("Scout");
     _timerNames.push_back("Network Evaluation");
+    _timerNames.push_back("net_ev1");
+    _timerNames.push_back("net_ev2");
+    _timerNames.push_back("net_ev3");
 }
 
 void TimerManager::startTimer(const TimerManager::Type t)

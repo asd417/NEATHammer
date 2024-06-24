@@ -106,15 +106,6 @@ BWAPI::TilePosition BuildingPlacer::connectedWalkableTileNear(const BWAPI::TileP
     return closestTile;
 }
 
-// If we're building at the enemy base, we don't care if our building overlaps a base location.
-bool BuildingPlacer::enemyMacroLocation(MacroLocation loc) const
-{
-    return
-        loc == MacroLocation::Proxy ||
-        loc == MacroLocation::EnemyMain ||
-        loc == MacroLocation::EnemyNatural;
-}
-
 // The rectangle in tile coordinates overlaps with a resource depot location.
 bool BuildingPlacer::boxOverlapsBase(int x1, int y1, int x2, int y2) const
 {
@@ -349,11 +340,6 @@ bool BuildingPlacer::canBuildWithSpace(const BWAPI::TilePosition & position, con
     {
         return false;
     }
-    
-    if (!enemyMacroLocation(b.macroLocation) && boxOverlapsBase(x1, y1, x2, y2))
-    {
-        return false;
-    }
 
     // Every tile must be buildable and unreserved.
     for (int x = x1; x <= x2; ++x)
@@ -368,231 +354,6 @@ bool BuildingPlacer::canBuildWithSpace(const BWAPI::TilePosition & position, con
     }
 
     return true;
-}
-
-// Buildings of these types should be grouped together,
-// not grouped with buildings of other types.
-bool BuildingPlacer::groupTogether(BWAPI::UnitType type) const
-{
-    return
-        type == BWAPI::UnitTypes::Terran_Barracks ||
-        type == BWAPI::UnitTypes::Terran_Factory ||
-        type == BWAPI::UnitTypes::Protoss_Gateway;
-}
-
-// Seek a location on the edge of the map.
-// NOTE
-//   This is intended for supply depots and tech buildings.
-//   It may go wrong if given a building which can take addons.
-BWAPI::TilePosition BuildingPlacer::findEdgeLocation(const Building & b) const
-{
-    // The building's tile position is its upper left corner.
-    int rightEdge = BWAPI::Broodwar->mapWidth() - b.type.tileWidth();
-    int bottomEdge = BWAPI::Broodwar->mapHeight() - b.type.tileHeight();
-
-    for (const BWAPI::TilePosition & tile : the.map.getClosestTilesTo(the.bases.myMain()->getTilePosition()))
-    {
-        // If the position is too far away, skip it.
-        if (the.zone.at(tile) != the.zone.at(the.bases.myMain()->getTilePosition()) ||
-            tile.getApproxDistance(the.bases.myMain()->getTilePosition()) > 18 * 32)
-        {
-            continue;
-        }
-
-        // Left.
-        if (tile.x == 0)
-        {
-            if (canBuildWithSpace(tile, b, 0) && freeOnRight(tile, b.type))
-            {
-                return tile;
-            }
-        }
-
-        // Top.
-        if (tile.y == 0)
-        {
-            if (canBuildWithSpace(tile, b, 0) && freeOnBottom(tile, b.type))
-            {
-                return tile;
-            }
-        }
-
-        // Right.
-        else if (tile.x + b.type.tileWidth() == BWAPI::Broodwar->mapWidth())
-        {
-            if (canBuildWithSpace(tile, b, 0) && freeOnLeft(tile, b.type))
-            {
-                return tile;
-            }
-        }
-
-        // Bottom.
-        // NOTE The map's bottom row of tiles is not buildable (though other edges are).
-        else if (tile.y + b.type.tileHeight() == BWAPI::Broodwar->mapHeight() - 1)
-        {
-            if (canBuildWithSpace(tile, b, 0) && freeOnTop(tile, b.type))
-            {
-                return tile;
-            }
-        }
-    }
-
-    // It's not on an edge.
-    return BWAPI::TilePositions::None;
-}
-
-// Try to put a pylon at every base.
-BWAPI::TilePosition BuildingPlacer::findPylonlessBaseLocation(const Building & b) const
-{
-    if (b.macroLocation != MacroLocation::Anywhere)
-    {
-        // The location is specified, don't override it.
-        return BWAPI::TilePositions::None;
-    }
-
-    for (Base * base : the.bases.getAll())
-    {
-        // NOTE We won't notice a pylon that is in the building manager but not started yet.
-        //      It's not a problem.
-        if (base->getOwner() == the.self() && !base->getPylon())
-        {
-            Building pylon = b;
-            pylon.desiredPosition = BWAPI::TilePosition(base->getFrontTile());
-            return findAnyLocation(pylon, 0);
-        }
-    }
-
-    return BWAPI::TilePositions::None;
-}
-
-BWAPI::TilePosition BuildingPlacer::findGroupedLocation(const Building & b) const
-{
-    // Some buildings should not be clustered.
-    // That includes resource depots and refineries, which are placed by different code.
-    if (b.type == BWAPI::UnitTypes::Terran_Bunker ||
-        b.type == BWAPI::UnitTypes::Terran_Missile_Turret ||
-        b.type == BWAPI::UnitTypes::Protoss_Pylon ||
-        b.type == BWAPI::UnitTypes::Protoss_Photon_Cannon ||
-        b.type == BWAPI::UnitTypes::Zerg_Sunken_Colony ||
-        b.type == BWAPI::UnitTypes::Zerg_Spore_Colony ||
-        b.type == BWAPI::UnitTypes::Zerg_Creep_Colony ||
-        b.type == BWAPI::UnitTypes::Zerg_Hatchery)
-    {
-        return BWAPI::TilePositions::None;
-    }
-
-    // Some buildings are best grouped with others of the same type.
-    const bool sameType = groupTogether(b.type);
-
-    BWAPI::Unitset choices;
-    for (BWAPI::Unit building : the.self()->getUnits())
-    {
-        if (building->getType().isBuilding() &&
-            building->getType() != BWAPI::UnitTypes::Protoss_Pylon &&
-            the.zone.at(building->getTilePosition()) == the.zone.at(b.desiredPosition) &&
-            (building->getType().tileWidth() == b.type.tileWidth() || building->getType().tileHeight() == b.type.tileHeight()))
-        {
-            if (sameType)
-            {
-                if (b.type == building->getType() && freeOnAllSides(building))
-                {
-                    choices.insert(building);
-                }
-            }
-            else
-            {
-                if (!groupTogether(building->getType()) && freeOnAllSides(building))
-                {
-                    choices.insert(building);
-                }
-            }
-        }
-    }
-
-    for (BWAPI::Unit choice : choices)
-    {
-        BWAPI::TilePosition tile;
-
-        if (choice->getType().tileWidth() == b.type.tileWidth())
-        {
-            // Above.
-            tile = choice->getTilePosition() + BWAPI::TilePosition(0, -b.type.tileHeight());
-            if (canBuildWithSpace(tile, b, 0) &&
-                freeOnTop(tile, b.type) &&
-                freeOnLeft(tile, b.type) &&
-                freeOnRight(tile, b.type))
-            {
-                return tile;
-            }
-
-            // Below.
-            tile = choice->getTilePosition() + BWAPI::TilePosition(0, choice->getType().tileHeight());
-            if (canBuildWithSpace(tile, b, 0) &&
-                freeOnBottom(tile, b.type) &&
-                freeOnLeft(tile, b.type) &&
-                freeOnRight(tile, b.type))
-            {
-                return tile;
-            }
-        }
-
-        // Buildings that may have addons in the future should be grouped vertically if at all.
-        if (choice->getType().tileHeight() == b.type.tileHeight() &&
-            !b.type.canBuildAddon() &&
-            !choice->getType().canBuildAddon())
-        {
-            // Left.
-            tile = choice->getTilePosition() + BWAPI::TilePosition(-b.type.tileWidth(), 0);
-            if (canBuildWithSpace(tile, b, 0) &&
-                freeOnTop(tile, b.type) &&
-                freeOnLeft(tile, b.type) &&
-                freeOnBottom(tile, b.type))
-            {
-                return tile;
-            }
-
-            // Right.
-            tile = choice->getTilePosition() + BWAPI::TilePosition(0, choice->getType().tileHeight());
-            if (canBuildWithSpace(tile, b, 0) &&
-                freeOnBottom(tile, b.type) &&
-                freeOnLeft(tile, b.type) &&
-                freeOnTop(tile, b.type))
-            {
-                return tile;
-            }
-        }
-    }
-    
-    return BWAPI::TilePositions::None;
-}
-
-// Some buildings get special-case placement.
-BWAPI::TilePosition BuildingPlacer::findSpecialLocation(const Building & b) const
-{
-    BWAPI::TilePosition tile = BWAPI::TilePositions::None;
-
-    if (b.type == BWAPI::UnitTypes::Terran_Supply_Depot ||
-        b.type == BWAPI::UnitTypes::Terran_Academy ||
-        b.type == BWAPI::UnitTypes::Terran_Armory)
-    {
-        // These buildings are all 3x2 and will line up neatly.
-        tile = findEdgeLocation(b);
-        if (!tile.isValid())
-        {
-            tile = findGroupedLocation(b);
-        }
-    }
-    
-    else if (b.type == BWAPI::UnitTypes::Protoss_Pylon)
-    {
-        tile = findPylonlessBaseLocation(b);
-    }
-    else
-    {
-        tile = findGroupedLocation(b);
-    }
-
-    return tile;
 }
 
 BWAPI::TilePosition BuildingPlacer::findAnyLocation(const Building & b, int extraSpace) const
@@ -646,24 +407,18 @@ BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(const Building & b, int
 {
     // BWAPI::Broodwar->printf("Building Placer seeks position near %d, %d", b.desiredPosition.x, b.desiredPosition.y);
 
-    BWAPI::TilePosition tile = BWAPI::TilePositions::None;
+    BWAPI::TilePosition tile = b.desiredPosition;
     
     //tile = findSpecialLocation(b);
-    
-    try {
-        if (!tile.isValid())
-        {
-            tile = findAnyLocation(b, extraSpace);
-        }
-        // Let Bases decide whether to change which base is the main base.
-        the.bases.checkBuildingPosition(b.desiredPosition, tile);
+    if (b.type.isRefinery()) {
+        BWAPI::Unit g = BWAPI::Broodwar->getClosestUnit({ tile.x * 32, tile.y * 32 }, BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Vespene_Geyser);
+        tile = g->getTilePosition();
     }
-    catch (std::exception e)
+    else
     {
-        //UAB_ASSERT_WARNING(false, "Error BuildingPlacer::getBuildLocationNear()");
-        tile = BWAPI::TilePositions::None;
+        tile = findAnyLocation(b, extraSpace);
     }
-
+    //the.bases.checkBuildingPosition(b.desiredPosition, tile);
     return tile;		// may be None
 }
 
@@ -735,140 +490,6 @@ bool BuildingPlacer::buildingOK(const Building & b, const BWAPI::TilePosition & 
         canBuildHere(pos, b);
 }
 
-// Find the desired location for a command center, nexus, or hatchery from its macro location.
-// It's usually the same as usual, but the "Anywhere" default is different.
-BWAPI::TilePosition BuildingPlacer::getExpoLocationTile(MacroLocation loc) const
-{
-    if (loc == MacroLocation::Anywhere)
-    {
-        if (the.bases.myNatural() &&
-            the.bases.myNatural()->owner == the.neutral() &&
-            the.bases.myStart()->owner == the.self())
-        {
-            loc = MacroLocation::Natural;
-        }
-        else
-        {
-            loc = MacroLocation::Expo;
-        }
-    }
-
-    return getMacroLocationTile(loc);
-}
-
-// Generic macro locations on the map.
-// If used to place a building, the expectation in most cases is that the returned tile
-// will be a starting point; we'll look for an open area nearby to build.
-// NOTE Some cases must be treated as special cases, e.g. refinery building locations.
-//      See BuildingManager::getBuildingLocation().
-BWAPI::TilePosition BuildingPlacer::getMacroLocationTile(MacroLocation loc) const
-{
-    if (loc == MacroLocation::Main)
-    {
-        // A main base building, including macro hatchery.
-        // The main base is always set, even if we don't have any building there at the moment.
-        return the.bases.myMain()->getTilePosition();
-    }
-    else if (loc == MacroLocation::Natural)
-    {
-        Base * natural = the.bases.myNatural();
-        if (natural)
-        {
-            return natural->getTilePosition();
-        }
-    }
-    else if (loc == MacroLocation::Front)
-    {
-        BWAPI::TilePosition front = the.bases.frontTile();
-        if (front.isValid())
-        {
-            return front;
-        }
-    }
-    else if (loc == MacroLocation::Expo)
-    {
-        // Mineral and gas base.
-        BWAPI::TilePosition pos = the.map.getNextExpansion(false, true, true);
-        if (pos.isValid())
-        {
-            return pos;
-        }
-    }
-    else if (loc == MacroLocation::MinOnly)
-    {
-        // Mineral base with or without gas geyser.
-        BWAPI::TilePosition pos = the.map.getNextExpansion(false, true, false);
-        if (pos.isValid())
-        {
-            return pos;
-        }
-    }
-    else if (loc == MacroLocation::GasOnly)
-    {
-        // Gas base with or without minerals.
-        BWAPI::TilePosition pos = the.map.getNextExpansion(false, false, true);
-        if (pos.isValid())
-        {
-            return pos;
-        }
-    }
-    else if (loc == MacroLocation::Hidden)
-    {
-        // "Hidden" mineral and gas base.
-        BWAPI::TilePosition pos = the.map.getNextExpansion(true, true, true);
-        if (pos.isValid())
-        {
-            return pos;
-        }
-    }
-    else if (loc == MacroLocation::Center)
-    {
-        // Near the center of the map. Find a walkable tile connected to the start.
-        return connectedWalkableTileNear(BWAPI::TilePosition(BWAPI::Broodwar->mapWidth() / 2, BWAPI::Broodwar->mapHeight() / 2));
-    }
-    else if (loc == MacroLocation::Proxy)
-    {
-        if (the.bases.enemyStart())
-        {
-            // We know where the enemy is. We can proxy in or close to the enemy base.
-            // Other code should try to find the enemy base first!
-            BWAPI::TilePosition proxy = getProxyPosition(the.bases.enemyStart());
-            if (proxy.isValid())
-            {
-                return proxy;
-            }
-        }
-        // We don't know where the enemy is, or can't find a close proxy position,
-        // but we can at least proxy to the center of the map.
-        return getMacroLocationTile(MacroLocation::Center);
-    }
-    else if (loc == MacroLocation::EnemyMain)
-    {
-        if (the.bases.enemyStart())
-        {
-            return the.bases.enemyStart()->getTilePosition();
-        }
-        return getMacroLocationTile(MacroLocation::Center);
-    }
-    else if (loc == MacroLocation::EnemyNatural)
-    {
-        if (the.bases.enemyStart() && the.bases.enemyStart()->getNatural())
-        {
-            return the.bases.enemyStart()->getNatural()->getTilePosition();
-        }
-        return getMacroLocationTile(MacroLocation::Center);
-    }
-
-    // Default: Build in the current main base, which is guaranteed to exist (though it may be empty or in enemy hands).
-    // MacroLocation::Anywhere falls through to here. So does MacroLocation::Tile.
-    return the.bases.myMain()->getTilePosition();
-}
-
-BWAPI::Position BuildingPlacer::getMacroLocationPos(MacroLocation loc) const
-{
-    return TileCenter(getMacroLocationTile(loc));
-}
-
 
 /// <summary>
 /// Get Closest Geyser position from the given position
@@ -878,7 +499,7 @@ BWAPI::Position BuildingPlacer::getMacroLocationPos(MacroLocation loc) const
 BWAPI::TilePosition BuildingPlacer::getRefineryPosition(BWAPI::TilePosition targetPosition) const
 {
     BWAPI::TilePosition closestGeyser = BWAPI::TilePositions::None;
-    int minGeyserDistanceFromHome = 100000;
+    int minGeyserDistanceFromHome = 1000000;
     BWAPI::Position homePosition = { targetPosition.x, targetPosition.y };
 
     for (BWAPI::Unit geyser : BWAPI::Broodwar->getGeysers())

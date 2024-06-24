@@ -35,6 +35,10 @@ FeedForwardNetwork::FeedForwardNetwork(json& inodes, json& onodes)
     }
 }
 
+void FeedForwardNetwork::FinishInitializing()
+{
+}
+
 void FeedForwardNetwork::AddNodeEval(const json& nodeEval)
 {
     NodeEval ne = { nodeEval["node"], nodeEval["activation_function"], nodeEval["aggregation_function"] , nodeEval["bias"], nodeEval["response"]};
@@ -42,6 +46,10 @@ void FeedForwardNetwork::AddNodeEval(const json& nodeEval)
         ne.AddConnection(c["inode"], c["weight"]);
     }
     nodeEvals.push_back(ne);
+}
+
+void FeedForwardNetwork::Reset()
+{
 }
 
 const std::vector<double>& FeedForwardNetwork::getOutputVector()
@@ -195,4 +203,107 @@ AggrFuncPtr NodeEval::getAggregationFunction(const char* name) {
     if (!strcmp(name, "mean_aggregation")) return mean_aggregation;
     throw std::invalid_argument("Unknown aggregation function");
     return nullptr;
+}
+
+RecurrentNetwork::RecurrentNetwork(json& inodes, json& onodes)
+{
+    for (int i : inodes) {
+        inputNodes.push_back(i);
+    }
+    for (int o : onodes) {
+        outputNodes.push_back(o);
+    }
+    for (auto& v : valuesArray)
+    {
+        for (int i : inodes) {
+            v[i] = 0.0f;
+        }
+
+        for (int o : onodes) {
+            v[o] = 0.0f;
+        }
+    }
+}
+
+void RecurrentNetwork::AddNodeEval(const json& nodeEval)
+{
+    NodeEval ne = { nodeEval["node"], nodeEval["activation_function"], nodeEval["aggregation_function"] , nodeEval["bias"], nodeEval["response"] };
+    for (auto& c : nodeEval["inputs"]) {
+        ne.AddConnection(c["inode"], c["weight"]);
+    }
+    nodeEvals.push_back(ne);
+}
+
+/// <summary>
+/// Call when all node_evals have been added
+/// </summary>
+void RecurrentNetwork::FinishInitializing()
+{
+    for (auto& v : valuesArray)
+    {
+        for (auto& ne : nodeEvals)
+        {
+            v[ne.node] = 0.0f;
+            for (auto& c : ne.connections)
+            {
+                v[c.inputNode] = 0.0f;
+            }
+        }
+    }
+}
+
+void RecurrentNetwork::Reset()
+{
+    std::vector<int> keys;
+    for (auto& v : valuesArray)
+    {
+        for (auto& k : v)
+        {
+            keys.push_back(k.first);
+        }
+    }
+    for (auto& k : keys)
+    {
+        valuesArray[0][k] = 0.0f;
+        valuesArray[1][k] = 0.0f;
+    }
+    active = 0;
+}
+
+const std::vector<double>& RecurrentNetwork::getOutputVector()
+{
+    return outputs;
+}
+
+
+bool RecurrentNetwork::IsNodeEvalEmpty()
+{
+    return nodeEvals.size() == 0;
+}
+
+void Network::Activate(std::vector<double>& inputValues)
+{
+}
+
+const std::vector<double>& Network::getOutputVector()
+{
+    throw std::exception("Properly inherit this class instead");
+    return {};
+}
+
+void Network::AddNodeEval(const json& nodeEval)
+{
+}
+
+void Network::FinishInitializing()
+{
+}
+
+void Network::Reset()
+{
+}
+
+bool Network::IsNodeEvalEmpty()
+{
+    return false;
 }

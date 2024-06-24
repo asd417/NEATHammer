@@ -634,8 +634,8 @@ void Bases::update()
 // is full and we need to choose a new main base.
 void Bases::checkBuildingPosition(const BWAPI::TilePosition & desired, const BWAPI::TilePosition & actual)
 {
-    UAB_ASSERT(desired.isValid(), "bad location");
-    if (!desired.isValid()) throw std::exception("Bad location");
+    //UAB_ASSERT(desired.isValid(), "bad location");
+    //if (!desired.isValid()) throw std::exception("Bad location");
     if (the.zone.at(desired) == the.zone.at(mainBase->getTilePosition()))
     {
         // We tried to place in the main base, so let's keep checking.

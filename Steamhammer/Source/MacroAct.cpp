@@ -12,66 +12,6 @@ using namespace UAlbertaBot;
 // Map unit type names to unit types.
 static std::map<std::string, BWAPI::UnitType> _unitTypesByName;
 
-MacroLocation MacroAct::getMacroLocationFromString(const std::string & s) const
-{
-    if (s == "main")
-    {
-        return MacroLocation::Main;
-    }
-    if (s == "natural")
-    {
-        return MacroLocation::Natural;
-    }
-    if (s == "front")
-    {
-        return MacroLocation::Front;
-    }
-    if (s == "macro")
-    {
-        return MacroLocation::Macro;
-    }
-    if (s == "expo")
-    {
-        return MacroLocation::Expo;
-    }
-    if (s == "min only")
-    {
-        return MacroLocation::MinOnly;
-    }
-    if (s == "gas only")
-    {
-        return MacroLocation::GasOnly;
-    }
-    if (s == "hidden")
-    {
-        return MacroLocation::Hidden;
-    }
-    if (s == "center")
-    {
-        return MacroLocation::Center;
-    }
-    if (s == "proxy")
-    {
-        return MacroLocation::Proxy;
-    }
-    if (s == "enemy main")
-    {
-        return MacroLocation::EnemyMain;
-    }
-    if (s == "enemy natural")
-    {
-        return MacroLocation::EnemyNatural;
-    }
-    if (s == "gas steal")
-    {
-        return MacroLocation::GasSteal;
-    }
-
-    //UAB_ASSERT(false, "config file - bad location '@ %s'", s.c_str());
-
-    return MacroLocation::Anywhere;
-}
-
 void MacroAct::initializeUnitTypesByName()
 {
     if (_unitTypesByName.size() == 0)       // if not already initialized
@@ -98,7 +38,6 @@ BWAPI::UnitType MacroAct::getUnitTypeFromString(const std::string & s) const
 
 MacroAct::MacroAct() 
     : _type(MacroActs::Default)
-    , _macroLocation(MacroLocation::Anywhere)
     , _tileLocation(BWAPI::TilePositions::None)
     , _parent(nullptr)
 {
@@ -107,26 +46,19 @@ MacroAct::MacroAct()
 MacroAct::MacroAct (BWAPI::UnitType t) 
     : _unitType(t)
     , _type(MacroActs::Unit) 
-    , _macroLocation(MacroLocation::Anywhere)
     , _tileLocation(BWAPI::TilePositions::None)
     , _parent(nullptr)
 {
 }
 
-MacroAct::MacroAct(BWAPI::UnitType t, MacroLocation loc)
+/// <summary>
+/// For placing a building precisely on a pre-chosen tile.
+/// </summary>
+/// <param name="t"></param>
+/// <param name="tile"></param>
+MacroAct::MacroAct(BWAPI::UnitType t, BWAPI::TilePosition tile)
     : _unitType(t)
     , _type(MacroActs::Unit)
-    , _macroLocation(loc)
-    , _tileLocation(BWAPI::TilePositions::None)
-    , _parent(nullptr)
-{
-}
-
-// For placing a building precisely on a pre-chosen tile.
-MacroAct::MacroAct(BWAPI::UnitType t, const BWAPI::TilePosition & tile)
-    : _unitType(t)
-    , _type(MacroActs::Unit)
-    , _macroLocation(MacroLocation::Tile)
     , _tileLocation(tile)
     , _parent(nullptr)
 {
@@ -135,7 +67,6 @@ MacroAct::MacroAct(BWAPI::UnitType t, const BWAPI::TilePosition & tile)
 MacroAct::MacroAct(BWAPI::UnitType t, BWAPI::Unit parent) 
     : _unitType(t)
     , _type(MacroActs::Unit)
-    , _macroLocation(MacroLocation::Anywhere)
     , _tileLocation(BWAPI::TilePositions::None)
     , _parent(parent)
 {
@@ -144,8 +75,7 @@ MacroAct::MacroAct(BWAPI::UnitType t, BWAPI::Unit parent)
 MacroAct::MacroAct(BWAPI::TechType t)
     : _techType(t)
     , _type(MacroActs::Tech) 
-    , _macroLocation(MacroLocation::Anywhere)
-    , _tileLocation(BWAPI::TilePositions::None)
+    , _tileLocation({0,0})
     , _parent(nullptr)
 {
 }
@@ -153,8 +83,7 @@ MacroAct::MacroAct(BWAPI::TechType t)
 MacroAct::MacroAct(BWAPI::UpgradeType t) 
     : _upgradeType(t)
     , _type(MacroActs::Upgrade) 
-    , _macroLocation(MacroLocation::Anywhere)
-    , _tileLocation(BWAPI::TilePositions::None)
+    , _tileLocation({ 0,0 })
     , _parent(nullptr)
 {
 }
@@ -162,7 +91,6 @@ MacroAct::MacroAct(BWAPI::UpgradeType t)
 MacroAct::MacroAct(MacroCommandType t)
     : _macroCommandType(t)
     , _type(MacroActs::Command)
-    , _macroLocation(MacroLocation::Anywhere)
     , _tileLocation(BWAPI::TilePositions::None)
     , _parent(nullptr)
 {
@@ -171,7 +99,6 @@ MacroAct::MacroAct(MacroCommandType t)
 UAlbertaBot::MacroAct::MacroAct(MacroCommand t, const BWAPI::TilePosition& tile)
     : _macroCommandType(t)
     , _type(MacroActs::Command)
-    , _macroLocation(MacroLocation::Tile)
     , _tileLocation(tile)
     , _parent(nullptr)
 {
@@ -180,7 +107,6 @@ UAlbertaBot::MacroAct::MacroAct(MacroCommand t, const BWAPI::TilePosition& tile)
 MacroAct::MacroAct(MacroCommandType t, int amount)
     : _macroCommandType(t, amount)
     , _type(MacroActs::Command)
-    , _macroLocation(MacroLocation::Anywhere)
     , _tileLocation(BWAPI::TilePositions::None)
     , _parent(nullptr)
 {
@@ -189,7 +115,6 @@ MacroAct::MacroAct(MacroCommandType t, int amount)
 MacroAct::MacroAct(MacroCommandType t, BWAPI::UnitType type)
     : _macroCommandType(t, type)
     , _type(MacroActs::Command)
-    , _macroLocation(MacroLocation::Anywhere)
     , _tileLocation(BWAPI::TilePositions::None)
     , _parent(nullptr)
 {
@@ -278,11 +203,6 @@ bool MacroAct::isSupply() const
         || _unitType == BWAPI::UnitTypes::Zerg_Overlord);
 }
 
-bool MacroAct::isGasSteal() const
-{
-    return getMacroLocation() == MacroLocation::GasSteal;
-}
-
 BWAPI::UnitType MacroAct::getUnitType() const
 {
     //UAB_ASSERT(_type == MacroActs::Unit, "getUnitType of non-unit");
@@ -307,14 +227,6 @@ MacroCommand MacroAct::getCommandType() const
     return _macroCommandType;
 }
 
-MacroLocation MacroAct::getMacroLocation() const
-{
-    /*if (isBuilding() && getUnitType() == BWAPI::UnitTypes::Zerg_Hatchery && StrategyBossZerg::Instance().hiddenBaseNext())
-    {
-        return MacroLocation::Hidden;
-    }*/
-    return _macroLocation;
-}
 
 BWAPI::TilePosition MacroAct::getTileLocation() const
 {
@@ -714,17 +626,13 @@ void MacroAct::produce(BWAPI::Unit producer) const
     else if (isBuilding() && UnitUtil::NeedsWorkerBuildingType(getUnitType()))
     {
         BWAPI::UnitType type = getUnitType();
-        BWAPI::TilePosition desiredPosition;
-        try {
-            Building b = Building(type, _tileLocation);
-            b.macroLocation = MacroLocation::Tile;
-            desiredPosition = BuildingManager::Instance().getBuildingLocation(b);
-
-            BuildingManager::Instance().addBuildingTask(*this, desiredPosition, producer, false);
-        } catch (std::exception e)
-        {
-            throw std::exception("Error in MacroAct::produce()!");
-        }
+        BWAPI::TilePosition desiredPosition = _tileLocation;
+        
+        Building b = Building(type, _tileLocation);
+        b.desiredPosition = _tileLocation;
+        desiredPosition = BuildingManager::Instance().getBuildingLocation(b);
+        
+        if(desiredPosition != BWAPI::TilePositions::None) BuildingManager::Instance().addBuildingTask(*this, desiredPosition, producer, false);
     }
     // A non-building unit, or a morphed zerg building.
     else if (isUnit())

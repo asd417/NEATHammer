@@ -5,6 +5,7 @@
 #include "time.h"
 #include <vector>
 #include <array>
+#include "TimerManager.h"
 namespace UAlbertaBot
 {
 	enum class NetworkTerranOptions {
@@ -287,9 +288,10 @@ namespace UAlbertaBot
 		void onUnitShow(BWAPI::Unit unit);
 
 		void drawDebug(int x, int y);
-
+		void setTimeManager(TimerManager* t);
 	private:
 		NEATCommander();
+		TimerManager* timer = nullptr;
 		int mapWidth;
 		int mapHeight;
 		int lastMineral;
@@ -336,7 +338,7 @@ namespace UAlbertaBot
 		std::array<std::array<int, 16>, 16> friendlyMapData{};
 		std::array<std::array<int, 16>, 16> friendlyMapBuildingData{};
 
-		FeedForwardNetwork* network;
+		Network* network;
 		std::vector<double> inputVector{};
 		
 

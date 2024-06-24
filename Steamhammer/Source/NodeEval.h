@@ -35,14 +35,67 @@ private:
 	static AggrFuncPtr getAggregationFunction(const char*);
 };
 
-class FeedForwardNetwork {
+class Network {
+public:
+	virtual void						Activate(std::vector<double>& inputValues);
+	virtual const std::vector<double>&	getOutputVector();
+	virtual void						AddNodeEval(const json& nodeEval);
+	virtual void						FinishInitializing();
+	virtual void						Reset();
+	virtual bool						IsNodeEvalEmpty();
+};
+
+class RecurrentNetwork : public Network {
+public:
+	RecurrentNetwork(json& inodes, json& onodes);
+	void AddNodeEval(const json& nodeEval) override;
+	void FinishInitializing() override;
+	void Reset() override;
+
+	virtual void Activate(std::vector<double>& inputValues) override
+	{
+		if (inputValues.size() != inputNodes.size()) throw std::invalid_argument("Input Vector size does not match Network Input size!");
+		auto& iv = valuesArray[active];
+		auto& ov = valuesArray[1 - active];
+		active = 1 - active;
+
+		for (int i = 0; i < inputNodes.size(); i++) {
+			iv[inputNodes[i]] = inputValues[i];
+			ov[inputNodes[i]] = inputValues[i];
+		}
+		for (const NodeEval& ne : nodeEvals) {
+			std::vector<double> node_inputs{};
+			for (Connection c : ne.connections) {
+				node_inputs.push_back(iv[c.inputNode] * c.weight);
+			}
+			double sum = ne.aggrFuncVal(node_inputs);
+			ov[ne.node] = ne.actiFuncVal(ne.bias + ne.response * sum);
+		}
+		for (int o : outputNodes)
+		{
+			outputs.push_back(ov[o]);
+		}
+	}
+	const std::vector<double>& RecurrentNetwork::getOutputVector() override;
+	bool IsNodeEvalEmpty() override;
+
+private:
+	int active = 0;
+	std::vector<int> inputNodes;
+	std::vector<int> outputNodes;
+	std::vector<NodeEval> nodeEvals;
+	std::array<std::unordered_map<int, double>,2> valuesArray;
+
+	std::vector<double> outputs;
+};
+
+class FeedForwardNetwork : public Network {
 public:
 	FeedForwardNetwork(json& inodes, json& onodes);
-
-	void AddNodeEval(const json& nodeEval);
-
-	template<typename T>
-	void Activate(std::vector<T>& inputValues)
+	void FinishInitializing() override;
+	void AddNodeEval(const json& nodeEval) override;
+	void Reset() override;
+	void Activate(std::vector<double>& inputValues) override
 	{
 		outputs.clear();
 		if (inputValues.size() != inputNodes.size()) throw std::invalid_argument("Input Vector size does not match Network Input size!");
@@ -63,8 +116,8 @@ public:
 		}
 	}
 
-	const std::vector<double>& getOutputVector();
-	bool IsNodeEvalEmpty();
+	const std::vector<double>& getOutputVector() override;
+	bool IsNodeEvalEmpty() override;
 	int getOutputCount() const {
 		return outputCount;
 	}

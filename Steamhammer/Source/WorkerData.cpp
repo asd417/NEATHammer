@@ -6,20 +6,12 @@
 using namespace UAlbertaBot;
 
 WorkerData::WorkerPost::WorkerPost()
-    : location(MacroLocation::Anywhere)
-    , position(the.placer.getMacroLocationPos(MacroLocation::Anywhere))
+    : position({0,0})
 {
 }
 
-WorkerData::WorkerPost::WorkerPost(MacroLocation loc)
-    : location(loc)
-    , position(the.placer.getMacroLocationPos(loc))
-{
-}
-
-WorkerData::WorkerPost::WorkerPost(BWAPI::TilePosition loc)
-    : location(MacroLocation::Tile)
-    , position({ loc.x * 32, loc.y * 32 })
+WorkerData::WorkerPost::WorkerPost(BWAPI::Position loc)
+    : position(loc)
 {
 }
 
@@ -192,7 +184,8 @@ void WorkerData::setWorkerPost(BWAPI::Unit unit, BWAPI::TilePosition loc)
 
     clearPreviousJob(unit);
     workerJobMap[unit] = Posted;
-    workerPostMap[unit] = WorkerData::WorkerPost(loc);
+    BWAPI::Position p = { loc.x * 32, loc.y * 32 };
+    workerPostMap[unit] = WorkerData::WorkerPost(p);
 }
 
 // Give it a Posted or BuildPosted job without updating the map position.

@@ -4,23 +4,6 @@
 
 namespace UAlbertaBot
 {
-enum class MacroLocation
-    { Anywhere     // default location
-    , Main         // macro hatchery or main base building
-    , Natural      // "natural" first expansion base
-    , Front        // front line base (main or natural, as available)
-    , Macro        // where production is needed
-    , Expo         // mineral and gas expansion
-    , MinOnly      // mineral expansion, gas optional
-    , GasOnly      // gas expansion, minerals optional
-    , Hidden       // mineral and gas expansion far from both sides' main bases
-    , Center       // middle of the map
-    , Proxy        // hidden in or in range of the enemy main or natural
-    , EnemyMain    // in plain sight
-    , EnemyNatural // in plain sight
-    , GasSteal     // this is a gas steal, a unit type must be a refinery type
-    , Tile         // on or near a specific tile
-    };
 
 //namespace MacroActs
 //{
@@ -47,24 +30,20 @@ class MacroAct
     MacroCommand		_macroCommandType;
     BWAPI::Unit         _parent;
 
-    MacroLocation		_macroLocation;     //Rarely if not never used by NEATCommander
     BWAPI::TilePosition _tileLocation;      // Used widely by NEATCommander
 
     
 
     void                initializeUnitTypesByName();
-    MacroLocation		getMacroLocationFromString(const std::string & s) const;
     BWAPI::UnitType     getUnitTypeFromString(const std::string & s) const;
     
 public:
     double confidence;
     MacroAct();
-    MacroAct(const std::string & name);
     MacroAct(BWAPI::UnitType t);
-    MacroAct(BWAPI::UnitType t, MacroLocation loc);
     MacroAct(BWAPI::UnitType t, BWAPI::Unit parent);
 
-    MacroAct(BWAPI::UnitType t, const BWAPI::TilePosition & tile);
+    MacroAct(BWAPI::UnitType t, BWAPI::TilePosition tile);
     MacroAct(BWAPI::TechType t);
     MacroAct(BWAPI::UpgradeType t);
     MacroAct(MacroCommand t, const BWAPI::TilePosition& tile);
@@ -93,7 +72,6 @@ public:
     BWAPI::TechType getTechType() const;
     BWAPI::UpgradeType getUpgradeType() const;
     MacroCommand getCommandType() const;
-    MacroLocation getMacroLocation() const;
     BWAPI::TilePosition getTileLocation() const;
 
     int supplyRequired() const;
