@@ -191,27 +191,83 @@ namespace UAlbertaBot
         BWAPI::Broodwar->drawTextScreen(startX, startY, "NetworkOutputs:");
         y += 12;
         startY += 12;
-        for (int i = 0; i < network->getOutputCount(); i++) {
-            double v = network->getOutputVector()[i];
-            BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", v);
-            y += 12;
-            if (i == 20)
-            {
-                x += 60;
-                y = startY;
-            }
-            if (i == 40)
-            {
-                x += 60;
-                y = startY;
-            }
-            if (i == 60)
-            {
-                x += 60;
-                y = startY;
-            }
 
+        int c = 0;
+        for (const double& bo : builderOutputs)
+        {
+            BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", bo);
+            y += 12;
+            c++;
+            if (c == 20)
+            {
+                x += 60;
+                y = startY;
+            }
+            if (c == 40)
+            {
+                x += 60;
+                y = startY;
+            }
         }
+
+        for (const double& bo : builderOutputs)
+        {
+            BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", bo);
+            y += 12;
+            c++;
+            if (c == 20)
+            {
+                x += 60;
+                y = startY;
+            }
+            if (c == 40)
+            {
+                x += 60;
+                y = startY;
+            }
+        }
+        
+        for (const double& bo : macroCommandTypeOutputs)
+        {
+            BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", bo);
+            y += 12;
+            c++;
+            if (c == 20)
+            {
+                x += 60;
+                y = startY;
+            }
+            if (c == 40)
+            {
+                x += 60;
+                y = startY;
+            }
+        }
+        
+        BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", tilePosX);
+        y += 12;
+        BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", tilePosY);
+
+        //for (int i = 0; i < network->getOutputCount(); i++) {
+        //    double v = network->getOutputVector()[i];
+        //    BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", v);
+        //    y += 12;
+        //    if (i == 20)
+        //    {
+        //        x += 60;
+        //        y = startY;
+        //    }
+        //    if (i == 40)
+        //    {
+        //        x += 60;
+        //        y = startY;
+        //    }
+        //    if (i == 60)
+        //    {
+        //        x += 60;
+        //        y = startY;
+        //    }
+        //}
     
     }
     void NEATCommander::evaluate()
@@ -437,6 +493,8 @@ namespace UAlbertaBot
         //Looked through all sections. Make command
         if (curSection == 0)
         {
+            tilePosX = tilePosX / (double) maxSections;
+            tilePosY = tilePosY / (double) maxSections;
             std::clamp(tilePosX, (double)0.0f, (double)1.0f);
             std::clamp(tilePosY, (double)0.0f, (double)1.0f);
             int posx = int(tilePosX * mapWidth);
