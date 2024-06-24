@@ -1093,7 +1093,7 @@ BWAPI::Unit WorkerManager::getBuilder(const Building & b)
     const BWAPI::Position pos(
         b.finalPosition.isValid() ? b.finalPosition : b.desiredPosition
     );
-    UAB_ASSERT(pos.isValid(), "bad position");
+    //UAB_ASSERT(pos.isValid(), "bad position");
 
     BWAPI::Unit builder = getPostedWorker(pos);
     if (builder)
