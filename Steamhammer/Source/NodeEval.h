@@ -65,9 +65,13 @@ public:
 
 	const std::vector<double>& getOutputVector();
 	bool IsNodeEvalEmpty();
+	int getOutputCount() const {
+		return outputCount;
+	}
 private:
 	std::vector<int> inputNodes;
 	std::vector<int> outputNodes;
+	int outputCount = 0;
 	std::vector<NodeEval> nodeEvals;
 
 	//Used for Activation

@@ -184,6 +184,36 @@ namespace UAlbertaBot
         //Used detector to reveal invisible units
         if (unit->getPlayer() == the.enemy()) scoreFitness(Config::NEAT::EnemyShowScore);
     }
+    void NEATCommander::drawDebug(int x, int y)
+    {
+        int startX = x;
+        int startY = y;
+        BWAPI::Broodwar->drawTextScreen(startX, startY, "NetworkOutputs:");
+        y += 12;
+        startY += 12;
+        for (int i = 0; i < network->getOutputCount(); i++) {
+            double v = network->getOutputVector()[i];
+            BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", v);
+            y += 12;
+            if (i == 20)
+            {
+                x += 60;
+                y = startY;
+            }
+            if (i == 40)
+            {
+                x += 60;
+                y = startY;
+            }
+            if (i == 60)
+            {
+                x += 60;
+                y = startY;
+            }
+
+        }
+    
+    }
     void NEATCommander::evaluate()
     {   
         if (!initialized) return;
@@ -413,53 +443,53 @@ namespace UAlbertaBot
             int posy = int(tilePosY * mapHeight);
             BWAPI::TilePosition buildPos = { posx,posy };
 
-            int highestBuildOptionOutput = 0;
-            double highestBuildOptionOutputScore = 0;
+            int maxBuildChoice = 0;
+            double maxBuildScore = 0.0f;
             for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)
             {
-                if (builderOutputs[i] > highestBuildOptionOutputScore && canBuild((NetworkTerranOptions)i, buildPos))
+                if (builderOutputs[i] > maxBuildScore && canBuild((NetworkTerranOptions)i, buildPos))
                 {
-                    highestBuildOptionOutput = i;
-                    highestBuildOptionOutputScore = builderOutputs[i];
+                    maxBuildChoice = i;
+                    maxBuildScore = builderOutputs[i];
                 }
             }
 
-            int highestMacroCommandTypeOutput = 0;
-            double highestMacroCommandTypeOutputScore = 0;
+            int maxCommandType = 0;
+            double maxCommandScore = 0.0f;
             for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)
             {
                 //Check if unit exists
-                if (macroCommandTypeOutputs[i] > highestMacroCommandTypeOutputScore && canMacro((MacroCommandType)i))
+                if (macroCommandTypeOutputs[i] > maxCommandScore && canMacro((MacroCommandType)i))
                 {
-                    highestMacroCommandTypeOutput = i;
-                    highestMacroCommandTypeOutputScore = macroCommandTypeOutputs[i];
+                    maxCommandType = i;
+                    maxCommandScore = macroCommandTypeOutputs[i];
                 }
             }
 
             MacroAct ma;
             // compare score between build option score and macro command type score
-            if (highestBuildOptionOutputScore > highestMacroCommandTypeOutputScore)
+            if (maxBuildScore > maxCommandScore)
             {
                 //BuildOutput has stronger signal than MacroCommandUnitType signal
-                if ((NetworkTerranOptions)highestBuildOptionOutput < NetworkTerranOptions::Cloaking_Field) //unit or building
+                if ((NetworkTerranOptions)maxBuildChoice < NetworkTerranOptions::Cloaking_Field) //unit or building
                 {
-                    ma = MacroAct(ToBWAPIUnit((NetworkTerranOptions)highestBuildOptionOutput), buildPos);
+                    ma = MacroAct(ToBWAPIUnit((NetworkTerranOptions)maxBuildChoice), buildPos);
                 }
-                else if ((NetworkTerranOptions)highestBuildOptionOutput < NetworkTerranOptions::Apollo_Reactor) //tech
+                else if ((NetworkTerranOptions)maxBuildChoice < NetworkTerranOptions::Apollo_Reactor) //tech
                 {
-                    ma = MacroAct(ToBWAPITech((NetworkTerranOptions)highestBuildOptionOutput));
+                    ma = MacroAct(ToBWAPITech((NetworkTerranOptions)maxBuildChoice));
                 }
                 else //upgrade
                 {
-                    ma = MacroAct(ToBWAPIUpgrade((NetworkTerranOptions)highestBuildOptionOutput));
+                    ma = MacroAct(ToBWAPIUpgrade((NetworkTerranOptions)maxBuildChoice));
                 }
-                ma.confidence = highestBuildOptionOutputScore;
+                ma.confidence = maxBuildChoice;
             }
             else {
-                ma = MacroAct((MacroCommandType)highestMacroCommandTypeOutput, { posx,posy });
-                ma.confidence = highestMacroCommandTypeOutputScore;
-                UAB_ASSERT(false, "MacroCommand. Build score was only: %4.8f", highestBuildOptionOutputScore);
+                ma = MacroAct((MacroCommandType)maxCommandType, { posx,posy });
+                ma.confidence = maxCommandScore;
             }
+            UAB_ASSERT(false, "MacroCommand %d with %4.8f, TerranOptionID: %d with %4.8f, ", maxCommandType, maxCommandScore, maxBuildChoice, maxBuildScore);
 
             _actions.push_back(ma);
             //std::cout << "Network Evaluated " << std::to_string(_actions.size()) << " actions\n";
@@ -654,7 +684,7 @@ namespace UAlbertaBot
 
     bool NEATCommander::canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location)
     {
-        if (option < NetworkTerranOptions::Cloaking_Field && location.isValid())
+        if (option < NetworkTerranOptions::Cloaking_Field)
         {
             //unit or building
             BWAPI::UnitType type = ToBWAPIUnit(option);
@@ -662,6 +692,7 @@ namespace UAlbertaBot
             if (type.isRefinery()) return BWAPI::Broodwar->canMake(type);
             else if (type.isAddon()) return BWAPI::Broodwar->canMake(type);
             else if (type.isBuilding()) {
+                location = the.placer.getBuildLocationNear(Building(type, location), 5);
                 return BWAPI::Broodwar->canMake(type) && BWAPI::Broodwar->canBuildHere(location, type);
             }
             else return BWAPI::Broodwar->canMake(type);
@@ -743,6 +774,8 @@ namespace UAlbertaBot
         }
         return BWAPI::TilePositions::None;
     }
+
+
     BWAPI::UnitType NEATCommander::ToBWAPIUnit(NetworkTerranOptions ut)
     {
         switch (ut) {

@@ -27,8 +27,10 @@ FeedForwardNetwork::FeedForwardNetwork(json& inodes, json& onodes)
         values[i] = 0.0f;
         inputNodes.push_back(i);
     }
+
     for (int o : onodes) {
         values[o] = 0.0f;
+        outputCount++;
         outputNodes.push_back(o);
     }
 }

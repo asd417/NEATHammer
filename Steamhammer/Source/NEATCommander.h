@@ -285,6 +285,9 @@ namespace UAlbertaBot
 
 		//When invisible unit becomes visible
 		void onUnitShow(BWAPI::Unit unit);
+
+		void drawDebug(int x, int y);
+
 	private:
 		NEATCommander();
 		int mapWidth;
