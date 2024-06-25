@@ -4,9 +4,25 @@
 #include "The.h"
 #include <windows.h> 
 #include "BuildingManager.h"
+#include "Logger.h"
+#include <fstream>
+#include <sstream>
 #define HyperNEAT
+
 namespace UAlbertaBot
 {
+    void logToStream(std::stringstream& out, const char* fmt, ...)
+    {
+        va_list arg;
+
+        va_start(arg, fmt);
+        //vfprintf(log_file, fmt, arg);
+        char buff[256];
+        vsnprintf_s(buff, 256, fmt, arg);
+        va_end(arg);
+
+        out << buff;
+    }
     NEATCommander& NEATCommander::Instance()
     {
         static NEATCommander instance;
@@ -100,9 +116,14 @@ namespace UAlbertaBot
 
             try {
                 json networkJson = json::parse(std::string(r[0]["Network"]));
+                
                 if (!network) delete network;
 #ifdef HyperNEAT
                 network = new RecurrentNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+                //Logger::LogAppendToFile("NEAT_log.txt", "RECURRENT_NETWORK///////////////////////////////////////////////////////////////////////////////////////////////////////");
+                //Logger::LogAppendToFile("NEAT_log.txt", std::string(r[0]["Network"]));
+                //Logger::LogAppendToFile("NEAT_log.txt", "\tInputs///////////////////////////////////////////////////////////////////////////////////////////////////////");
+                
 #else
                 network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
 #endif
@@ -290,6 +311,8 @@ namespace UAlbertaBot
         if (!network) return;
 
         if (the.now() == _lastUpdateFrame) return;
+        //Logger::LogAppendToFile("NEAT_log.txt", "\tNEATCommander::evaluate()///////////////////////////////////////////////////////////////////////////////////////////////////////");
+
         //Make sure to only call this once per frame
         _lastUpdateFrame = the.now();
 
@@ -409,6 +432,27 @@ namespace UAlbertaBot
         inputVector[10] = double(workerCount)/double(200);
         inputVector[11] = double(enemyRace)/double(3);
 #endif
+        //Logger::LogAppendToFile("NEAT_log.txt", "Input Vector\n");
+        std::stringstream logStream;
+        logToStream(logStream, "\n");
+        //Logger::LogAppendToFile("NEAT_log.txt", );
+        for (int xi = 0; xi < 32; xi++)
+        {
+            for (int yi = 0; yi < 32; yi++)
+            {
+                //Logger::LogAppendToFile("NEAT_log.txt", );
+                logToStream(logStream, "%4.5f\t", inputVector[xi*32 + yi]);
+            }
+            logToStream(logStream, "\n");
+        }
+        logToStream(logStream, "\n");
+
+        std::ofstream logFStream;
+        logFStream.open("NEAT_log.txt", std::ofstream::app);
+        logFStream << logStream.rdbuf();
+        logFStream.flush();
+        logFStream.close();
+
         network->Activate(inputVector);
         //Read output nodes 
         // 
@@ -669,6 +713,7 @@ namespace UAlbertaBot
             {
                 //Half resolution it
                 BWAPI::TilePosition tp = { startW + x * 2,startH + y * 2 };
+
                 BWAPI::WalkPosition wp = { (startW + x * 2) * 4,(startH + y * 2) * 4 }; //WalkPosition is 8 pixels big
 
                 if (!BWAPI::Broodwar->isVisible(tp)) {

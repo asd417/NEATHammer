@@ -334,10 +334,10 @@ namespace UAlbertaBot
 		int maxSections;
 		int curSection = 0;
 		std::vector<std::array<int, 2>> sectionsCoords{};
-		std::array<std::array<int, 16>, 16> enemyMapData{};
-		std::array<std::array<int, 16>, 16> enemyMapBuildingData{};
-		std::array<std::array<int, 16>, 16> friendlyMapData{};
-		std::array<std::array<int, 16>, 16> friendlyMapBuildingData{};
+		std::array<std::array<double, 16>, 16> enemyMapData{};
+		std::array<std::array<double, 16>, 16> enemyMapBuildingData{};
+		std::array<std::array<double, 16>, 16> friendlyMapData{};
+		std::array<std::array<double, 16>, 16> friendlyMapBuildingData{};
 
 		Network* network;
 		std::vector<double> inputVector{};

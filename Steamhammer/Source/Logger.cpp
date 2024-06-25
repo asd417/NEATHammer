@@ -30,6 +30,8 @@ void Logger::LogAppendToFile(const std::string & logFile, const char *fmt, ...)
     logStream.close();
 }
 
+
+
 void Logger::LogOverwriteToFile(const std::string & logFile, const std::string & msg)
 {
     std::ofstream logStream(logFile.c_str());
