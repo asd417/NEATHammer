@@ -37,7 +37,7 @@ private:
 
 class Network {
 public:
-	virtual void						Activate(std::vector<double>& inputValues);
+	virtual void						Activate(const std::vector<double>& inputValues);
 	virtual const std::vector<double>&	getOutputVector();
 	virtual void						AddNodeEval(const json& nodeEval);
 	virtual void						FinishInitializing();
@@ -52,9 +52,11 @@ public:
 	void FinishInitializing() override;
 	void Reset() override;
 
-	virtual void Activate(std::vector<double>& inputValues) override
+	virtual void Activate(const std::vector<double>& inputValues) override
 	{
 		if (inputValues.size() != inputNodes.size()) throw std::invalid_argument("Input Vector size does not match Network Input size!");
+		//Switch between current two value arrays
+		//This effectively means using previous values in the current evaluation
 		auto& iv = valuesArray[active];
 		auto& ov = valuesArray[1 - active];
 		active = 1 - active;
@@ -68,9 +70,9 @@ public:
 			for (Connection c : ne.connections) {
 				node_inputs.push_back(iv[c.inputNode] * c.weight);
 			}
-			double sum = ne.aggrFuncVal(node_inputs);
-			ov[ne.node] = ne.actiFuncVal(ne.bias + ne.response * sum);
+			ov[ne.node] = ne.actiFuncVal(ne.bias + ne.response * ne.aggrFuncVal(node_inputs));
 		}
+		outputs.clear();
 		for (int o : outputNodes)
 		{
 			outputs.push_back(ov[o]);
@@ -95,9 +97,8 @@ public:
 	void FinishInitializing() override;
 	void AddNodeEval(const json& nodeEval) override;
 	void Reset() override;
-	void Activate(std::vector<double>& inputValues) override
+	void Activate(const std::vector<double>& inputValues) override
 	{
-		outputs.clear();
 		if (inputValues.size() != inputNodes.size()) throw std::invalid_argument("Input Vector size does not match Network Input size!");
 		for (int i = 0; i < inputNodes.size(); i++) {
 			values[inputNodes[i]] = inputValues[i];
@@ -110,6 +111,7 @@ public:
 			double sum = ne.aggrFuncVal(node_inputs);
 			values[ne.node] = ne.actiFuncVal(ne.bias + ne.response * sum);
 		}
+		outputs.clear();
 		for (int o : outputNodes)
 		{
 			outputs.push_back(values[o]);

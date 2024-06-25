@@ -112,6 +112,13 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
         JSONTools::ReadInt("FitnessScore_Gas_Divider", neat, Config::NEAT::FitnessScore_Gas_Divider);
         JSONTools::ReadInt("SubtractFitnessScore", neat, Config::NEAT::SubtractFitnessScore);
         JSONTools::ReadBool("AutoSurrender", neat, Config::NEAT::AutoSurrender);
+        
+        JSONTools::ReadBool("LogInputVector", neat, Config::NEAT::LogInputVector);
+        JSONTools::ReadString("InputLogFileName", neat, Config::NEAT::InputLogFileName);
+        JSONTools::ReadBool("LogOutputVector", neat, Config::NEAT::LogOutputVector);
+        JSONTools::ReadString("OutputLogFileName", neat, Config::NEAT::OutputLogFileName);
+        JSONTools::ReadBool("LogOutputDecision", neat, Config::NEAT::LogOutputDecision);
+        JSONTools::ReadString("DecisionLogFileName", neat, Config::NEAT::DecisionLogFileName);
     }
 
     // Parse the Debug Options
@@ -315,7 +322,7 @@ BWAPI::Race ParseUtils::GetRace(const std::string & raceName)
         return BWAPI::Races::Random;
     }
 
-    UAB_ASSERT_WARNING(false, "Race not found: %s", raceName.c_str());
+    //UAB_ASSERT_WARNING(false, "Race not found: %s", raceName.c_str());
     return BWAPI::Races::None;
 }
 

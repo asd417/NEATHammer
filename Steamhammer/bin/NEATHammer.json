@@ -6,8 +6,7 @@
     "PrintInfoOnStart": true
   },
 
-  "NEAT": 
-  {
+  "NEAT": {
     "Train": true,
     "TrainingServerIP": "http://127.0.0.1:5000",
     "LoadNetworkFromJSON": false,
@@ -17,13 +16,20 @@
     "FitnessScore_Mineral_Divider": 500,
     "FitnessScore_Gas_Divider": 500,
     "SubtractFitnessScore": 400,
-    "AutoSurrender": true
+    "AutoSurrender": true,
+    "PrintNetworkOutput": false,
+    "LogInputVector": false,
+    "InputLogFileName": "Log_NEAT_Input.txt",
+    "LogOutputVector": false,
+    "OutputLogFileName": "Log_NEAT_Output.txt",
+    "LogOutputDecision": false,
+    "DecisionLogFileName": "Log_NEAT_Reasoning.txt"
   },
 
   "BWAPI" :
   {
     "SetLocalSpeed"             : 0,
-    "SetFrameSkip"              : 300,
+    "SetFrameSkip"              : 0,
     "UserInput"                 : false,
     "CompleteMapInformation"    : false
   },
@@ -54,9 +60,9 @@
     "DrawGameInfo"              : false,
     "DrawUnitHealthBars"        : false,
     "DrawKills"                 : false,
-    "DrawProductionInfo"        : true,
-    "DrawQueueFixInfo"          : true,
-    "DrawBuildOrderSearchInfo"  : true,
+    "DrawProductionInfo"        : false,
+    "DrawQueueFixInfo"          : false,
+    "DrawBuildOrderSearchInfo"  : false,
     "DrawScoutInfo"             : false,
     "DrawEnemyUnitInfo"         : false,
     "DrawUnitCounts"            : false,
@@ -65,7 +71,7 @@
     "DrawCombatSimInfo"         : false,
     "DrawUnitTargets"           : false,
     "DrawUnitOrders"            : false,
-    "DrawMicroState"            : true,
+    "DrawMicroState"            : false,
     "DrawLurkerTactics"         : false,
     "DrawMapInfo"               : false,
     "DrawMapGrid"               : false,
@@ -78,11 +84,11 @@
     "DrawClusters"              : false,
     "DrawDefenseClusters"       : false,
     "DrawWorkerInfo"            : false,
-    "DrawBuildingInfo"          : true,
+    "DrawBuildingInfo"          : false,
     "DrawStaticDefensePlan"     : false,
     "DrawReservedBuildingTiles"	: false,
     "DrawResourceAmounts"       : false,
-    "DrawTasks"                 : true,
+    "DrawTasks"                 : false,
     "DrawEvaluation"            : false
   },
 

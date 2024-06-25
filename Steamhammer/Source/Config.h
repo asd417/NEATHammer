@@ -70,6 +70,15 @@ namespace Config
         extern int FitnessScore_Gas_Divider;
         extern int SubtractFitnessScore;
         extern bool AutoSurrender;
+
+        extern bool PrintNetworkOutput;
+
+        extern bool LogInputVector;
+        extern std::string InputLogFileName;
+        extern bool LogOutputVector;
+        extern std::string OutputLogFileName;
+        extern bool LogOutputDecision;
+        extern std::string DecisionLogFileName;
     }
     namespace BWAPIOptions
     {

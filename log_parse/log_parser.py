@@ -5,6 +5,8 @@ from IPython.display import display
 import tkinter as tk
 from tkinter import ttk
 
+
+
 def parse_grid(file_path):
     """
     Parse a grid of float values from a file and return as a 2D numpy array.
@@ -66,6 +68,15 @@ class ImageSliderApp:
 
         self.index_label = ttk.Label(self.slider_frame, text=f"Image Index: {self.current_index}")
         self.index_label.pack()
+        
+        self.button_frame = ttk.Frame(master)
+        self.button_frame.pack(pady=10)
+
+        self.prev_button = ttk.Button(self.button_frame, text="Previous", command=self.decrement_index)
+        self.prev_button.pack(side=tk.LEFT, padx=5)
+
+        self.next_button = ttk.Button(self.button_frame, text="Next", command=self.increment_index)
+        self.next_button.pack(side=tk.LEFT, padx=5)
 
         self.update_image(0)
 
@@ -78,9 +89,20 @@ class ImageSliderApp:
         self.image_label.configure(image=imgtk)
         self.index_label.config(text=f"Image Index: {self.current_index}")
 
+    def increment_index(self):
+        if self.current_index < len(self.images) - 1:
+            self.current_index += 1
+            self.update_image(self.current_index)
+
+    def decrement_index(self):
+        if self.current_index > 0:
+            self.current_index -= 1
+            self.update_image(self.current_index)
+
 
 def main():
-    input_file = 'NEAT_log.txt'  # Path to the input file containing the grid
+    input_file = 'NEAT_output_log.txt'  # Path to the input file containing the grid
+    #input_file = 'NEAT_log.txt'  # Path to the input file containing the grid
     output_image = 'grayscale_image.png'  # Path to the output image file
 
     # Parse the grid from the file

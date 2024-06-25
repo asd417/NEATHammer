@@ -66,6 +66,15 @@ namespace Config
         int FitnessScore_Gas_Divider = 100;
         int SubtractFitnessScore = 1600;
         bool AutoSurrender = true;
+
+        bool PrintNetworkOutput = false;
+
+        bool LogInputVector = false;
+        std::string InputLogFileName = "Log_NEAT_Input.txt";
+        bool LogOutputVector = false;
+        std::string OutputLogFileName = "Log_NEAT_Output.txt";
+        bool LogOutputDecision = false;
+        std::string DecisionLogFileName = "Log_NEAT_Reasoning.txt";
     }
 
     namespace BotInfo

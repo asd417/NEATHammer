@@ -5,6 +5,8 @@
 #include "time.h"
 #include <vector>
 #include <array>
+
+#include <random>
 #include "TimerManager.h"
 namespace UAlbertaBot
 {
@@ -258,8 +260,8 @@ namespace UAlbertaBot
 
 	enum NEAT_TileType_Simple {
 		sFOG = 0,
-		sWALKABLE,
 		sNOTWALKABLE,
+		sWALKABLE,
 		sMINERAL,
 		sGAS,
 		sUNIT,
@@ -345,6 +347,11 @@ namespace UAlbertaBot
 
 		int genomeID = 0;
 		double fitness = 0.0f;
+
+		//Random number generator
+		std::random_device rd;
+		std::mt19937 gen;
+		std::uniform_real_distribution<double> dis;
 	};
 
 }

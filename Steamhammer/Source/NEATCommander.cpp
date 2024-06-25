@@ -7,6 +7,7 @@
 #include "Logger.h"
 #include <fstream>
 #include <sstream>
+
 #define HyperNEAT
 
 namespace UAlbertaBot
@@ -30,7 +31,7 @@ namespace UAlbertaBot
         return instance;
     }
     
-    NEATCommander::NEATCommander() {
+    NEATCommander::NEATCommander() : gen{ rd() }, dis{ 0.0f, 1.0f } {
         initialized = false;
         mapWidth = BWAPI::Broodwar->mapWidth();
         mapHeight = BWAPI::Broodwar->mapHeight();
@@ -137,7 +138,23 @@ namespace UAlbertaBot
                 std::cout << "Error creating Network Structure: " << e.what() << "\n";
                 BWAPI::Broodwar->leaveGame();
             }
-
+            std::stringstream logStream;
+            for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 1.0f);
+            logToStream(logStream, "\n");
+            for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 1.0f);
+            logToStream(logStream, "\n");
+            for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 1.0f);
+            logToStream(logStream, "\n");
+            for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 1.0f);
+            logToStream(logStream, "\n");
+            for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 1.0f);
+            logToStream(logStream, "\n");
+            logToStream(logStream, "\n");
+            std::ofstream logFStream;
+            logFStream.open("NEAT_output_log.txt", std::ofstream::app);
+            logFStream << logStream.rdbuf();
+            logFStream.flush();
+            logFStream.close();
             genomeID = id;
             initialized = true;
         }
@@ -177,17 +194,18 @@ namespace UAlbertaBot
             if (type.isBuilding())
             {
                 //Not a huge motivation to build buildings
-                scoreFitness(type.buildScore());
+                //scoreFitness(type.buildScore());
             }
             else if(type.isWorker())
             {
                 //Some Motivation to build army
-                scoreFitness(type.buildScore());
+                //scoreFitness(type.buildScore());
             }
             else
             {
                 //Huge Motivation to build army
-                scoreFitness(type.buildScore() * 10);
+                //Buildscore squared
+                scoreFitness(type.buildScore() * type.buildScore());
             }
         }
         
@@ -196,11 +214,15 @@ namespace UAlbertaBot
     {
         BWAPI::UnitType type = unit->getType();
         //Strong motivation to kill
-        if (unit->getPlayer() == the.enemy()) scoreFitness(type.buildScore() * 20);
-        //If building is destroyed deduct some of the score that was given by creating the building
-        if (unit->getPlayer() == the.self() && type.isBuilding()) scoreFitness(-type.buildScore() / 20);
-        //Worker destroyed = bad
-        if (unit->getPlayer() == the.self() && type.isWorker()) scoreFitness(-type.buildScore() / 10);
+        if (unit->getPlayer() == the.enemy()) scoreFitness(type.buildScore() * type.buildScore());
+        if (unit->getPlayer() == the.self())
+        {
+            //If building is destroyed deduct some of the score that was given by creating the building
+            if(type.isBuilding()) scoreFitness(-type.buildScore() / 2);
+            //Worker destroyed = bad
+            else if (type.isWorker()) scoreFitness(-type.buildScore() / 2);
+            else scoreFitness(-type.buildScore());
+        }
     }
     void NEATCommander::onUnitHide(BWAPI::Unit unit)
     {
@@ -387,7 +409,7 @@ namespace UAlbertaBot
         //fm |em
         //-------
         //fmb|emb
-            
+
         for (int xi = 0; xi < 32; xi++)
         {
             for (int yi = 0; yi < 32; yi++)
@@ -398,12 +420,16 @@ namespace UAlbertaBot
                     {
                         //Friendly map encoding
                         inputVector.push_back(friendlyMapData[xi][yi]);
+
+                        //inputVector.push_back(dis(gen));
                     }
                     else
                     {
                         //yi >= 16
                         //Friendly building map encoding
                         inputVector.push_back(friendlyMapBuildingData[xi][yi - 16]);
+
+                        //inputVector.push_back(dis(gen));
                     }
                 }
                 else
@@ -412,11 +438,15 @@ namespace UAlbertaBot
                     {
                         //enemy map encoding
                         inputVector.push_back(enemyMapData[xi - 16][yi]);
+
+                        //inputVector.push_back(dis(gen));
                     }
                     else
                     {
                         //enemy building map encoding
                         inputVector.push_back(enemyMapData[xi - 16][yi - 16]);
+
+                        //inputVector.push_back(dis(gen));
                     }
                 }
             }
@@ -431,27 +461,31 @@ namespace UAlbertaBot
         inputVector[7] = double(sectionCoordH)/double(mapHeight);
         inputVector[10] = double(workerCount)/double(200);
         inputVector[11] = double(enemyRace)/double(3);
+
 #endif
-        //Logger::LogAppendToFile("NEAT_log.txt", "Input Vector\n");
-        std::stringstream logStream;
-        logToStream(logStream, "\n");
-        //Logger::LogAppendToFile("NEAT_log.txt", );
-        for (int xi = 0; xi < 32; xi++)
+        //Log input vector
+        if (Config::NEAT::LogInputVector)
         {
-            for (int yi = 0; yi < 32; yi++)
+            //Draw all inputs
+            std::stringstream logStream;
+            logToStream(logStream, "\n");
+            for (int xi = 0; xi < 32; xi++)
             {
-                //Logger::LogAppendToFile("NEAT_log.txt", );
-                logToStream(logStream, "%4.5f\t", inputVector[xi*32 + yi]);
+                for (int yi = 0; yi < 32; yi++)
+                {
+                    logToStream(logStream, "%4.5f\t", inputVector[xi*32 + yi]);
+                }
+                logToStream(logStream, "\n");
             }
             logToStream(logStream, "\n");
-        }
-        logToStream(logStream, "\n");
 
-        std::ofstream logFStream;
-        logFStream.open("NEAT_log.txt", std::ofstream::app);
-        logFStream << logStream.rdbuf();
-        logFStream.flush();
-        logFStream.close();
+            std::ofstream logFStream;
+            logFStream.open(Config::NEAT::InputLogFileName.c_str(), std::ofstream::app);
+            logFStream << logStream.rdbuf();
+            logFStream.flush();
+            logFStream.close();
+
+        }
 
         network->Activate(inputVector);
         //Read output nodes 
@@ -548,11 +582,11 @@ namespace UAlbertaBot
         {
             builderOutputs[i] += network->getOutputVector()[i];
         }
-        constexpr int outputVectorOffset = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
         for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)
         {
             macroCommandTypeOutputs[i] += network->getOutputVector()[(int)NetworkTerranOptions::NETWORK_OPTION_COUNT + i];
         }
+        constexpr int outputVectorOffset = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
         tilePosX += network->getOutputVector()[outputVectorOffset];
         tilePosY += network->getOutputVector()[outputVectorOffset + 1];
 
@@ -560,7 +594,9 @@ namespace UAlbertaBot
         curSection++;
         curSection = curSection % maxSections;
         //Looked through all sections. Make command
-        drawDebug(180, 50);
+        if (Config::NEAT::PrintNetworkOutput) {
+            drawDebug(180, 10);
+        }
         if (curSection == 0)
         {
             //This part apparently can cause a lot of lag...
@@ -571,6 +607,33 @@ namespace UAlbertaBot
             posx = std::clamp(posx, 1, mapWidth-4);
             posy = std::clamp(posy, 1, mapHeight-4);
             BWAPI::TilePosition buildPos = { posx,posy };
+
+            //Log output
+            if (Config::NEAT::LogOutputVector)
+            {
+                //Draw all outputs
+                std::stringstream logStream;
+                for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)logToStream(logStream, "%4.5f\t", builderOutputs[i]);
+                for (int i = 0; i < 3; i++)logToStream(logStream, "%4.5f\t", 0.0f);
+                logToStream(logStream, "\n");
+                for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 0.0f);
+                logToStream(logStream, "\n");
+                for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)logToStream(logStream, "%4.5f\t", macroCommandTypeOutputs[i] );
+                for (int i = 0; i < 40; i++)logToStream(logStream, "%4.5f\t", 0.0f);
+                logToStream(logStream, "\n");
+                for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 0.0f);
+                logToStream(logStream, "\n");
+                logToStream(logStream, "%4.5f\t", tilePosX);
+                logToStream(logStream, "%4.5f\t", tilePosY);
+                for (int i = 0; i < 58; i++)logToStream(logStream, "%4.5f\t", 0.0f);
+                logToStream(logStream, "\n");
+                logToStream(logStream, "\n");
+                std::ofstream logFStream;
+                logFStream.open(Config::NEAT::OutputLogFileName.c_str(), std::ofstream::app);
+                logFStream << logStream.rdbuf();
+                logFStream.flush();
+                logFStream.close();
+            }
 
             int maxBuildChoice = 0;
             double maxBuildScore = 0.0f;
@@ -635,8 +698,16 @@ namespace UAlbertaBot
                         //BWAPI::TilePosition found = the.placer.getBuildLocationNear(b, 2);
                         BWAPI::TilePosition found = BuildingManager::Instance().getBuildingLocation(b);
                         if (!found.isValid()) failed = true;
-                        UAB_ASSERT(!buildPos.isValid(), "Trying to build at %d, %d", buildPos.x, buildPos.y);
-
+                        //UAB_ASSERT(!buildPos.isValid(), "Trying to build at %d, %d", buildPos.x, buildPos.y);
+                        if (failed)
+                        {
+                            Logger::LogAppendToFile("NEAT_Decisions.txt", "Tried to build %s at %d, %d and failed\n", t.c_str(), buildPos.x, buildPos.y);
+                        }
+                        else
+                        {
+                            Logger::LogAppendToFile("NEAT_Decisions.txt", "Building %s at %d, %d\n", t.c_str(), found.x, found.y);
+                        }
+                        
                         ma = MacroAct(ToBWAPIUnit((NetworkTerranOptions)maxBuildChoice), buildPos);
                     }
                     else
@@ -658,7 +729,7 @@ namespace UAlbertaBot
                 ma = MacroAct((MacroCommandType)maxCommandType, { posx,posy });
                 ma.confidence = maxCommandScore;
             }
-            UAB_ASSERT(false, "MacroCommand %d with %4.8f, TerranOptionID: %d with %4.8f, ", maxCommandType, maxCommandScore, maxBuildChoice, maxBuildScore);
+            //UAB_ASSERT(false, "MacroCommand %d with %4.8f, TerranOptionID: %d with %4.8f, ", maxCommandType, maxCommandScore, maxBuildChoice, maxBuildScore);
             if (timer != nullptr)
             {
                 timer->stopTimer(TimerManager::net_ev3);
@@ -707,36 +778,29 @@ namespace UAlbertaBot
         if (sectionNum >= maxSections) throw std::overflow_error("sectionNum is bigger than maxSections");
         int startW = sectionsCoords[sectionNum][0];
         int startH = sectionsCoords[sectionNum][1];
-        for (int x = 0; x < 16; x++)
+        //Half resolution it
+        for (int xi = 0; xi < 16; xi++)
         {
-            for (int y = 0; y < 16; y++)
+            for (int yi = 0; yi < 16; yi++)
             {
-                //Half resolution it
-                BWAPI::TilePosition tp = { startW + x * 2,startH + y * 2 };
+                int x = xi * 2;
+                int y = yi * 2;
+                BWAPI::TilePosition tp = { startW + x,startH + y};
 
-                BWAPI::WalkPosition wp = { (startW + x * 2) * 4,(startH + y * 2) * 4 }; //WalkPosition is 8 pixels big
+                //Get center of 2x2 tile
+                BWAPI::WalkPosition wp = { (startW + x + 1) * 4,(startH + y + 1) * 4}; //WalkPosition is 8 pixels big
 
                 if (!BWAPI::Broodwar->isVisible(tp)) {
-                    friendlyMapData[x][y]           = NEAT_TileType_Simple::sFOG;
-                    friendlyMapBuildingData[x][y]   = NEAT_TileType_Simple::sFOG;
-                    enemyMapData[x][y]              = NEAT_TileType_Simple::sFOG;
-                    enemyMapBuildingData[x][y]      = NEAT_TileType_Simple::sFOG;
-                    break;
+                    friendlyMapData[xi][yi]           = NEAT_TileType_Simple::sFOG;
+                    friendlyMapBuildingData[xi][yi]   = NEAT_TileType_Simple::sFOG;
+                    enemyMapData[xi][yi]              = NEAT_TileType_Simple::sFOG;
+                    enemyMapBuildingData[xi][yi]      = NEAT_TileType_Simple::sFOG;
                 }
                 else
                 {
                     //BWAPI::UnitFilter uf = BWAPI::UnitFilter(the.self());
-                    BWAPI::Unitset allyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsAlly && !BWAPI::Filter::IsBuilding);
-                    BWAPI::Unitset allyBuildingOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsAlly && BWAPI::Filter::IsBuilding);
-                    BWAPI::Unitset enemyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsEnemy && !BWAPI::Filter::IsBuilding);
-                    BWAPI::Unitset enemyBuildingsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, BWAPI::Filter::IsEnemy && BWAPI::Filter::IsBuilding);
-                    BWAPI::Unitset mineralOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, 
-                        BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field ||
-                        BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field_Type_2 ||
-                        BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field_Type_3);
-                    BWAPI::Unitset gasOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + x * 2, startH + y * 2, 
-                        BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Vespene_Geyser);
-
+                    BWAPI::Unitset units = BWAPI::Broodwar->getUnitsInRectangle({ (startW + x) * 32, (startH + y) * 32 }, { (startW + x + 2) * 32 - 1, (startH + y + 2) * 32 - 1 });
+     
                     NEAT_TileType_Simple fm     = NEAT_TileType_Simple::sNOTWALKABLE;
                     NEAT_TileType_Simple fmb    = NEAT_TileType_Simple::sNOTWALKABLE;
                     NEAT_TileType_Simple em     = NEAT_TileType_Simple::sNOTWALKABLE;
@@ -748,40 +812,55 @@ namespace UAlbertaBot
                         em  = NEAT_TileType_Simple::sWALKABLE;
                         emb = NEAT_TileType_Simple::sWALKABLE;
                     }
-                    if (mineralOnTile.size() > 0)
+
+                    for (const auto& u : units)
                     {
-                        fm  = NEAT_TileType_Simple::sMINERAL;
-                        fmb = NEAT_TileType_Simple::sMINERAL;
-                        em  = NEAT_TileType_Simple::sMINERAL;
-                        emb = NEAT_TileType_Simple::sMINERAL;
+                        const auto type = u->getType();
+                        if (
+                            type == BWAPI::UnitTypes::Resource_Mineral_Field ||
+                            type == BWAPI::UnitTypes::Resource_Mineral_Field_Type_2 ||
+                            type == BWAPI::UnitTypes::Resource_Mineral_Field_Type_3)
+                        {
+                            fmb = NEAT_TileType_Simple::sMINERAL;
+                            fm = NEAT_TileType_Simple::sMINERAL;
+                            emb = NEAT_TileType_Simple::sMINERAL;
+                            em = NEAT_TileType_Simple::sMINERAL;
+                        }
+                        else if(type == BWAPI::UnitTypes::Resource_Vespene_Geyser)
+                        {
+                            fmb =   NEAT_TileType_Simple::sGAS;
+                            fm  =   NEAT_TileType_Simple::sGAS;
+                            emb =   NEAT_TileType_Simple::sGAS;
+                            em  =   NEAT_TileType_Simple::sGAS;
+                        }
+                        else if (u->getPlayer() == the.self())
+                        {
+                            if (type.isBuilding())
+                            {
+                                fmb = NEAT_TileType_Simple::sUNIT;
+                            }
+                            else
+                            {
+                                fm = NEAT_TileType_Simple::sUNIT;
+                            }
+                        }
+                        else
+                        {
+                            if (type.isBuilding())
+                            {
+                                emb = NEAT_TileType_Simple::sUNIT;
+                            }
+                            else
+                            {
+                                em = NEAT_TileType_Simple::sUNIT;
+                            }
+                        }
                     }
-                    if (gasOnTile.size() > 0)
-                    {
-                        fm  = NEAT_TileType_Simple::sGAS;
-                        fmb = NEAT_TileType_Simple::sGAS;
-                        em  = NEAT_TileType_Simple::sGAS;
-                        emb = NEAT_TileType_Simple::sGAS;
-                    }
-                    if (allyUnitsOnTile.size() > 0)
-                    {
-                        fm = NEAT_TileType_Simple::sUNIT;
-                    }
-                    if (allyBuildingOnTile.size() > 0)
-                    {
-                        fmb = NEAT_TileType_Simple::sUNIT;
-                    }
-                    if (enemyUnitsOnTile.size() > 0)
-                    {
-                        em = NEAT_TileType_Simple::sUNIT;
-                    }
-                    if (enemyBuildingsOnTile.size() > 0)
-                    {
-                        emb = NEAT_TileType_Simple::sUNIT;
-                    }
-                    friendlyMapData[x][y] = double(fm) / double(NEAT_TileType_Simple::MAX);
-                    friendlyMapBuildingData[x][y] = double(fmb) / double(NEAT_TileType_Simple::MAX);
-                    enemyMapData[x][y] = double(em) / double(NEAT_TileType_Simple::MAX);
-                    enemyMapBuildingData[x][y] = double(emb) / double(NEAT_TileType_Simple::MAX);
+
+                    friendlyMapData[xi][yi] = double(fm) / double(NEAT_TileType_Simple::MAX);
+                    friendlyMapBuildingData[xi][yi] = double(fmb) / double(NEAT_TileType_Simple::MAX);
+                    enemyMapData[xi][yi] = double(em) / double(NEAT_TileType_Simple::MAX);
+                    enemyMapBuildingData[xi][yi] = double(emb) / double(NEAT_TileType_Simple::MAX);
                 }
             }
         }
@@ -882,12 +961,10 @@ namespace UAlbertaBot
             BWAPI::UnitType type = ToBWAPIUnit(option);
             
             if (type.isRefinery()) {
-                //Building b = Building(type, location);
-                //location = the.placer.getBuildLocationNear(b, 5);
-                //return BWAPI::Broodwar->canMake(type) && BWAPI::Broodwar->canBuildHere(location, type);
                 auto tp = the.placer.getRefineryPosition();
                 return tp != BWAPI::TilePositions::None;
             }
+            Logger::LogAppendToFile("NEAT_Decisions.txt", "Frame %d: Commander can make %d\n", frame, (int)option);
             return BWAPI::Broodwar->canMake(type);
         }
         else if (option < NetworkTerranOptions::Apollo_Reactor)

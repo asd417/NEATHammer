@@ -281,7 +281,7 @@ bool RecurrentNetwork::IsNodeEvalEmpty()
     return nodeEvals.size() == 0;
 }
 
-void Network::Activate(std::vector<double>& inputValues)
+void Network::Activate(const std::vector<double>& inputValues)
 {
 }
 
