@@ -81,6 +81,7 @@ namespace UAlbertaBot
     {
         //UAB_ASSERT(fitness > 0.0f, "Negative Fitness: %s", std::to_string(fitness).c_str());
         fitness += add;
+        fitness = fitness >= 0.0f ? fitness : 0.0f;
     }
 
     void NEATCommander::InitializeNetwork()
@@ -136,6 +137,7 @@ namespace UAlbertaBot
             }
             catch (std::exception e) {
                 std::cout << "Error creating Network Structure: " << e.what() << "\n";
+                fitness = 0.0f;
                 BWAPI::Broodwar->leaveGame();
             }
             std::stringstream logStream;
@@ -296,27 +298,6 @@ namespace UAlbertaBot
         y += 12;
         BWAPI::Broodwar->drawTextScreen(x, y, "%2.8f", tilePosY);
 
-        //for (int i = 0; i < network->getOutputCount(); i++) {
-        //    double v = network->getOutputVector()[i];
-        //    BWAPI::Broodwar->drawTextScreen(x, y, "%4.8f", v);
-        //    y += 12;
-        //    if (i == 20)
-        //    {
-        //        x += 60;
-        //        y = startY;
-        //    }
-        //    if (i == 40)
-        //    {
-        //        x += 60;
-        //        y = startY;
-        //    }
-        //    if (i == 60)
-        //    {
-        //        x += 60;
-        //        y = startY;
-        //    }
-        //}
-    
     }
     void NEATCommander::setTimeManager(TimerManager* t)
     {
