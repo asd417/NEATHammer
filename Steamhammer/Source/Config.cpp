@@ -57,7 +57,10 @@ namespace Config
     namespace NEAT
     {
         bool Train = true;
+        //Connection Settings
         std::string TrainingServerIP = "http://127.0.0.1:5000";
+        int RetryTimer = 30;
+        
         bool LoadNetworkFromJSON = false;
         std::string NetworkJSON = "";
         int WinScore = 1000;

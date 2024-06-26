@@ -79,6 +79,7 @@ namespace Config
         extern std::string OutputLogFileName;
         extern bool LogOutputDecision;
         extern std::string DecisionLogFileName;
+        extern int RetryTimer;
     }
     namespace BWAPIOptions
     {

@@ -9,6 +9,7 @@
   "NEAT": {
     "Train": true,
     "TrainingServerIP": "http://127.0.0.1:5000",
+    "RetryTimer": 30,
     "LoadNetworkFromJSON": false,
     "NetworkJSON": "network.json",
     "WinScore": 1000,

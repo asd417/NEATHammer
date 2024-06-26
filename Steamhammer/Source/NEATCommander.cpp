@@ -110,7 +110,7 @@ namespace UAlbertaBot
                     //UAB_ASSERT(false, "Error while retrieving new genome to evaluate: %s", e.what());
                     r.clear();
                     id = -1;
-                    Sleep(2000);
+                    Sleep(Config::NEAT::RetryTimer * 1000);
                 }
             }
 
@@ -232,7 +232,7 @@ namespace UAlbertaBot
     void NEATCommander::onUnitShow(BWAPI::Unit unit)
     {
         //Used detector to reveal invisible units
-        if (unit->getPlayer() == the.enemy()) scoreFitness(Config::NEAT::EnemyShowScore);
+        //if (unit->getPlayer() == the.enemy()) scoreFitness(Config::NEAT::EnemyShowScore);
     }
     void NEATCommander::drawDebug(int x, int y)
     {
