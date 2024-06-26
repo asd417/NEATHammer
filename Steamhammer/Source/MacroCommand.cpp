@@ -15,7 +15,7 @@ MacroCommand::MacroCommand(MacroCommandType type)
     , _amount(0)
     , _unitType(BWAPI::UnitTypes::None)
 {
-    UAB_ASSERT(!hasNumericArgument(type), "missing MacroCommand argument");
+    //UAB_ASSERT(!hasNumericArgument(type), "missing MacroCommand argument");
 }
 
 MacroCommand::MacroCommand(MacroCommandType type, int amount)

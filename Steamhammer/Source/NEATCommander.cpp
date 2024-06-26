@@ -324,11 +324,11 @@ namespace UAlbertaBot
         int mSupply = BWAPI::Broodwar->self()->supplyTotal();
         int cSupply = BWAPI::Broodwar->self()->supplyUsed();
 
-        double deltaMineral = min > lastMineral ? min - lastMineral : 0;
-        double deltaGas = gas > lastGas ? gas - lastGas : 0;
+        //double deltaMineral = min > lastMineral ? min - lastMineral : 0;
+        //double deltaGas = gas > lastGas ? gas - lastGas : 0;
 
-        lastMineral = min;
-        lastGas = gas;
+        //lastMineral = min;
+        //lastGas = gas;
 
         //What if we remove the gas and mineral from fitness score?
         //scoreFitness(deltaMineral / Config::NEAT::FitnessScore_Gas_Divider);
@@ -624,12 +624,7 @@ namespace UAlbertaBot
             }
             for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)
             {
-                //UAB_ASSERT(i != (int)NetworkTerranOptions::Terran_Barracks, "Barrack score: %4.8f", builderOutputs[i]);
-                if (
-                    //i != (int)NetworkTerranOptions::Terran_Command_Center && 
-                    //i != (int)NetworkTerranOptions::Terran_Supply_Depot &&
-                    //i != (int)NetworkTerranOptions::Terran_Refinery &&
-                    builderOutputs[i] > maxBuildScore && canBuild((NetworkTerranOptions)i, buildPos))
+                if (builderOutputs[i] > maxBuildScore && canBuild((NetworkTerranOptions)i, buildPos, min, gas))
                 {
                     maxBuildChoice = i;
                     maxBuildScore = builderOutputs[i];
@@ -680,13 +675,13 @@ namespace UAlbertaBot
                         BWAPI::TilePosition found = BuildingManager::Instance().getBuildingLocation(b);
                         if (!found.isValid()) failed = true;
                         //UAB_ASSERT(!buildPos.isValid(), "Trying to build at %d, %d", buildPos.x, buildPos.y);
-                        if (failed)
+                        if (failed && Config::NEAT::LogOutputDecision)
                         {
-                            Logger::LogAppendToFile("NEAT_Decisions.txt", "Tried to build %s at %d, %d and failed\n", t.c_str(), buildPos.x, buildPos.y);
+                            Logger::LogAppendToFile(Config::NEAT::DecisionLogFileName.c_str(), "Tried to build %s at %d, %d and failed\n", t.c_str(), buildPos.x, buildPos.y);
                         }
                         else
                         {
-                            Logger::LogAppendToFile("NEAT_Decisions.txt", "Building %s at %d, %d\n", t.c_str(), found.x, found.y);
+                            Logger::LogAppendToFile(Config::NEAT::DecisionLogFileName.c_str(), "Building %s at %d, %d\n", t.c_str(), found.x, found.y);
                         }
                         
                         ma = MacroAct(ToBWAPIUnit((NetworkTerranOptions)maxBuildChoice), buildPos);
@@ -901,6 +896,10 @@ namespace UAlbertaBot
     
     bool NEATCommander::canMacro(MacroCommandType command)
     {
+        if (command == MacroCommandType::StartGas || command == MacroCommandType::StopGas)
+        {
+            return the.my.completed.count(BWAPI::UnitTypes::Terran_Refinery) > 1;
+        }
         if (command == MacroCommandType::SCAN)
         {
             BWAPI::Unitset comsats = BWAPI::Broodwar->self()->getUnits();
@@ -933,7 +932,7 @@ namespace UAlbertaBot
         return true;
     }
 
-    bool NEATCommander::canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location)
+    bool NEATCommander::canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location, int mineral, int gas)
     {
         
         if (option < NetworkTerranOptions::Cloaking_Field)
@@ -945,18 +944,25 @@ namespace UAlbertaBot
                 auto tp = the.placer.getRefineryPosition();
                 return tp != BWAPI::TilePositions::None;
             }
-            Logger::LogAppendToFile("NEAT_Decisions.txt", "Frame %d: Commander can make %d\n", frame, (int)option);
-            return BWAPI::Broodwar->canMake(type);
+            if (Config::NEAT::LogOutputDecision)
+            {
+                Logger::LogAppendToFile(Config::NEAT::DecisionLogFileName.c_str(), "Frame %d: %s, Current mineral: %d, gas: %d\n", frame, type.c_str(), mineral, gas);
+            }
+            return type.mineralPrice() < mineral && type.gasPrice() < gas && BWAPI::Broodwar->canMake(type);
         }
         else if (option < NetworkTerranOptions::Apollo_Reactor)
         {
             //tech
-            return BWAPI::Broodwar->canResearch(ToBWAPITech(option));
+            BWAPI::TechType t = ToBWAPITech(option);
+            return t.mineralPrice() < mineral && t.gasPrice() < gas && BWAPI::Broodwar->canResearch(t);
+            
         }
         else
         {
             //upgrade
-            return BWAPI::Broodwar->canUpgrade(ToBWAPIUpgrade(option));
+            BWAPI::UpgradeType u = ToBWAPIUpgrade(option);
+
+            return u.mineralPrice() < mineral && u.gasPrice() < gas && BWAPI::Broodwar->canUpgrade(u);
         }
     }
 

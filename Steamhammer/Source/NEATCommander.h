@@ -316,7 +316,7 @@ namespace UAlbertaBot
 		void getVisibleMap(int sectionNum);
 		bool canMacro(MacroCommandType command);
 		void getVisibleMapSimple(int sectionNum);
-		bool canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location);
+		bool canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location, int mineral, int gas);
 		bool canBuild(NetworkProtossOptions option, BWAPI::TilePosition& location);
 		BWAPI::TilePosition getClosestProtossBuildPosition(BWAPI::Position closestTo, BWAPI::UnitType buildingType) const;
 
