@@ -141,14 +141,6 @@ void ScoutManager::update()
         _overlordScout = nullptr;
     }
 
-    // If we're done with a gas steal and we don't want to keep scouting, release the worker.
-    // If we're zerg, the worker may have turned into an extractor. That is handled elsewhere.
-    if (_scoutCommand == MacroCommandType::None && _gasStealOver)
-    {
-        _scoutStatus = "gas steal over";
-        releaseWorkerScout();
-    }
-
     // Release the worker if it can no longer help: We have combat units to keep watch.
     if (_workerScout && releaseScoutEarly(_workerScout))
     {
@@ -239,26 +231,10 @@ void ScoutManager::releaseOverlordScout()
 void ScoutManager::setScoutCommand(MacroCommandType cmd)
 {
     UAB_ASSERT(
-        cmd == MacroCommandType::Scout ||
-        cmd == MacroCommandType::ScoutIfNeeded ||
-        cmd == MacroCommandType::ScoutLocation ||
-        cmd == MacroCommandType::ScoutOnceOnly,
+        cmd == MacroCommandType::Scout,
         "bad scout command");
 
     _scoutCommand = cmd;
-}
-
-void ScoutManager::setScoutCommand(MacroCommandType cmd, int issuedAI)
-{
-    UAB_ASSERT(
-        cmd == MacroCommandType::Scout ||
-        cmd == MacroCommandType::ScoutIfNeeded ||
-        cmd == MacroCommandType::ScoutLocation ||
-        cmd == MacroCommandType::ScoutOnceOnly,
-        "bad scout command");
-
-    _scoutCommand = cmd;
-    _orderIssuedBy = issuedAI;
 }
 
 void ScoutManager::drawScoutInformation(int x, int y)
@@ -271,26 +247,7 @@ void ScoutManager::drawScoutInformation(int x, int y)
     BWAPI::Broodwar->drawTextScreen(x, y, "Scout info: %s", _scoutStatus.c_str());
     BWAPI::Broodwar->drawTextScreen(x, y+10, "Gas steal: %s", _gasStealStatus.c_str());
     std::string more = "not yet";
-    /*if (_scoutCommand == MacroCommandType::Scout)
-    {
-        more = "and stay";
-    }
-    else if (_scoutCommand == MacroCommandType::ScoutLocation)
-    {
-        more = "location";
-    }
-    else if (_scoutCommand == MacroCommandType::ScoutOnceOnly)
-    {
-        more = "once around";
-    }
-    else if (_scoutCommand == MacroCommandType::ScoutWhileSafe)
-    {
-        more = "while safe";
-    }*/
-    /*else if (wantGasSteal())
-    {
-        more = "to steal gas";
-    }*/
+    
     // NOTE "go scout if needed" doesn't need to be represented here.
     BWAPI::Broodwar->drawTextScreen(x, y + 20, "Go scout: %s", more.c_str());
 
@@ -405,14 +362,6 @@ void ScoutManager::followGroundPath()
     if (destination.isValid())
     {
         _nextDestination = destination;
-        if (_scoutCommand == MacroCommandType::ScoutOnceOnly && !wantGasSteal())
-        {
-            if (BWAPI::Broodwar->isExplored(BWAPI::TilePosition(_nextDestination)))
-            {
-                releaseWorkerScout();
-                return;
-            }
-        }
     }
     else
     {

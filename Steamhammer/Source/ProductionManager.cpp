@@ -561,13 +561,9 @@ int ProductionManager::getFreeGas() const
 void ProductionManager::executeCommand(const MacroAct & act)
 {
     MacroCommandType cmd = act.getCommandType().getType();
-    if (cmd == MacroCommandType::Scout ||
-        cmd == MacroCommandType::ScoutIfNeeded ||
-        cmd == MacroCommandType::ScoutLocation ||
-        cmd == MacroCommandType::ScoutOnceOnly)
+    if (cmd == MacroCommandType::Scout)
     {
         ScoutManager::Instance().setScoutCommand(cmd);
-        //ScoutManager::Instance().setScoutCommand(cmd, aiIndex);
     }
     else if (cmd == MacroCommandType::StopGas)
     {
@@ -587,12 +583,7 @@ void ProductionManager::executeCommand(const MacroAct & act)
     }
     else if (cmd == MacroCommandType::PullWorkers)
     {
-        CombatCommander::Instance().pullWorkers(act.getCommandType().getAmount());
-    }
-    else if (cmd == MacroCommandType::PullWorkersLeaving)
-    {
-        int nWorkers = WorkerManager::Instance().getNumMineralWorkers() + WorkerManager::Instance().getNumGasWorkers();
-        CombatCommander::Instance().pullWorkers(nWorkers - act.getCommandType().getAmount());
+        CombatCommander::Instance().pullWorkers(act.getTileLocation());
     }
     else if (cmd == MacroCommandType::ReleaseWorkers)
     {

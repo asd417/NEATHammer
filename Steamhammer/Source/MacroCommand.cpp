@@ -37,9 +37,7 @@ MacroCommand::MacroCommand(MacroCommandType type, BWAPI::UnitType unitType)
 // The command has a numeric argument, the _amount.
 bool MacroCommand::hasNumericArgument(MacroCommandType t)
 {
-    return
-        t == MacroCommandType::PullWorkers ||
-        t == MacroCommandType::PullWorkersLeaving;
+    return t == MacroCommandType::PullWorkers;
 }
 
 //Lift command was the only one with the unit argument
@@ -54,19 +52,6 @@ const std::string MacroCommand::getName(MacroCommandType t)
     {
         return "go scout";
     }
-    if (t == MacroCommandType::ScoutIfNeeded)
-    {
-        return "go scout if needed";
-    }
-    if (t == MacroCommandType::ScoutLocation)
-    {
-        return "go scout location";
-    }
-    if (t == MacroCommandType::ScoutOnceOnly)
-    {
-        return "go scout once around";
-    }
-
     if (t == MacroCommandType::StartGas)
     {
         return "go start gas";
@@ -74,10 +59,6 @@ const std::string MacroCommand::getName(MacroCommandType t)
     if (t == MacroCommandType::StopGas)
     {
         return "go stop gas";
-    }
-    if (t == MacroCommandType::StealGas)
-    {
-        return "go steal gas";
     }
     if (t == MacroCommandType::Aggressive)
     {
@@ -90,10 +71,6 @@ const std::string MacroCommand::getName(MacroCommandType t)
     if (t == MacroCommandType::PullWorkers)
     {
         return "go pull workers";
-    }
-    if (t == MacroCommandType::PullWorkersLeaving)
-    {
-        return "go pull workers leaving";
     }
     if (t == MacroCommandType::ReleaseWorkers)
     {

@@ -8,16 +8,11 @@ namespace UAlbertaBot
 enum class MacroCommandType
     { None
     , Scout
-    , ScoutIfNeeded
-    , ScoutLocation
-    , ScoutOnceOnly
-    , StealGas
     , StartGas
     , StopGas
     , Aggressive
     , Defensive
     , PullWorkers
-    , PullWorkersLeaving
     , ReleaseWorkers
     , PostWorker
     , UnpostWorkers

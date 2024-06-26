@@ -2,9 +2,10 @@
 #include "Config.h"
 #include "MacroAct.h"
 #include "The.h"
-#include <windows.h> 
 #include "BuildingManager.h"
+#include "CombatCommander.h"
 #include "Logger.h"
+#include <windows.h> 
 #include <fstream>
 #include <sstream>
 
@@ -122,10 +123,6 @@ namespace UAlbertaBot
                 if (!network) delete network;
 #ifdef HyperNEAT
                 network = new RecurrentNetwork(networkJson["input_keys"], networkJson["output_keys"]);
-                //Logger::LogAppendToFile("NEAT_log.txt", "RECURRENT_NETWORK///////////////////////////////////////////////////////////////////////////////////////////////////////");
-                //Logger::LogAppendToFile("NEAT_log.txt", std::string(r[0]["Network"]));
-                //Logger::LogAppendToFile("NEAT_log.txt", "\tInputs///////////////////////////////////////////////////////////////////////////////////////////////////////");
-                
 #else
                 network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
 #endif
@@ -324,13 +321,11 @@ namespace UAlbertaBot
         int mSupply = BWAPI::Broodwar->self()->supplyTotal();
         int cSupply = BWAPI::Broodwar->self()->supplyUsed();
 
+        //What if we remove the gas and mineral from fitness score?
         //double deltaMineral = min > lastMineral ? min - lastMineral : 0;
         //double deltaGas = gas > lastGas ? gas - lastGas : 0;
-
         //lastMineral = min;
         //lastGas = gas;
-
-        //What if we remove the gas and mineral from fitness score?
         //scoreFitness(deltaMineral / Config::NEAT::FitnessScore_Gas_Divider);
         //scoreFitness(deltaGas / Config::NEAT::FitnessScore_Gas_Divider);
 
@@ -569,7 +564,7 @@ namespace UAlbertaBot
         }
         constexpr int outputVectorOffset = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
         tilePosX += network->getOutputVector()[outputVectorOffset];
-        tilePosY += network->getOutputVector()[outputVectorOffset + 1];
+        tilePosY += network->getOutputVector()[outputVectorOffset + 1]; //74 output nodes
 
         //We scanned through the whole map
         curSection++;
@@ -728,7 +723,6 @@ namespace UAlbertaBot
         }
 #endif
     }
-
 
     int NEATCommander::getWorkerCount(BWAPI::Unitset& allMyUnits)
     {
@@ -896,6 +890,14 @@ namespace UAlbertaBot
     
     bool NEATCommander::canMacro(MacroCommandType command)
     {
+        if (command == MacroCommandType::Aggressive)
+        {
+            return !CombatCommander::Instance().getAggression();
+        }
+        if (command == MacroCommandType::Defensive)
+        {
+            return CombatCommander::Instance().getAggression();
+        }
         if (command == MacroCommandType::StartGas || command == MacroCommandType::StopGas)
         {
             return the.my.completed.count(BWAPI::UnitTypes::Terran_Refinery) > 1;
@@ -1099,7 +1101,7 @@ namespace UAlbertaBot
         case NetworkTerranOptions::Terran_Armory:
             return BWAPI::UnitTypes::Terran_Armory;
         default:
-            return BWAPI::UnitTypes::Terran_SCV;
+            throw std::exception("AI evaluated invalid unit type");
         }
     }
     BWAPI::TechType NEATCommander::ToBWAPITech(NetworkTerranOptions tt)

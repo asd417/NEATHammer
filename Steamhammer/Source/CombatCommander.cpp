@@ -1704,6 +1704,40 @@ void CombatCommander::pullWorkers(int n)
     }
 }
 
+//Pull workers in 5 tile radius
+void CombatCommander::pullWorkers(BWAPI::TilePosition location)
+{
+    struct Compare
+    {
+        auto operator()(BWAPI::Unit left, BWAPI::Unit right) const -> bool
+        {
+            return workerPullScore(left) < workerPullScore(right);
+        }
+    };
+
+    std::priority_queue<BWAPI::Unit, std::vector<BWAPI::Unit>, Compare> workers;
+
+    Squad& groundSquad = _squadData.getSquad("Ground");
+
+    for (BWAPI::Unit unit : _combatUnits)
+    {
+        if (unit->getType().isWorker() &&
+            WorkerManager::Instance().isFree(unit) &&
+            _squadData.canAssignUnitToSquad(unit, groundSquad) &&
+            location.getDistance(unit->getTilePosition()) < 5)
+        {
+            workers.push(unit);
+        }
+    }
+
+    while (!workers.empty())
+    {
+        BWAPI::Unit worker = workers.top();
+        workers.pop();
+        _squadData.assignUnitToSquad(worker, groundSquad);
+    }
+}
+
 // Release workers from the attack squad.
 void CombatCommander::releaseWorkers()
 {
@@ -1727,23 +1761,6 @@ SquadOrder CombatCommander::getAttackOrder(Squad * squad)
     if (false && squad && squad->getUnits().size() > 0 && squad->hasGround() && squad->canAttackGround())
     {
         // We check our current bases (formerly plus 2 bases we may want to take next).
-        /*
-        Base * baseToClear1 = nullptr;
-        Base * baseToClear2 = nullptr;
-        BWAPI::TilePosition nextBasePos = the.map.getNextExpansion(false, true, false);
-        if (nextBasePos.isValid())
-        {
-            // The next mineral-optional expansion.
-            baseToClear1 = the.bases.getBaseAtTilePosition(nextBasePos);
-        }
-        nextBasePos = the.map.getNextExpansion(false, true, true);
-        if (nextBasePos.isValid() && nextBasePos != baseToClear1)
-        {
-            // The next gas expansion.
-            baseToClear2 = the.bases.getBaseAtTilePosition(nextBasePos);
-        }
-        */
-
         // Then pick any base with blockers and clear it.
         // The blockers are neutral buildings, and we can get their initial positions.
         for (Base * base : the.bases.getAll())

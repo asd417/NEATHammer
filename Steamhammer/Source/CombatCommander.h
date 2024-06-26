@@ -38,8 +38,6 @@ class CombatCommander
 
     void            updateIdleSquad();
     void            updateIrradiatedSquad();
-    void            updateOverlordSquad();
-    void			updateScourgeSquad();
     void            updateAttackSquads();
     void			updateReconSquad();
     void			updateWatchSquads();
@@ -68,7 +66,6 @@ class CombatCommander
     BWAPI::Unit     findClosestDefender(const Squad & defenseSquad, BWAPI::Position pos, bool flyingDefender, bool pullWoekers, bool enemyHasAntiAir);
     BWAPI::Unit     findClosestWorkerToTarget(BWAPI::Unitset & unitsToAssign, BWAPI::Unit target);
 
-    void			chooseScourgeTarget(const Squad & squad);
     void			chooseReconTarget(const Squad & squad);
     Base *          getReconLocation() const;
     SquadOrder		getAttackOrder(Squad * squad);
@@ -107,6 +104,7 @@ public:
     void clearLurkerOrder(LurkerTactic tactic);
     
     void pullWorkers(int n);
+    void pullWorkers(BWAPI::TilePosition location);
     void releaseWorkers();
     
     void drawSquadInformation(int x, int y);
