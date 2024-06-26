@@ -80,6 +80,7 @@ namespace UAlbertaBot
     }
     void NEATCommander::scoreFitness(double add)
     {
+        if (!network) return; // Only score fitness if network is initialized
         //UAB_ASSERT(fitness > 0.0f, "Negative Fitness: %s", std::to_string(fitness).c_str());
         fitness += add;
         fitness = fitness >= 0.0f ? fitness : 0.0f;
@@ -118,14 +119,22 @@ namespace UAlbertaBot
             std::cout << "Creating Network Structure" << id << "\n";
 
             try {
+                networkType = r[0]["NetworkType"];
                 json networkJson = json::parse(std::string(r[0]["Network"]));
                 
                 if (!network) delete network;
-#ifdef HyperNEAT
-                network = new RecurrentNetwork(networkJson["input_keys"], networkJson["output_keys"]);
-#else
-                network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
-#endif
+                if (networkType == NetworkType::FEEDFORWARD)
+                {
+                    network = new RecurrentNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+                }
+                else if (networkType == NetworkType::RECURRENT)
+                {
+                    network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+                }
+                else
+                {
+                    throw std::exception("INVALID NETWORK TYPE. CHOOSE FEEDFORWARD OR RECURRENT");
+                }
                 for (const json& ne : networkJson["node_evals"]) {
                     network->AddNodeEval(ne);
                 }
@@ -179,6 +188,7 @@ namespace UAlbertaBot
             catch (std::exception e) {
                 std::cout << "Error while sending fitness value to the training server: " << e.what() << "\n";
             }
+            delete network;
         }
     }
     void NEATCommander::onUnitCreate(BWAPI::Unit unit)
@@ -420,7 +430,7 @@ namespace UAlbertaBot
                     else
                     {
                         //enemy building map encoding
-                        inputVector.push_back(enemyMapData[xi - 16][yi - 16]);
+                        inputVector.push_back(enemyMapBuildingData[xi - 16][yi - 16]);
 
                         //inputVector.push_back(dis(gen));
                     }
@@ -590,12 +600,12 @@ namespace UAlbertaBot
                 //Draw all outputs
                 std::stringstream logStream;
                 for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)logToStream(logStream, "%4.5f\t", builderOutputs[i]);
-                for (int i = 0; i < 3; i++)logToStream(logStream, "%4.5f\t", 0.0f);
+                for (int i = 0; i < 60 - (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)logToStream(logStream, "%4.5f\t", 0.0f);
                 logToStream(logStream, "\n");
                 for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 0.0f);
                 logToStream(logStream, "\n");
                 for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)logToStream(logStream, "%4.5f\t", macroCommandTypeOutputs[i] );
-                for (int i = 0; i < 40; i++)logToStream(logStream, "%4.5f\t", 0.0f);
+                for (int i = 0; i < 60 - (int)MacroCommandType::QueueBarrier; i++)logToStream(logStream, "%4.5f\t", 0.0f);
                 logToStream(logStream, "\n");
                 for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 0.0f);
                 logToStream(logStream, "\n");

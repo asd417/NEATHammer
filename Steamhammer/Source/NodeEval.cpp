@@ -213,6 +213,7 @@ RecurrentNetwork::RecurrentNetwork(json& inodes, json& onodes)
     for (int o : onodes) {
         outputNodes.push_back(o);
     }
+    outputCount = onodes.size();
     for (auto& v : valuesArray)
     {
         for (int i : inodes) {

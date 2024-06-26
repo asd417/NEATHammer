@@ -268,6 +268,10 @@ namespace UAlbertaBot
 		MAX
 	};
 	class NEATCommander {
+		enum NetworkType {
+			FEEDFORWARD,
+			RECURRENT
+		};
 	public:
 		static NEATCommander& Instance();
 		void update();
@@ -307,7 +311,7 @@ namespace UAlbertaBot
 		double tilePosY; //0~256
 
 		void InitializeNetwork();
-
+		int networkType = NetworkType::FEEDFORWARD;
 		bool isWorkerType(BWAPI::UnitType type);
 		int getWorkerCount(BWAPI::Unitset& allUnits);
 		BWAPI::Unit NEATCommander::getProducer(NetworkProtossOptions option) const;

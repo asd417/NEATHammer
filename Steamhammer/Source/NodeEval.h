@@ -43,6 +43,9 @@ public:
 	virtual void						FinishInitializing();
 	virtual void						Reset();
 	virtual bool						IsNodeEvalEmpty();
+	int getOutputCount() const { return outputCount; }
+protected:
+	int outputCount;
 };
 
 class RecurrentNetwork : public Network {
@@ -77,6 +80,7 @@ public:
 		{
 			outputs.push_back(ov[o]);
 		}
+		if(outputs.size() != outputCount) throw std::invalid_argument("Output Vector size does not match Network Output size!");
 	}
 	const std::vector<double>& RecurrentNetwork::getOutputVector() override;
 	bool IsNodeEvalEmpty() override;
@@ -116,13 +120,11 @@ public:
 		{
 			outputs.push_back(values[o]);
 		}
+		if (outputs.size() != outputCount) throw std::invalid_argument("Output Vector size does not match Network Output size!");
 	}
-
 	const std::vector<double>& getOutputVector() override;
 	bool IsNodeEvalEmpty() override;
-	int getOutputCount() const {
-		return outputCount;
-	}
+	
 private:
 	std::vector<int> inputNodes;
 	std::vector<int> outputNodes;
