@@ -107,6 +107,8 @@ namespace UAlbertaBot
 
                     if (id == -1 || !res) throw std::exception("id is -1");
                     retry = false;
+                    networkType = r[0]["NetworkType"];
+                    networkJson = json::parse(std::string(r[0]["Network"]));
                 }
                 catch (std::exception e) {
                     //std::cout << "Error while retrieving new genome to evaluate: " << e.what() << "\n";
@@ -116,8 +118,6 @@ namespace UAlbertaBot
                     id = -1;
                     Sleep(Config::NEAT::RetryTimer * 1000);
                 }
-                networkType = r[0]["NetworkType"];
-                networkJson = json::parse(std::string(r[0]["Network"]));
             }
         }
         else 
