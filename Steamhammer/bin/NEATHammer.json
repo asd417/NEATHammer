@@ -11,8 +11,11 @@
     "RetryTimer": 30,
     "LoadNetworkFromJSON": false,
     "NetworkJSON": "network.json",
-    "WinScore": 1000,
-    "BuildingScore": 100,
+
+    "WinScore": 100,
+    "BuildingScore": 10,
+    "UnitCompleteScore": 1000,
+
     "AutoSurrender": true,
     "PrintNetworkOutput": false,
     "LogInputVector": false,
