@@ -86,8 +86,6 @@ namespace UAlbertaBot
         OpsBoss ops;
         // Extensible set of skills using the opponent model.
         SkillKit skillkit;
-        // Defense buildings for all races.
-        StaticDefense & staticDefense;
 
         // Varying during the game.
 

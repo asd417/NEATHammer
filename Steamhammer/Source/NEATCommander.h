@@ -144,6 +144,7 @@ namespace UAlbertaBot
 		NETWORK_OPTION_COUNT
 	};
 
+	//Complex Tile Type Enum
 	//Entries with higher number will override the data if the tile has multiple types of units
 	enum NEAT_TileType {
 		FOG = 0,
@@ -256,8 +257,7 @@ namespace UAlbertaBot
 		Terran_Battlecruiser,
 		Terran_Nuclear_Missile, //This is the only thing that the bot will see when the nuke is fired (if fired within visible range?)
 	};
-
-
+	//Simple Tile Type Enum
 	enum NEAT_TileType_Simple {
 		sFOG = 0,
 		sNOTWALKABLE,
@@ -283,45 +283,28 @@ namespace UAlbertaBot
 		void scoreFitness(double add);
 		void sendFitnessToTrainServer();
 
-		//Callbacks
+		//Fitness Functions
 		void onUnitCreate(BWAPI::Unit unit);
 		void onUnitComplete(BWAPI::Unit unit);
 		void onUnitDestroy(BWAPI::Unit unit);
-
-		//When visible unit becomes invisible
 		void onUnitHide(BWAPI::Unit unit);
-
-		//When invisible unit becomes visible
 		void onUnitShow(BWAPI::Unit unit);
 
 		void drawDebug(int x, int y);
-		void setTimeManager(TimerManager* t);
+		void setTimeManager(TimerManager* t); 
 	private:
 		NEATCommander();
-		TimerManager* timer = nullptr;
-		int mapWidth;
-		int mapHeight;
-		int lastMineral;
-		int lastGas;
-
-		//output vector
-		std::array<double, (size_t)NetworkProtossOptions::NETWORK_OPTION_COUNT> builderOutputs;
-		std::array<double, (size_t)MacroCommandType::QueueBarrier> macroCommandTypeOutputs;
-		double tilePosX; //0~256
-		double tilePosY; //0~256
 
 		void InitializeNetwork();
-		int networkType = NetworkType::FEEDFORWARD;
-		bool isWorkerType(BWAPI::UnitType type);
 		int getWorkerCount(BWAPI::Unitset& allUnits);
-		BWAPI::Unit NEATCommander::getProducer(NetworkProtossOptions option) const;
 
 		void evaluate();
 		void getVisibleMap(int sectionNum);
-		bool canMacro(MacroCommandType command);
 		void getVisibleMapSimple(int sectionNum);
+		bool canMacro(MacroCommandType command);
 		bool canBuild(NetworkTerranOptions option, BWAPI::TilePosition& location, int mineral, int gas);
 		bool canBuild(NetworkProtossOptions option, BWAPI::TilePosition& location);
+
 		BWAPI::TilePosition getClosestProtossBuildPosition(BWAPI::Position closestTo, BWAPI::UnitType buildingType) const;
 
 		BWAPI::UnitType ToBWAPIUnit(NetworkTerranOptions ut);
@@ -333,10 +316,13 @@ namespace UAlbertaBot
 		BWAPI::UpgradeType ToBWAPIUpgrade(NetworkProtossOptions ut);
 
 		NEAT_TileType getTileType(BWAPI::UnitType type);
-		std::vector<MacroAct> _actions{};
-		bool initialized = false;
+
+		//Input Vector
+		int mapWidth;
+		int mapHeight;
+		int lastMineral;
+		int lastGas;
 		int frame = 0;
-		int _lastUpdateFrame = 0;
 		int maxSections;
 		int curSection = 0;
 		std::vector<std::array<int, 2>> sectionsCoords{};
@@ -344,18 +330,32 @@ namespace UAlbertaBot
 		std::array<std::array<double, 16>, 16> enemyMapBuildingData{};
 		std::array<std::array<double, 16>, 16> friendlyMapData{};
 		std::array<std::array<double, 16>, 16> friendlyMapBuildingData{};
+		std::vector<double> inputVector{};
+
+		//Output Vector
+		std::array<double, (size_t)NetworkProtossOptions::NETWORK_OPTION_COUNT> builderOutputs;
+		std::array<double, (size_t)MacroCommandType::QueueBarrier> macroCommandTypeOutputs;
+		double tilePosX; //0~256
+		double tilePosY; //0~256
 
 		Network* network;
-		std::vector<double> inputVector{};
-		
-
 		int genomeID = 0;
 		double fitness = 0.0f;
+		bool initialized = false;
+		int _lastUpdateFrame = 0;
+		std::vector<MacroAct> _actions{};
+		int networkType = NetworkType::FEEDFORWARD;
 
+		//Misc
+
+		/// <summary>
+		/// NOT OWNED BY NEATCOMMANDER DO NOT DELETE
+		/// </summary>
+		TimerManager* timer = nullptr; 
 		//Random number generator
 		std::random_device rd;
 		std::mt19937 gen;
 		std::uniform_real_distribution<double> dis;
 	};
 
-}
+};

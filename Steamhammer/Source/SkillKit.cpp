@@ -2,7 +2,6 @@
 
 #include "SkillBattles.h"
 #include "SkillGasSteal.h"
-#include "SkillLurkers.h"
 #include "SkillUnitTimings.h"
 #include "The.h"
 
@@ -27,7 +26,6 @@ void SkillKit::addSkill(Skill * skill)
 void SkillKit::initialize()
 {
     addSkill(new SkillBattles);
-    addSkill(new SkillLurkers);
     addSkill(new SkillUnitTimings);
 }
 

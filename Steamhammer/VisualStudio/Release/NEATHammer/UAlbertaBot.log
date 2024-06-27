@@ -2,10 +2,11 @@
   NEATCommander.cpp
 c:\users\ylee5\documents\starcraft_research\neathammer\steamhammer\source\nodeeval.h(67): warning C4018: '<': signed/unsigned mismatch
 c:\users\ylee5\documents\starcraft_research\neathammer\steamhammer\source\nodeeval.h(107): warning C4018: '<': signed/unsigned mismatch
+c:\users\ylee5\documents\starcraft_research\neathammer\steamhammer\source\neatcommander.cpp(138): warning C4101: 'e': unreferenced local variable
      Creating library C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\NEATHammer.lib and object C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\NEATHammer.exp
   Generating code
-  28 of 14085 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+  37 of 13374 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    15 functions had inline decision re-evaluated but remain unchanged
+    24 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   UAlbertaBot.vcxproj -> C:\Users\ylee5\Documents\Starcraft_Research\NEATHammer\Steamhammer\VisualStudio\\..\bin\NEATHammer.dll

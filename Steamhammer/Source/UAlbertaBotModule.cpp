@@ -22,7 +22,7 @@ UAlbertaBotModule::UAlbertaBotModule()
 void UAlbertaBotModule::onStart()
 {
     // Initialize BOSS, the Build Order Search System
-    BOSS::init();
+    //BOSS::init();
 
     the.initialize();
 
@@ -58,7 +58,7 @@ void UAlbertaBotModule::onStart()
 
 void UAlbertaBotModule::onEnd(bool isWinner)
 {
-    NEATCommander::Instance().scoreFitness(Config::NEAT::WinScore);
+    if(isWinner) NEATCommander::Instance().scoreFitness(Config::NEAT::WinScore);
     GameCommander::Instance().onEnd(isWinner);
 }
 
@@ -95,7 +95,6 @@ void UAlbertaBotModule::onUnitDestroy(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitDestroy(unit);
     NEATCommander::Instance().onUnitDestroy(unit);
-    
 }
 
 void UAlbertaBotModule::onUnitMorph(BWAPI::Unit unit)
@@ -108,15 +107,12 @@ void UAlbertaBotModule::onSendText(std::string text)
     ParseUtils::ParseTextCommand(text);
 }
 
-/// <summary>
-/// Called when any unit is created.
-/// </summary>
-/// <param name="unit"></param>
 void UAlbertaBotModule::onUnitCreate(BWAPI::Unit unit)
 { 
     GameCommander::Instance().onUnitCreate(unit);
     NEATCommander::Instance().onUnitCreate(unit);
 }
+
 /// <summary>
 /// Called when the state of a unit changes from incomplete to complete.
 /// (finished training or finished constructing
@@ -126,7 +122,6 @@ void UAlbertaBotModule::onUnitComplete(BWAPI::Unit unit)
 {
     GameCommander::Instance().onUnitComplete(unit);
     NEATCommander::Instance().onUnitComplete(unit);
-    
 }
 
 /// <summary>

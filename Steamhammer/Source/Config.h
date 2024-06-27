@@ -29,10 +29,7 @@ namespace Config
         extern std::string PreparedDataDir;
         extern std::string ReadDir;
         extern std::string WriteDir;
-        extern std::string OpeningTimingFile;
         extern int MaxGameRecords;
-        extern bool ReadOpponentModel;
-        extern bool WriteOpponentModel;
     }
 
     namespace Skills
@@ -43,21 +40,8 @@ namespace Config
         extern bool SurrenderWhenHopeIsLost;
 
         extern bool ScoutHarassEnemy;
-        extern bool GasSteal;
-
-        extern bool Burrow;
-        extern bool UseSunkenRangeBug;
-
-        extern int MaxQueens;
-        extern int MaxInfestedTerrans;
-        extern int MaxDefilers;
     }
 
-    namespace Strategy
-    {
-        extern bool Crazyhammer;
-        extern bool UsePlanRecognizer;
-    }
     namespace NEAT
     {
         extern bool Train;
@@ -65,10 +49,7 @@ namespace Config
         extern bool LoadNetworkFromJSON;
         extern std::string NetworkJSON;
         extern int WinScore;
-        extern int EnemyShowScore;
-        extern int FitnessScore_Mineral_Divider;
-        extern int FitnessScore_Gas_Divider;
-        extern int SubtractFitnessScore;
+        extern int BuildingScore;
         extern bool AutoSurrender;
 
         extern bool PrintNetworkOutput;
@@ -99,7 +80,6 @@ namespace Config
         extern bool DrawGameInfo;
         extern bool DrawUnitHealthBars;
         extern bool DrawProductionInfo;
-        extern bool DrawBuildOrderSearchInfo;
         extern bool DrawQueueFixInfo;
         extern bool DrawScoutInfo;
         extern bool DrawWorkerInfo;
@@ -107,7 +87,6 @@ namespace Config
         extern bool DrawReservedBuildingTiles;
         extern bool DrawCombatSimulationInfo;
         extern bool DrawBuildingInfo;
-        extern bool DrawStaticDefensePlan;
         extern bool DrawEnemyUnitInfo;
         extern bool DrawUnitCounts;
         extern bool DrawHiddenEnemies;
@@ -117,11 +96,9 @@ namespace Config
         extern bool DrawTerrainHeights;
         extern bool DrawBaseInfo;
         extern bool DrawExpoScores;
-        extern bool DrawStrategyBossInfo;
         extern bool DrawUnitTargets;
         extern bool DrawUnitOrders;
         extern bool DrawMicroState;
-        extern bool DrawLurkerTactics;
         extern bool DrawSquadInfo;
         extern bool DrawClusters;
         extern bool DrawDefenseClusters;
@@ -145,10 +122,8 @@ namespace Config
     
     namespace Macro
     {
-        extern int BOSSFrameLimit;
         extern int WorkersPerRefinery;
         extern double WorkersPerPatch;
-        extern int AbsoluteMaxWorkers;
         extern int ProductionJamFrameLimit;
         extern bool ExpandToIslands;
     }

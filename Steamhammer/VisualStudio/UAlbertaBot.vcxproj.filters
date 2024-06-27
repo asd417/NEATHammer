@@ -171,9 +171,7 @@
     <ClCompile Include="..\Source\GridBuildable.cpp" />
     <ClCompile Include="..\Source\MacroCommand.cpp" />
     <ClCompile Include="..\Source\SkillBattles.cpp" />
-    <ClCompile Include="..\Source\SkillLurkers.cpp" />
     <ClCompile Include="..\Source\TacticsOrders.cpp" />
-    <ClCompile Include="..\Source\StaticDefense.cpp" />
     <ClCompile Include="..\Source\NEATCommander.cpp">
       <Filter>NEAT</Filter>
     </ClCompile>
@@ -366,9 +364,7 @@
     <ClInclude Include="..\Source\SkillUnitTimings.h" />
     <ClInclude Include="..\Source\GridBuildable.h" />
     <ClInclude Include="..\Source\SkillBattles.h" />
-    <ClInclude Include="..\Source\SkillLurkers.h" />
     <ClInclude Include="..\Source\TacticsOrders.h" />
-    <ClInclude Include="..\Source\StaticDefense.h" />
     <ClInclude Include="..\Source\NEATCommander.h">
       <Filter>NEAT</Filter>
     </ClInclude>

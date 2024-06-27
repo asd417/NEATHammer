@@ -38,40 +38,13 @@ class StrategyManager
 {
     StrategyManager();
 
-    BWAPI::Race					    _selfRace;
-    BWAPI::Race					    _enemyRace;
-    std::map<std::string, Strategy> _strategies;
-    int                             _totalGamesPlayed;
-    const BuildOrder                _emptyBuildOrder;
-    std::string						_openingGroup;
-    bool							_hasDropTech;
-    int								_highWaterBases;				// most bases we've ever had, terran and protoss only
-    bool							_openingStaticDefenseDropped;	// make sure we do this at most once ever
-
-    const	bool				    shouldExpandNow() const;
-    const	MetaPairVector		    getProtossBuildOrderGoal();
+    //Left as example
     const	MetaPairVector		    getTerranBuildOrderGoal();
-    const	MetaPairVector		    getZergBuildOrderGoal() const;
-
-    bool							detectSupplyBlock(BuildOrderQueue & queue) const;
-    bool							handleExtremeEmergency(BuildOrderQueue & queue);
 
     bool							canPlanBuildOrderNow() const;
-    void							performBuildOrderSearch();
-
 public:
-    
     static	StrategyManager &	    Instance();
-
-            void                    addStrategy(const std::string & name, Strategy & strategy);
-    const	std::string &			getOpeningGroup() const;
-    const	MetaPairVector		    getBuildOrderGoal();
-
-            void					handleUrgentProductionIssues(BuildOrderQueue & queue);
-            void					freshProductionPlan();
-
-            bool					dropIsPlanned() const;
-            bool					hasDropTech();
+    void							queryNetworkEvaluation();
 };
 
 }

@@ -148,8 +148,6 @@ bool MacroAct::isCombatUnit() const
 
         return
             _unitType.canAttack() ||                             // includes carriers and reavers
-            _unitType == BWAPI::UnitTypes::Zerg_Queen ||
-            _unitType == BWAPI::UnitTypes::Zerg_Defiler ||
             _unitType == BWAPI::UnitTypes::Terran_Medic ||
             _unitType == BWAPI::UnitTypes::Terran_Science_Vessel ||
             _unitType == BWAPI::UnitTypes::Protoss_High_Templar ||
@@ -182,11 +180,6 @@ bool MacroAct::isBuilding()	const
 bool MacroAct::isAddon() const
 {
     return _type == MacroActs::Unit && _unitType.isAddon();
-}
-
-bool MacroAct::isMorphedBuilding() const
-{
-    return _type == MacroActs::Unit && UnitUtil::IsMorphedBuildingType(_unitType);
 }
 
 bool MacroAct::isRefinery()	const

@@ -1416,23 +1416,6 @@ int WorkerManager::getNumPostedWorkers() const
     return workerData.getNumPostedWorkers();
 }
 
-// The largest number of workers that it is efficient to have right now.
-// Does not take into account possible preparations for future expansions.
-// May not exceed Config::Macro::AbsoluteMaxWorkers.
-int WorkerManager::getMaxWorkers() const
-{
-    int patches = the.bases.mineralPatchCount();
-    int refineries, geysers;
-    the.bases.gasCounts(refineries, geysers);
-
-    // Never let the max number of workers fall to 0!
-    // Set aside 1 for future opportunities.
-    return std::min(
-            Config::Macro::AbsoluteMaxWorkers,
-            1 + int(std::round(Config::Macro::WorkersPerPatch * patches + Config::Macro::WorkersPerRefinery * refineries))
-        );
-}
-
 // The number of workers assigned to this resource depot to mine minerals, or to this refinery to mine gas.
 int WorkerManager::getNumWorkers(BWAPI::Unit jobUnit) const
 {

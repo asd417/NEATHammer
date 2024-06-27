@@ -3,7 +3,7 @@
 using namespace UAlbertaBot;
 
 TimerManager::TimerManager() 
-    : _timers(std::vector<BOSS::Timer>(NumTypes))
+    : _timers(std::vector<Timer>(NumTypes))
     , _count(0)
     , _maxMilliseconds(0.0)
     , _totalMilliseconds(0.0)

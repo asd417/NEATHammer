@@ -38,7 +38,6 @@ class ProductionManager
     int                 _combatGasSpent;
     
     BWAPI::Unit         getClosestUnitToPosition(const std::vector<BWAPI::Unit> & units, BWAPI::Position closestTo) const;
-    BWAPI::Unit         getClosestLarvaToPosition(BWAPI::Position closestTo) const;
 
     void				executeCommand(const MacroAct & act);
     void				updateGoals();

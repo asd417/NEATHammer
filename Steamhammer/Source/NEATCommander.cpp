@@ -42,7 +42,8 @@ namespace UAlbertaBot
         int dividedWidth = mapWidth / 32; //get 8
         int dividedHeight = mapHeight / 32;
 
-        fitness = -Config::NEAT::SubtractFitnessScore;
+        //Game always start with 1 command center. 
+        fitness = -Config::NEAT::BuildingScore;
 
         //Get number of sections in the map
         maxSections = dividedWidth * dividedHeight;
@@ -88,10 +89,11 @@ namespace UAlbertaBot
 
     void NEATCommander::InitializeNetwork()
     {
+        json networkJson;
+        int id = -1;
         if (!Config::NEAT::LoadNetworkFromJSON)
         {
             bool retry = true;
-            int id = -1;
             json r{};
             while (retry) {
                 DBKeySpace dbkeys{};
@@ -114,38 +116,60 @@ namespace UAlbertaBot
                     id = -1;
                     Sleep(Config::NEAT::RetryTimer * 1000);
                 }
-            }
-
-            std::cout << "Creating Network Structure" << id << "\n";
-
-            try {
                 networkType = r[0]["NetworkType"];
-                json networkJson = json::parse(std::string(r[0]["Network"]));
-                
-                if (!network) delete network;
-                if (networkType == NetworkType::FEEDFORWARD)
-                {
-                    network = new RecurrentNetwork(networkJson["input_keys"], networkJson["output_keys"]);
-                }
-                else if (networkType == NetworkType::RECURRENT)
-                {
-                    network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
-                }
-                else
-                {
-                    throw std::exception("INVALID NETWORK TYPE. CHOOSE FEEDFORWARD OR RECURRENT");
-                }
-                for (const json& ne : networkJson["node_evals"]) {
-                    network->AddNodeEval(ne);
-                }
-                if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Gene");
-                network->FinishInitializing();
+                networkJson = json::parse(std::string(r[0]["Network"]));
             }
-            catch (std::exception e) {
-                std::cout << "Error creating Network Structure: " << e.what() << "\n";
-                fitness = 0.0f;
-                BWAPI::Broodwar->leaveGame();
+        }
+        else 
+        {
+            std::ifstream file(Config::NEAT::NetworkJSON);
+            if (!file.is_open()) {
+                throw std::exception("Could not open the file");
             }
+            std::string file_contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+            // Close the file
+            file.close();
+
+            // Parse the JSON data
+            try {
+                networkJson = json::parse(file_contents);
+            }
+            catch (json::parse_error& e) {
+                throw std::exception("Error while parsing network JSON");
+            }
+            //Should automate this...
+            networkType = NetworkType::FEEDFORWARD;
+        }
+        
+        try {
+            if (!network) delete network;
+            if (networkType == NetworkType::FEEDFORWARD)
+            {
+                network = new RecurrentNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+            }
+            else if (networkType == NetworkType::RECURRENT)
+            {
+                network = new FeedForwardNetwork(networkJson["input_keys"], networkJson["output_keys"]);
+            }
+            else
+            {
+                throw std::exception("INVALID NETWORK TYPE. CHOOSE FEEDFORWARD OR RECURRENT");
+            }
+            for (const json& ne : networkJson["node_evals"]) {
+                network->AddNodeEval(ne);
+            }
+            if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Gene");
+            network->FinishInitializing();
+        }
+        catch (std::exception e) {
+            std::cout << "Error creating Network Structure: " << e.what() << "\n";
+            fitness = 0.0f;
+            BWAPI::Broodwar->leaveGame();
+        }
+        if (Config::NEAT::LogOutputVector)
+        {
+            //Mark new network
             std::stringstream logStream;
             for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 1.0f);
             logToStream(logStream, "\n");
@@ -159,17 +183,18 @@ namespace UAlbertaBot
             logToStream(logStream, "\n");
             logToStream(logStream, "\n");
             std::ofstream logFStream;
-            logFStream.open("NEAT_output_log.txt", std::ofstream::app);
+            logFStream.open(Config::NEAT::OutputLogFileName, std::ofstream::app);
             logFStream << logStream.rdbuf();
             logFStream.flush();
             logFStream.close();
-            genomeID = id;
-            initialized = true;
         }
+        genomeID = id;
+        initialized = true;
+        
     }
     void NEATCommander::sendFitnessToTrainServer()
     {
-        if (Config::NEAT::Train)
+        if (Config::NEAT::Train && !Config::NEAT::LoadNetworkFromJSON)
         {
             std::cout << "Genome ID " << genomeID << " ";
             std::cout << "Fitness Calculated: " << fitness << "\n";
@@ -191,6 +216,19 @@ namespace UAlbertaBot
             delete network;
         }
     }
+    int NEATCommander::getWorkerCount(BWAPI::Unitset& allMyUnits)
+    {
+        int r = 0;
+        for (auto u : allMyUnits) {
+            if (u->getType().isWorker())
+            {
+                r++;
+            }
+        }
+        return r;
+    }
+
+    //Fitness functions
     void NEATCommander::onUnitCreate(BWAPI::Unit unit)
     {
     }
@@ -203,7 +241,7 @@ namespace UAlbertaBot
             if (type.isBuilding())
             {
                 //Not a huge motivation to build buildings
-                //scoreFitness(type.buildScore());
+                scoreFitness(Config::NEAT::BuildingScore);
             }
             else if(type.isWorker())
             {
@@ -213,25 +251,13 @@ namespace UAlbertaBot
             else
             {
                 //Huge Motivation to build army
-                //Buildscore squared
-                scoreFitness(type.buildScore() * type.buildScore());
+                scoreFitness(type.buildScore());
             }
         }
         
     }
     void NEATCommander::onUnitDestroy(BWAPI::Unit unit)
     {
-        BWAPI::UnitType type = unit->getType();
-        //Strong motivation to kill
-        if (unit->getPlayer() == the.enemy()) scoreFitness(type.buildScore() * type.buildScore());
-        if (unit->getPlayer() == the.self())
-        {
-            //If building is destroyed deduct some of the score that was given by creating the building
-            if(type.isBuilding()) scoreFitness(-type.buildScore() / 2);
-            //Worker destroyed = bad
-            else if (type.isWorker()) scoreFitness(-type.buildScore() / 2);
-            else scoreFitness(-type.buildScore());
-        }
     }
     void NEATCommander::onUnitHide(BWAPI::Unit unit)
     {
@@ -241,6 +267,8 @@ namespace UAlbertaBot
         //Used detector to reveal invisible units
         //if (unit->getPlayer() == the.enemy()) scoreFitness(Config::NEAT::EnemyShowScore);
     }
+
+
     void NEATCommander::drawDebug(int x, int y)
     {
         int startX = x;
@@ -300,7 +328,6 @@ namespace UAlbertaBot
                 y = startY;
             }
         }
-        
         BWAPI::Broodwar->drawTextScreen(x, y, "%2.8f", tilePosX);
         y += 12;
         BWAPI::Broodwar->drawTextScreen(x, y, "%2.8f", tilePosY);
@@ -321,7 +348,6 @@ namespace UAlbertaBot
         if (!network) return;
 
         if (the.now() == _lastUpdateFrame) return;
-        //Logger::LogAppendToFile("NEAT_log.txt", "\tNEATCommander::evaluate()///////////////////////////////////////////////////////////////////////////////////////////////////////");
 
         //Make sure to only call this once per frame
         _lastUpdateFrame = the.now();
@@ -363,38 +389,6 @@ namespace UAlbertaBot
 
         //getVisibleMap(curSection);
         getVisibleMapSimple(curSection);
-
-#ifndef HyperNEAT
-        //NEAT Input: 16x16 + 16x16 + 12 = 524
-        
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                inputVector.push_back(friendlyMapData[i][j]);
-            }
-        }
-        //16x16 + 16x16
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                inputVector.push_back(enemyMapData[i][j]);
-            }
-        }
-        inputVector.push_back(mSupply);
-        inputVector.push_back(cSupply);
-        inputVector.push_back(min);
-        inputVector.push_back(gas);
-        inputVector.push_back(ctime);
-        inputVector.push_back(ctime);
-        inputVector.push_back(sectionCoordW);
-        inputVector.push_back(sectionCoordH);
-        inputVector.push_back(mapWidth);
-        inputVector.push_back(mapWidth);
-        inputVector.push_back(workerCount);
-        inputVector.push_back(enemyRace);
-#else
-        //HyperNEAT encoding 16x2 x 16x2 = 32x32 = 1024 input nodes
-        //fm |em
-        //-------
-        //fmb|emb
 
         for (int xi = 0; xi < 32; xi++)
         {
@@ -448,7 +442,6 @@ namespace UAlbertaBot
         inputVector[10] = double(workerCount)/double(200);
         inputVector[11] = double(enemyRace)/double(3);
 
-#endif
         //Log input vector
         if (Config::NEAT::LogInputVector)
         {
@@ -483,87 +476,6 @@ namespace UAlbertaBot
         // 
         //BuilderOutput and MacroCommandTypeOutput will be chosen through strongest node output 
 
-#ifdef PROTOSS
-        for (int i = 0; i < (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i++)
-        {
-            builderOutputs[i] += network->getOutputVector()[i];
-        }
-        constexpr int outputVectorOffset = (int)NetworkProtossOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
-        for (int i = (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i < outputVectorOffset; i++)
-        {
-            macroCommandTypeOutputs[i] += network->getOutputVector()[i];
-        }
-        tilePosX += network->getOutputVector()[outputVectorOffset];
-        tilePosY += network->getOutputVector()[outputVectorOffset+1];
-
-        //We scanned through the whole map
-        curSection++;
-        curSection = curSection % maxSections;
-        //Looked through all sections. Make command
-        if (curSection == 0)
-        {
-            std::clamp(tilePosX, (double) 0.0f, (double) 1.0f);
-            std::clamp(tilePosY, (double) 0.0f, (double) 1.0f);
-            int posx = int(tilePosX * mapWidth);
-            int posy = int(tilePosY * mapHeight);
-            BWAPI::TilePosition buildPos = { posx,posy };
-
-            int highestBuildOptionOutput = 0;
-            double highestBuildOptionOutputScore = 0;
-            for (int i = 0; i < (int)NetworkProtossOptions::NETWORK_OPTION_COUNT; i++)
-            {
-                if (builderOutputs[i] > highestBuildOptionOutputScore && canBuild((NetworkProtossOptions)i, buildPos))
-                {
-                    highestBuildOptionOutput = i;
-                    highestBuildOptionOutputScore = builderOutputs[i];
-                }
-            }
-            
-            int highestMacroCommandTypeOutput = 0;
-            double highestMacroCommandTypeOutputScore = 0;
-            for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)
-            {
-                //Check if unit exists
-                if (macroCommandTypeOutputs[i] > highestMacroCommandTypeOutputScore)
-                {
-                    highestMacroCommandTypeOutput = i;
-                    highestMacroCommandTypeOutputScore = macroCommandTypeOutputs[i];
-                }
-            }
-
-            MacroAct ma;
-            // compare score between build option score and macro command type score
-            if (highestBuildOptionOutputScore > highestMacroCommandTypeOutputScore)
-            {
-                //BuildOutput has stronger signal than MacroCommandUnitType signal
-                if ((NetworkProtossOptions)highestBuildOptionOutput < NetworkProtossOptions::Psionic_Storm) //unit or building
-                {
-                    ma = MacroAct(ToBWAPIUnit((NetworkProtossOptions)highestBuildOptionOutput), buildPos);
-                }
-                else if ((NetworkProtossOptions)highestBuildOptionOutput < NetworkProtossOptions::Protoss_Ground_Armor) //tech
-                {
-                    ma = MacroAct(ToBWAPITech((NetworkProtossOptions)highestBuildOptionOutput));
-                }
-                else //upgrade
-                {
-                    ma = MacroAct(ToBWAPIUpgrade((NetworkProtossOptions)highestBuildOptionOutput));
-                }
-                ma.confidence = highestBuildOptionOutputScore;
-            }
-            else {
-                ma = MacroAct((MacroCommandType)highestMacroCommandTypeOutput, {posx,posy});
-                ma.confidence = highestMacroCommandTypeOutputScore;
-            }
-            
-            _actions.push_back(ma);
-            //std::cout << "Network Evaluated " << std::to_string(_actions.size()) << " actions\n";
-            //Reset output vector
-            builderOutputs.fill(0.0f);
-            macroCommandTypeOutputs.fill(0.0f);
-            tilePosX = 0.0f; //0~256
-            tilePosY = 0.0f; //0~256
-        }
-#else
         for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)
         {
             builderOutputs[i] += network->getOutputVector()[i];
@@ -730,25 +642,6 @@ namespace UAlbertaBot
             tilePosY = 0.0f; //0~256
             //when using recurrent network, resets the network
             network->Reset();
-        }
-#endif
-    }
-
-    int NEATCommander::getWorkerCount(BWAPI::Unitset& allMyUnits)
-    {
-        int r = 0;
-        for (auto u : allMyUnits) {
-            if (isWorkerType(u->getType()))
-            {
-                r++;
-            }
-        }
-        return r;
-    }
-
-    bool NEATCommander::isWorkerType(BWAPI::UnitType type) {
-        if (type == BWAPI::UnitTypes::Terran_SCV || type == BWAPI::UnitTypes::Zerg_Drone || type == BWAPI::UnitTypes::Protoss_Probe) {
-            return true;
         }
     }
 

@@ -7,7 +7,6 @@
 #include "ParseUtils.h"
 #include "ProductionManager.h"
 #include "Random.h"
-#include "StaticDefense.h"
 
 using namespace UAlbertaBot;
 
@@ -18,7 +17,7 @@ The::The()
     //, openingTiming(OpeningTiming::Instance())
     , production(ProductionManager::Instance())
     , random(Random::Instance())
-    , staticDefense(*new StaticDefense)
+    
 {
 }
 

@@ -101,8 +101,8 @@ class ImageSliderApp:
 
 
 def main():
-    input_file = 'Log_NEAT_Input.txt'  # Path to the input file containing the grid
-    #input_file = 'Log_NEAT_Output.txt'  # Path to the output file containing the grid
+    #input_file = 'Log_NEAT_Input.txt'  # Path to the input file containing the grid
+    input_file = 'Log_NEAT_Output.txt'  # Path to the output file containing the grid
     output_image = 'grayscale_image.png'  # Path to the output image file
 
     # Parse the grid from the file

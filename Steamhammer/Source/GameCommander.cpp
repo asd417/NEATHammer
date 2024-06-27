@@ -158,10 +158,6 @@ void GameCommander::drawGameInformation(int x, int y)
         //white, summary.totalWins, summary.totalGames - summary.totalWins,
         BWAPI::Broodwar->enemy()->getTextColor(), BWAPI::Broodwar->enemy()->getName().c_str());
     y += 12;
-    
-    const std::string & openingGroup = StrategyManager::Instance().getOpeningGroup();
-
-    y += 12;
 
     std::string island = "";
     if (Bases::Instance().isIslandStart())

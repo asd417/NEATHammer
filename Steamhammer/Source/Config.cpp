@@ -19,15 +19,12 @@ namespace Config
     {
         std::string ErrorLogFilename		= "Steamhammer_ErrorLog.txt";
         bool LogAssertToErrorFile			= false;
-
         std::string StaticDir               = "bwapi-data/AI/";
         std::string PreparedDataDir         = "bwapi-data/AI/om/";
         std::string ReadDir                 = "bwapi-data/read/";
         std::string WriteDir				= "bwapi-data/write/";
         std::string OpeningTimingFile       = "timings.txt";
         int MaxGameRecords					= 0;
-        bool ReadOpponentModel				= false;
-        bool WriteOpponentModel				= false;
     }
 
     namespace Skills
@@ -38,20 +35,6 @@ namespace Config
         bool SurrenderWhenHopeIsLost        = true;
 
         bool ScoutHarassEnemy               = false;
-        bool GasSteal                       = true;
-
-        bool Burrow                         = true;
-        bool UseSunkenRangeBug              = true;
-
-        int MaxQueens                       = 0;
-        int MaxInfestedTerrans              = 0;
-        int MaxDefilers                     = 0;
-    }
-
-    namespace Strategy
-    {
-        bool Crazyhammer                    = false;
-        bool UsePlanRecognizer				= false;
     }
 
     namespace NEAT
@@ -63,11 +46,10 @@ namespace Config
         
         bool LoadNetworkFromJSON = false;
         std::string NetworkJSON = "";
+
         int WinScore = 1000;
-        int EnemyShowScore = 1;
-        int FitnessScore_Mineral_Divider = 100;
-        int FitnessScore_Gas_Divider = 100;
-        int SubtractFitnessScore = 1600;
+        int BuildingScore = 100;
+
         bool AutoSurrender = true;
 
         bool PrintNetworkOutput = false;
@@ -90,7 +72,7 @@ namespace Config
     namespace BWAPIOptions
     {
         int SetLocalSpeed                   = 0;
-        int SetFrameSkip                    = 3000;
+        int SetFrameSkip                    = 100;
         bool EnableUserInput                = true;
         bool EnableCompleteMapInformation   = false;
     }
@@ -104,8 +86,7 @@ namespace Config
     {
         bool DrawGameInfo                   = true;
         bool DrawUnitHealthBars             = false;
-        bool DrawProductionInfo             = true;
-        bool DrawBuildOrderSearchInfo       = false;
+        bool DrawProductionInfo             = false;
         bool DrawQueueFixInfo				= false;
         bool DrawScoutInfo                  = false;
         bool DrawWorkerInfo                 = false;
@@ -113,7 +94,6 @@ namespace Config
         bool DrawReservedBuildingTiles      = false;
         bool DrawCombatSimulationInfo       = false;
         bool DrawBuildingInfo               = false;
-        bool DrawStaticDefensePlan          = false;
         bool DrawEnemyUnitInfo              = false;
         bool DrawUnitCounts                 = false;
         bool DrawHiddenEnemies				= false;
@@ -123,11 +103,9 @@ namespace Config
         bool DrawTerrainHeights             = false;
         bool DrawBaseInfo					= false;
         bool DrawExpoScores					= false;
-        bool DrawStrategyBossInfo			= false;
         bool DrawUnitTargets				= false;
         bool DrawUnitOrders					= false;
         bool DrawMicroState					= false;
-        bool DrawLurkerTactics              = false;
         bool DrawSquadInfo                  = false;
         bool DrawClusters					= false;
         bool DrawDefenseClusters			= false;
@@ -142,7 +120,7 @@ namespace Config
     namespace Micro
     {
         bool KiteWithRangedUnits            = true;
-        bool WorkersDefendRush              = false;
+        bool WorkersDefendRush              = true;
         int RetreatMeleeUnitShields         = 0;
         int RetreatMeleeUnitHP              = 0;
         int CombatSimRadius					= 300;      // radius of units around frontmost unit for combat sim
@@ -151,11 +129,9 @@ namespace Config
 
     namespace Macro
     {
-        int BOSSFrameLimit                  = 160;
-        int ProductionJamFrameLimit			= 360;
+        int ProductionJamFrameLimit			= 33;
         int WorkersPerRefinery              = 3;
         double WorkersPerPatch              = 3.0;
-        int AbsoluteMaxWorkers				= 75;
         bool ExpandToIslands				= false;
     }
 

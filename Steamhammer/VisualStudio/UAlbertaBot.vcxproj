@@ -190,12 +190,10 @@
     <ClCompile Include="..\Source\Skill.cpp" />
     <ClCompile Include="..\Source\SkillBattles.cpp" />
     <ClCompile Include="..\Source\SkillKit.cpp" />
-    <ClCompile Include="..\Source\SkillLurkers.cpp" />
     <ClCompile Include="..\Source\SkillUnitTimings.cpp" />
     <ClCompile Include="..\Source\Squad.cpp" />
     <ClCompile Include="..\Source\SquadData.cpp" />
     <ClCompile Include="..\Source\SquadOrder.cpp" />
-    <ClCompile Include="..\Source\StaticDefense.cpp" />
     <ClCompile Include="..\Source\StrategyManager.cpp" />
     <ClCompile Include="..\Source\stringformat.cpp" />
     <ClCompile Include="..\Source\TacticsOrders.cpp" />
@@ -278,12 +276,10 @@
     <ClInclude Include="..\Source\Skill.h" />
     <ClInclude Include="..\Source\SkillBattles.h" />
     <ClInclude Include="..\Source\SkillKit.h" />
-    <ClInclude Include="..\Source\SkillLurkers.h" />
     <ClInclude Include="..\Source\SkillUnitTimings.h" />
     <ClInclude Include="..\Source\Squad.h" />
     <ClInclude Include="..\Source\SquadData.h" />
     <ClInclude Include="..\Source\SquadOrder.h" />
-    <ClInclude Include="..\Source\StaticDefense.h" />
     <ClInclude Include="..\Source\StrategyManager.h" />
     <ClInclude Include="..\Source\stringformat.h" />
     <ClInclude Include="..\Source\TacticsOrders.h" />

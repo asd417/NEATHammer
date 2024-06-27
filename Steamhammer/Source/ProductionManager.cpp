@@ -66,21 +66,9 @@ void ProductionManager::update()
     // if nothing is currently building, get a new goal from the strategy manager
     if (_queue.isEmpty())
     {
-        if (Config::Debug::DrawBuildOrderSearchInfo)
-        {
-            BWAPI::Broodwar->drawTextScreen(150, 10, "Nothing left to build, replanning.");
-        }
-
-        if (!_outOfBook)
-        {
-            //BWAPI::Broodwar->printf("build finished %d, minerals and gas %d %d",
-            //	the.now(), the.self()->minerals(), the.self()->gas()
-            //);
-        }
-
         goOutOfBookAndClearQueue();
         //NEAT network evaluation starts in here
-        StrategyManager::Instance().freshProductionPlan();
+        StrategyManager::Instance().queryNetworkEvaluation();
     }
 
     // Build stuff from the production queue.
@@ -183,7 +171,6 @@ void ProductionManager::manageBuildOrderQueue()
             // predict the worker movement to that building location
             // NOTE If the worker is set moving, this sets flag _movingToThisBuildingLocation = true
             //      so that we don't 
-            //Why is this function causing isse?????
             predictWorkerMovement(b);
             break;
         }
@@ -216,16 +203,7 @@ void ProductionManager::manageBuildOrderQueue()
             the.now() > _lastProductionFrame + Config::Macro::ProductionJamFrameLimit &&
             (the.self()->minerals() >= 100 || the.bases.mineralPatchCount() > 0))
         {
-            if (_queue.getHighestPriorityItem().macroAct.isUnit() &&
-                _queue.getHighestPriorityItem().macroAct.getUnitType() == BWAPI::UnitTypes::Zerg_Mutalisk &&
-                the.my.completed.count(BWAPI::UnitTypes::Zerg_Spire) == 0 &&
-                (the.my.all.count(BWAPI::UnitTypes::Zerg_Spire) > 0 || BuildingManager::Instance().isBeingBuilt(BWAPI::UnitTypes::Zerg_Spire)))
-            {
-                // Exception: Sometimes the opening book can intentionally pause production for over a minute
-                // while saving up for mutalisks. So if a mutalisk is next and a spire is building, do nothing.
-                // BWAPI::Broodwar->printf("saving for mutas");
-            }
-            else if (the.self()->supplyUsed() > 400 - 12)
+            if (the.self()->supplyUsed() > 400 - 12)
             {
                 // We can't produce most likely because we're maxed. Great news!
             }
@@ -267,14 +245,6 @@ void ProductionManager::maybeReorderQueue()
 
     // Don't move anything in front of a command.
     if (top.isCommand())
-    {
-        return;
-    }
-
-    // If next up is supply, don't reorder it.
-    // Supply is usually made automatically. If we move something above supply, code below
-    // will sometimes have to check whether we have supply to make a unit.
-    if (top.isUnit() && top.getUnitType() == the.selfRace().getSupplyProvider())
     {
         return;
     }
@@ -375,10 +345,6 @@ BWAPI::Unit ProductionManager::getProducer(MacroAct act) const
 
     //NEAT network decides where to produce
     BWAPI::Position closestTo = { act.getTileLocation().x * 32, act.getTileLocation().y * 32 };
-    if (act.isUnit() && the.selfRace().getID() == BWAPI::Races::Zerg.getID())
-    {
-        return getClosestLarvaToPosition(closestTo);
-    }
     return getClosestUnitToPosition(candidateProducers, closestTo);
 }
 
@@ -419,27 +385,6 @@ BWAPI::Unit ProductionManager::getClosestUnitToPosition(const std::vector<BWAPI:
 
     return closestUnit;
 }
-
-// Exclude larvas that have been ordered to morph into something else.
-// NOTE This is part of a workaround for a BWAPI 4.4.0 latency compensation bug.
-BWAPI::Unit ProductionManager::getClosestLarvaToPosition(BWAPI::Position closestTo) const
-{
-    std::vector<BWAPI::Unit> larvas;
-    for (BWAPI::Unit unit : the.self()->getUnits())
-    {
-        if (unit->getType() == BWAPI::UnitTypes::Zerg_Larva)
-        {
-            BWAPI::Order order = the.micro.getMicroState(unit).getOrder();
-            if (order != BWAPI::Orders::ZergUnitMorph)
-            {
-                larvas.push_back(unit);
-            }
-        }
-    }
-
-    return getClosestUnitToPosition(larvas, closestTo);
-}
-
 
 // Create a unit, start research, etc.
 void ProductionManager::create(BWAPI::Unit producer, const BuildOrderItem & item) 
@@ -757,26 +702,6 @@ bool ProductionManager::nextIsBuilding() const
 // NOTE This clears the queue even if we are already out of book.
 void ProductionManager::goOutOfBookAndClearQueue()
 {
-    if (Config::Debug::DrawQueueFixInfo && !_queue.isEmpty())
-    {
-        BWAPI::Broodwar->printf("queue: cleared queue");
-    }
     _queue.clearAll();
-    _outOfBook = true;
     _lastProductionFrame = the.now();       // don't immediately clear the "jam" again
-    //CombatCommander::Instance().setAggression(true);
-}
-
-// If we're in book, leave it and clear the queue.
-// Otherwise do nothing.
-void ProductionManager::goOutOfBook()
-{
-    if (!_outOfBook)
-    {
-        if (Config::Debug::DrawQueueFixInfo && _queue.isEmpty())
-        {
-            BWAPI::Broodwar->printf("queue: go out of book");
-        }
-        goOutOfBookAndClearQueue();
-    }
 }

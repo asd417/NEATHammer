@@ -11,13 +11,6 @@
 using namespace UAlbertaBot;
 
 StrategyManager::StrategyManager() 
-    : _selfRace(the.self()->getRace())
-    , _enemyRace(the.enemy()->getRace())
-    , _emptyBuildOrder(the.self()->getRace())
-    , _openingGroup("")
-    , _hasDropTech(false)
-    , _highWaterBases(1)
-    , _openingStaticDefenseDropped(false)
 {
 }
 
@@ -27,213 +20,6 @@ StrategyManager & StrategyManager::Instance()
     return instance;
 }
 
-void StrategyManager::addStrategy(const std::string & name, Strategy & strategy)
-{
-    _strategies[name] = strategy;
-}
-
-const std::string & StrategyManager::getOpeningGroup() const
-{
-    return _openingGroup;
-}
-
-//Unused
-const MetaPairVector StrategyManager::getBuildOrderGoal()
-{
-    /*if (_selfRace == BWAPI::Races::Protoss)
-    {
-        return getProtossBuildOrderGoal();
-    }
-    else if (_selfRace == BWAPI::Races::Terran)
-    {
-        return getTerranBuildOrderGoal();
-    }
-    else if (_selfRace == BWAPI::Races::Zerg)
-    {
-        return getZergBuildOrderGoal();
-    }*/
-
-    return MetaPairVector();
-}
-//Unused
-const MetaPairVector StrategyManager::getProtossBuildOrderGoal()
-{
-    // the goal to return
-    MetaPairVector goal;
-
-    // These counts include uncompleted units (except for numNexusCompleted).
-    int numPylons = the.my.all.count(BWAPI::UnitTypes::Protoss_Pylon);
-    int numNexusCompleted = the.my.completed.count(BWAPI::UnitTypes::Protoss_Nexus);
-    int numNexusAll = the.my.all.count(BWAPI::UnitTypes::Protoss_Nexus);
-    int numGateways = the.my.all.count(BWAPI::UnitTypes::Protoss_Gateway);
-    int numProbes = the.my.all.count(BWAPI::UnitTypes::Protoss_Probe);
-    int numCannon = the.my.all.count(BWAPI::UnitTypes::Protoss_Photon_Cannon);
-    int numObservers = the.my.all.count(BWAPI::UnitTypes::Protoss_Observer);
-    int numZealots = the.my.all.count(BWAPI::UnitTypes::Protoss_Zealot);
-    int numDragoons = the.my.all.count(BWAPI::UnitTypes::Protoss_Dragoon);
-    int numDarkTemplar = the.my.all.count(BWAPI::UnitTypes::Protoss_Dark_Templar);
-    int numReavers = the.my.all.count(BWAPI::UnitTypes::Protoss_Reaver);
-    int numCorsairs = the.my.all.count(BWAPI::UnitTypes::Protoss_Corsair);
-    int numCarriers = the.my.all.count(BWAPI::UnitTypes::Protoss_Carrier);
-
-    bool hasStargate = the.my.completed.count(BWAPI::UnitTypes::Protoss_Stargate) > 0;
-
-    int maxProbes = WorkerManager::Instance().getMaxWorkers();
-
-    PlayerSnapshot enemies(the.enemy());
-
-    BWAPI::Player self = the.self();
-
-    //if (_openingGroup == "zealots")
-    //{
-    //    goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + 6));
-
-    //    if (numNexusAll >= 3)
-    //    {
-    //        // In the end, switch to carriers; not so many dragoons.
-    //        goal.push_back(MetaPair(BWAPI::UpgradeTypes::Carrier_Capacity, 1));
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Carrier, numCarriers + 1));
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 1));
-    //    }
-    //    else if (numNexusAll >= 2)
-    //    {
-    //        // Once we have a 2nd nexus, add dragoons.
-    //        goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
-    //    }
-
-    //    // Once dragoons are out, get zealot speed.
-    //    if (numDragoons > 0)
-    //    {
-    //        goal.push_back(MetaPair(BWAPI::UpgradeTypes::Leg_Enhancements, 1));
-    //    }
-
-    //    // Finally add templar archives.
-    //    if (the.my.all.count(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) > 0)
-    //    {
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Templar_Archives, 1));
-    //    }
-
-    //    // If we have templar archives, make
-    //    // 1. a small fixed number of dark templar to force a reaction, and
-    //    // 2. an even number of high templar to merge into archons (so the high templar disappear quickly).
-    //    if (the.my.completed.count(BWAPI::UnitTypes::Protoss_Templar_Archives) > 0)
-    //    {
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dark_Templar, std::max(3, numDarkTemplar)));
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_High_Templar, 2));
-    //    }
-    //}
-    //else if (_openingGroup == "dragoons")
-    //{
-    //    goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
-    //    goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + numGateways));
-
-    //    // Once we have a 2nd nexus, add reavers.
-    //    if (numNexusAll >= 2)
-    //    {
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Reaver, numReavers + 1));
-    //    }
-
-    //    // If we have templar archives, make a small fixed number of DTs to force a reaction.
-    //    if (the.my.completed.count(BWAPI::UnitTypes::Protoss_Templar_Archives) > 0)
-    //    {
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dark_Templar, std::max(3, numDarkTemplar)));
-    //    }
-    //}
-    //else if (_openingGroup == "dark templar")
-    //{
-    //    goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dark_Templar, numDarkTemplar + 2));
-
-    //    // Once we have a 2nd nexus, add dragoons.
-    //    if (numNexusAll >= 2)
-    //    {
-    //        goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon, numDragoons + 4));
-
-    //        if (numGateways > 4)
-    //        {
-    //            goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot, numZealots + numGateways - 6));
-    //        }
-    //        if (numZealots >= 6)
-    //        {
-    //            goal.push_back(MetaPair(BWAPI::UpgradeTypes::Leg_Enhancements, 1));
-    //        }
-    //    }
-    //}
-    //else if (_openingGroup == "drop")
-    //{
-    //    goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dark_Templar, numDarkTemplar + 2));
-
-    //    // The drop prep is carried out entirely by the opening book.
-    //    // Immediately transition into something else.
-    //    _openingGroup = "dragoons";
-    //}
-    //else
-    //{
-    //    UAB_ASSERT_WARNING(false, "Unknown Opening Group: %s", _openingGroup.c_str());
-    //    _openingGroup = "dragoons";    // we're misconfigured, but try to do something
-    //}
-
-    //// If we're doing a corsair thing and it's still working, slowly add more.
-    //if (_enemyRace == BWAPI::Races::Zerg)
-    //{
-    //    if (hasStargate)
-    //    {
-    //        if (numCorsairs < 6 && self->deadUnitCount(BWAPI::UnitTypes::Protoss_Corsair) == 0 ||
-    //            numCorsairs < 9 && enemies.count(BWAPI::UnitTypes::Zerg_Mutalisk > numCorsairs))
-    //        {
-    //            goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Corsair, numCorsairs + 1));
-    //        }
-    //    }
-    //    else
-    //    {
-    //        // No stargate. Make one if it's useful.
-    //        if (enemies.count(BWAPI::UnitTypes::Zerg_Mutalisk) > 3)
-    //        {
-    //            goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Stargate, 1));
-    //        }
-    //    }
-    //}
-
-    //// Maybe get some static defense against air attack.
-    //const int enemyAirToGround =
-    //    enemies.count(BWAPI::UnitTypes::Terran_Wraith) / 8 +
-    //    enemies.count(BWAPI::UnitTypes::Terran_Battlecruiser) / 3 +
-    //    enemies.count(BWAPI::UnitTypes::Protoss_Scout) / 5 +
-    //    enemies.count(BWAPI::UnitTypes::Zerg_Mutalisk) / 6;
-    //if (enemyAirToGround > 0)
-    //{
-    //    goal.push_back(std::pair<MacroAct, int>(BWAPI::UnitTypes::Protoss_Photon_Cannon, enemyAirToGround));
-    //}
-
-    //// Get observers if we have a second base, or if the enemy has cloaked units.
-    //if (numNexusCompleted >= 2 || InformationManager::Instance().enemyHasCloakTech())
-    //{
-    //    goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Robotics_Facility, 1));
-
-    //    if (numObservers < 3 && self->completedUnitCount(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0)
-    //    {
-    //        goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, numObservers + 1));
-    //    }
-    //}
-
-    //// Make more probes, up to a limit.
-    //goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe, std::min(maxProbes, numProbes + 8)));
-
-    //// If the map has islands, get drop after we have 3 bases.
-    //if (Config::Macro::ExpandToIslands && numNexusCompleted >= 3 && the.bases.hasIslandBases())
-    //{
-    //    goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Shuttle, 1));
-    //}
-
-    //// if we want to expand, insert a nexus into the build order
-    //if (shouldExpandNow())
-    //{
-    //    goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Nexus, numNexusAll + 1));
-    //}
-
-    return goal;
-}
 //Left as example. No function calls this.
 const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 {
@@ -258,8 +44,6 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
     bool hasAcademy		= the.my.completed.count(BWAPI::UnitTypes::Terran_Academy) > 0;
     bool hasArmory		= the.my.completed.count(BWAPI::UnitTypes::Terran_Armory) > 0;
     bool hasPhysicsLab  = the.my.completed.count(BWAPI::UnitTypes::Terran_Physics_Lab) > 0;
-
-    int maxSCVs = WorkerManager::Instance().getMaxWorkers();
 
     bool makeVessel = false;
 
@@ -496,20 +280,8 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
     return goal;
 }
 
-// Called to refill the production queue when it is empty.
-void StrategyManager::freshProductionPlan()
-{
-    //if (_selfRace == BWAPI::Races::Zerg)
-    //{
-    //    ProductionManager::Instance().setBuildOrder(StrategyBossZerg::Instance().freshProductionPlan());
-    //}
-    //else
-    //{
-        performBuildOrderSearch();
-    //}
-}
 
-void StrategyManager::performBuildOrderSearch()
+void StrategyManager::queryNetworkEvaluation()
 {
     if (!canPlanBuildOrderNow())
     {
@@ -546,41 +318,4 @@ bool StrategyManager::canPlanBuildOrderNow() const
     }
 
     return true;
-}
-
-// Do we expect or plan to drop at some point during the game?
-bool StrategyManager::dropIsPlanned() const
-{
-    // Don't drop in ZvZ.
-    if (_selfRace == BWAPI::Races::Zerg && the.enemy()->getRace() == BWAPI::Races::Zerg)
-    {
-        return false;
-    }
-
-    // Otherwise plan drop if the opening says so, or if the map has islands to take.
-    return
-        getOpeningGroup() == "drop" ||
-        Config::Macro::ExpandToIslands && the.bases.hasIslandBases();
-}
-
-// Whether we have the tech and transport to drop.
-bool StrategyManager::hasDropTech()
-{
-    if (_selfRace == BWAPI::Races::Zerg)
-    {
-        // NOTE May be slow drop.
-        return
-            the.self()->getUpgradeLevel(BWAPI::UpgradeTypes::Ventral_Sacs) > 0 &&
-            the.my.completed.count(BWAPI::UnitTypes::Zerg_Overlord) > 0;
-    }
-    if (_selfRace == BWAPI::Races::Protoss)
-    {
-        return the.my.completed.count(BWAPI::UnitTypes::Protoss_Shuttle) > 0;
-    }
-    if (_selfRace == BWAPI::Races::Terran)
-    {
-        return the.my.completed.count(BWAPI::UnitTypes::Terran_Dropship) > 0;
-    }
-
-    return false;
 }
