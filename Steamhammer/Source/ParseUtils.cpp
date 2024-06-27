@@ -96,8 +96,12 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
         JSONTools::ReadString("TrainingServerIP", neat, Config::NEAT::TrainingServerIP);
         JSONTools::ReadBool("LoadNetworkFromJSON", neat, Config::NEAT::LoadNetworkFromJSON);
         JSONTools::ReadString("NetworkJSON", neat, Config::NEAT::NetworkJSON);
+
+        //Fitness function scores
         JSONTools::ReadInt("WinScore", neat, Config::NEAT::WinScore);
         JSONTools::ReadInt("BuildingScore", neat, Config::NEAT::BuildingScore);
+        JSONTools::ReadInt("UnitCompleteScore", neat, Config::NEAT::UnitCompleteScore);
+
         JSONTools::ReadBool("AutoSurrender", neat, Config::NEAT::AutoSurrender);
         
         JSONTools::ReadBool("LogInputVector", neat, Config::NEAT::LogInputVector);

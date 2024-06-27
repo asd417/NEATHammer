@@ -241,6 +241,9 @@
     <ClCompile Include="..\Source\SquadOrder.cpp">
       <Filter>game\combat\squad</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\MicroSciVessel.cpp">
+      <Filter>Micro\Terran</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\CombatCommander.h">
@@ -430,6 +433,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\stringformat.h">
       <Filter>game\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MicroSciVessel.h">
+      <Filter>Micro\Terran</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

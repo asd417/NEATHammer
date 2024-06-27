@@ -9,7 +9,10 @@
 #include <fstream>
 #include <sstream>
 
-#define HyperNEAT
+/// <summary>
+/// Check https://gamefaqs.gamespot.com/pc/25418-starcraft/faqs/2473 for some infos.
+/// These arent always accurate though
+/// </summary>
 
 namespace UAlbertaBot
 {
@@ -251,7 +254,7 @@ namespace UAlbertaBot
             else
             {
                 //Huge Motivation to build army
-                scoreFitness(type.buildScore());
+                scoreFitness(Config::NEAT::UnitCompleteScore);
             }
         }
         

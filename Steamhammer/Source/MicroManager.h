@@ -20,6 +20,15 @@ namespace UAlbertaBot
         , Broodling
         , DarkSwarm
         , Plague
+        //Terran
+        ,FLARE
+        ,RESTORATION
+        ,STIM
+        ,EMP
+        ,IRRADIATE
+        ,LOCKDOWN
+        ,CLOAK //for both wraith and ghost
+        ,YAMATO
         };
 
     // Used by some micro managers to keep track of what spell casters are intending.

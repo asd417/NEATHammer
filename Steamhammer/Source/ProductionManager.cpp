@@ -557,15 +557,11 @@ void ProductionManager::executeCommand(const MacroAct & act)
     }
     else if (cmd == MacroCommandType::SIEGEMODE)
     {
-        BWAPI::TilePosition tp = act.getTileLocation();
-        BWAPI::Unit v = BWAPI::Broodwar->getClosestUnit({ tp.x * 32, tp.y * 32 }, BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
-        the.micro.Siege(v);
+        return; //Siege mode is controlled by tank micro
     }
     else if (cmd == MacroCommandType::UNSIEGEMODE)
     {
-        BWAPI::TilePosition tp = act.getTileLocation();
-        BWAPI::Unit v = BWAPI::Broodwar->getClosestUnit({ tp.x * 32, tp.y * 32 }, BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        the.micro.Unsiege(v);
+        return; //Siege mode is controlled by tank micro
     }
     else if (cmd == MacroCommandType::NUKE)
     {

@@ -48,8 +48,11 @@ namespace Config
         extern std::string TrainingServerIP;
         extern bool LoadNetworkFromJSON;
         extern std::string NetworkJSON;
+
         extern int WinScore;
         extern int BuildingScore;
+        extern int UnitCompleteScore;
+
         extern bool AutoSurrender;
 
         extern bool PrintNetworkOutput;

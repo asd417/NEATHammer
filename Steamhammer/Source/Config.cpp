@@ -47,8 +47,9 @@ namespace Config
         bool LoadNetworkFromJSON = false;
         std::string NetworkJSON = "";
 
-        int WinScore = 1000;
-        int BuildingScore = 100;
+        int WinScore = 100;
+        int BuildingScore = 10;
+        int UnitCompleteScore = 1000;
 
         bool AutoSurrender = true;
 
