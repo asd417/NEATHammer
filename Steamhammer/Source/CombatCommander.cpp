@@ -1395,7 +1395,7 @@ void CombatCommander::loadOrUnloadBunkers()
         {
             //Remove from existing squad. This will take any marines from any squad
             Squad* squad = _squadData.getUnitSquad(m);
-            squad->removeUnit(m);
+            if(squad) squad->removeUnit(m);
         }
         if (enemiesNear.empty())
         {
