@@ -72,6 +72,8 @@ void CombatCommander::initializeSquads()
         setOrder(SquadOrder(SquadOrderTypes::Defend, ourBasePosition, Config::Micro::ScoutDefenseRadius, false, "Stop that scout"));
 
     _squadData.createSquad("Drop", DropPriority).setOrder(SquadOrder(SquadOrderTypes::Hold, ourBasePosition, AttackRadius, false, "Wait for transport"));
+    //same as drop squad but waits for nuke order and only lets drop ship and ghost in
+    _squadData.createSquad("Nuke", DropPriority).setOrder(SquadOrder(SquadOrderTypes::Hold, ourBasePosition, AttackRadius, false, "Wait for transport"));
 }
 
 void CombatCommander::update(const BWAPI::Unitset & combatUnits)
@@ -733,6 +735,100 @@ bool CombatCommander::isGroundSquadUnit(const BWAPI::UnitType type) const
         !type.isDetector() &&
         !type.isWorker();
 }
+
+void CombatCommander::updateNukeSquad()
+{
+    // If we don't have a nuke, skip
+    if (!_squadData.squadExists("Nuke") || the.my.completed.count(BWAPI::UnitTypes::Terran_Nuclear_Missile) == 0)
+    {
+        return;
+    }
+
+    Squad& dropSquad = _squadData.getSquad("Nuke");
+
+    // The squad is initialized with a Hold order.
+    // There are 3 phases, and in each phase the squad is given a different order:
+    // Collect units (Hold); load the transport (Load); go drop (Drop).
+
+    if (dropSquad.getOrder().getType() == SquadOrderTypes::Drop)
+    {
+        // If it has already been told to Drop, we issue a new drop order in case the
+        // target has changed.
+        /* TODO not yet supported by the drop code
+        SquadOrder dropOrder = SquadOrder(SquadOrderTypes::Drop, getDropLocation(dropSquad), 300, false, "Go drop!");
+        dropSquad.setOrder(dropOrder);
+        */
+
+        return;
+    }
+
+    // If we get here, we haven't been ordered to Drop yet.
+
+    // What units do we have, what units do we need?
+    BWAPI::Unit transportUnit = nullptr;
+    int transportSpotsRemaining = 8;      // all transports are the same size
+    bool anyUnloadedUnits = false;
+    const auto& dropUnits = dropSquad.getUnits();
+
+    for (BWAPI::Unit unit : dropUnits)
+    {
+        if (unit->exists())
+        {
+            if (unit->isFlying() && unit->getType().spaceProvided() > 0)
+            {
+                transportUnit = unit;
+            }
+            else
+            {
+                transportSpotsRemaining -= unit->getType().spaceRequired();
+                if (!unit->isLoaded())
+                {
+                    anyUnloadedUnits = true;
+                }
+            }
+        }
+    }
+
+    if (transportUnit && transportSpotsRemaining == 0)
+    {
+        if (anyUnloadedUnits)
+        {
+            // The drop squad is complete. Load up.
+            // See Squad::loadTransport().
+            dropSquad.setOrder(SquadOrder(SquadOrderTypes::Load, transportUnit->getPosition(), AttackRadius, false, "Load up"));
+        }
+        else
+        {
+            // We're full. wait for nuke command
+            //dropSquad.setOrder(SquadOrder(SquadOrderTypes::Drop, getDropLocation(dropSquad), 300, false, "Go drop!"));
+            //
+        }
+    }
+    else
+    {
+        // The drop squad is not complete. Look for more units.
+        for (BWAPI::Unit unit : _combatUnits)
+        {
+            // If the squad doesn't have a transport, try to add one.
+            if (!transportUnit &&
+                unit->getType().spaceProvided() > 0 && unit->isFlying() &&
+                _squadData.canAssignUnitToSquad(unit, dropSquad))
+            {
+                _squadData.assignUnitToSquad(unit, dropSquad);
+                transportUnit = unit;
+            }
+            //Nuke squad only picks up ghosts
+            else if (unit->getType().spaceRequired() <= transportSpotsRemaining &&
+                unit->getType()==BWAPI::UnitTypes::Terran_Ghost &&
+                _squadData.canAssignUnitToSquad(unit, dropSquad))
+            {
+                _squadData.assignUnitToSquad(unit, dropSquad);
+                transportSpotsRemaining -= unit->getType().spaceRequired();
+            }
+        }
+    }
+}
+
 
 // Despite the name, this supports only 1 drop squad which has 1 transport.
 // Furthermore, it can only drop once and doesn't know how to reset itself to try again.

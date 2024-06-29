@@ -141,7 +141,7 @@ namespace UAlbertaBot
             catch (json::parse_error& e) {
                 throw std::exception("Error while parsing network JSON");
             }
-            //Should automate this...
+            //Should automate this... But it looks like we'll stick to NEAT with simple feedforward so this should be fine
             networkType = NetworkType::FEEDFORWARD;
         }
         
@@ -164,6 +164,8 @@ namespace UAlbertaBot
             }
             if (network->IsNodeEvalEmpty()) throw std::exception("Faulty Gene");
             network->FinishInitializing();
+            constexpr int outputVectorTotal = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier + 2;
+            if (outputVectorTotal != network->getOutputCount()) throw std::exception("Output Vector Mismatch");
         }
         catch (std::exception e) {
             std::cout << "Error creating Network Structure: " << e.what() << "\n";
@@ -261,6 +263,26 @@ namespace UAlbertaBot
     }
     void NEATCommander::onUnitDestroy(BWAPI::Unit unit)
     {
+        //Enemy killed. update all kill counts
+        //This could technically count friendly kills.
+        if (unit->getPlayer() != the.self())
+        {
+            auto all = BWAPI::Broodwar->getAllUnits();
+            for (auto& u : all)
+            {
+                if (!u->getType().isWorker() && u->getPlayer() == the.self())
+                {
+                    //Make pointer value into int
+                    killMap[(int)u] = u->getKillCount();
+                }
+            }
+        }
+        //To prevent bot from learning to score high fitness by dropping nuke on friendly unit,
+        //add a small fitness penalty for allied units died.
+        if (unit->getPlayer() == the.self() && !unit->getType().isBuilding())
+        {
+            scoreFitness(-Config::NEAT::ArmyKillScore / 2);
+        }
     }
     void NEATCommander::onUnitHide(BWAPI::Unit unit)
     {
@@ -271,6 +293,15 @@ namespace UAlbertaBot
         //if (unit->getPlayer() == the.enemy()) scoreFitness(Config::NEAT::EnemyShowScore);
     }
 
+    void NEATCommander::onEnd()
+    {
+        int globalKills = 0;
+        for (auto it = killMap.begin(); it != killMap.end(); it++)
+        {
+            globalKills += it->second;
+        }
+        scoreFitness(globalKills * Config::NEAT::ArmyKillScore);
+    }
 
     void NEATCommander::drawDebug(int x, int y)
     {
@@ -489,8 +520,8 @@ namespace UAlbertaBot
         }
         constexpr int outputVectorOffset = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
         tilePosX += network->getOutputVector()[outputVectorOffset];
-        tilePosY += network->getOutputVector()[outputVectorOffset + 1]; //74 output nodes
-
+        tilePosY += network->getOutputVector()[outputVectorOffset + 1]; //72 output nodes
+        
         //We scanned through the whole map
         curSection++;
         curSection = curSection % maxSections;
@@ -733,10 +764,10 @@ namespace UAlbertaBot
                         }
                     }
 
-                    friendlyMapData[xi][yi] = double(fm) / double(NEAT_TileType_Simple::MAX);
-                    friendlyMapBuildingData[xi][yi] = double(fmb) / double(NEAT_TileType_Simple::MAX);
-                    enemyMapData[xi][yi] = double(em) / double(NEAT_TileType_Simple::MAX);
-                    enemyMapBuildingData[xi][yi] = double(emb) / double(NEAT_TileType_Simple::MAX);
+                    friendlyMapData[xi][yi] = double(fm) / double(NEAT_TileType_Simple::sMAX);
+                    friendlyMapBuildingData[xi][yi] = double(fmb) / double(NEAT_TileType_Simple::sMAX);
+                    enemyMapData[xi][yi] = double(em) / double(NEAT_TileType_Simple::sMAX);
+                    enemyMapBuildingData[xi][yi] = double(emb) / double(NEAT_TileType_Simple::sMAX);
                 }
             }
         }
@@ -755,43 +786,92 @@ namespace UAlbertaBot
     {
         int a = sectionNum;
         if (sectionNum >= maxSections) throw std::overflow_error("sectionNum is bigger than maxSections");
-
         int startW = sectionsCoords[sectionNum][0];
         int startH = sectionsCoords[sectionNum][1];
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                BWAPI::TilePosition tp = { startW + i * 2,startH + j * 2 };
-                BWAPI::WalkPosition wp = { (startW + i * 2) * 4,(startH + j * 2) * 4 }; //WalkPosition is 8 pixels big
+
+        BWAPI::Unitset resources = BWAPI::Broodwar->getUnitsInRectangle(
+            { startW * 32, startH * 32 },
+            { (startW + 32) * 32 - 1, (startH + 32) * 32 - 1 },
+            BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field ||
+            BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field_Type_2 ||
+            BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Mineral_Field_Type_3 ||
+            BWAPI::Filter::GetType == BWAPI::UnitTypes::Resource_Vespene_Geyser);
+
+        for (auto& r : resources)
+        {
+            BWAPI::TilePosition tp = r->getTilePosition();
+            NEAT_TileType tt;
+            switch (r->getType())
+            {
+            case BWAPI::UnitTypes::Resource_Mineral_Field:
+                tt = NEAT_TileType::MINERAL;
+            case BWAPI::UnitTypes::Resource_Mineral_Field_Type_2:
+                tt = NEAT_TileType::MINERAL;
+            case BWAPI::UnitTypes::Resource_Mineral_Field_Type_3:
+                tt = NEAT_TileType::MINERAL;
+            case BWAPI::UnitTypes::Resource_Vespene_Geyser:
+                tt = NEAT_TileType::GAS;
+
+            }
+            friendlyMapData[(tp.x - startW) / 2][(tp.y - startH) / 2] = tt;
+            friendlyMapBuildingData[(tp.x - startW) / 2][(tp.y - startH) / 2] = tt;
+            enemyMapData[(tp.x - startW) / 2][(tp.y - startH) / 2] = tt;
+            enemyMapBuildingData[(tp.x - startW) / 2][(tp.y - startH) / 2] = tt;
+        }
+
+        BWAPI::BestFilter highKillScore = BWAPI::Highest<BWAPI::Unit>(BWAPI::Filter::DestroyScore);
+        BWAPI::BestFilter highBuildScore = BWAPI::Highest<BWAPI::Unit>(BWAPI::Filter::BuildScore);
+        //Half resolution it
+        for (int xi = 0; xi < 16; xi++)
+        {
+            for (int yi = 0; yi < 16; yi++)
+            {
+                int x = xi * 2;
+                int y = yi * 2;
+                BWAPI::TilePosition tp = { startW + x,startH + y };
+
+                //Get center of 2x2 tile
+                BWAPI::WalkPosition wp = { (startW + x + 1) * 4,(startH + y + 1) * 4 }; //WalkPosition is 8 pixels big
+
                 if (!BWAPI::Broodwar->isVisible(tp)) {
-                    friendlyMapData[i][j] = NEAT_TileType::FOG;
-                    enemyMapData[i][j] = NEAT_TileType::FOG;
-                    break;
+                    friendlyMapData[xi][yi] = NEAT_TileType::FOG;
+                    friendlyMapBuildingData[xi][yi] = NEAT_TileType::FOG;
+                    enemyMapData[xi][yi] = NEAT_TileType::FOG;
+                    enemyMapBuildingData[xi][yi] = NEAT_TileType::FOG;
                 }
-                else {
+                else
+                {
                     //BWAPI::UnitFilter uf = BWAPI::UnitFilter(the.self());
-                    BWAPI::Unitset allyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + i * 2, startH + j * 2, BWAPI::Filter::IsAlly);
-                    BWAPI::Unitset enemyUnitsOnTile = BWAPI::Broodwar->getUnitsOnTile(startW + i * 2, startH + j * 2, BWAPI::Filter::IsEnemy);
+                    BWAPI::Unit fu = BWAPI::Broodwar->getBestUnit(highBuildScore, BWAPI::Filter::IsAlly && !BWAPI::Filter::IsBuilding, { (startW + x + 1) * 32, (startH + y + 1) * 32 }, 45);
+                    BWAPI::Unit fb = BWAPI::Broodwar->getBestUnit(highBuildScore, BWAPI::Filter::IsAlly && BWAPI::Filter::IsBuilding, { (startW + x + 1) * 32, (startH + y + 1) * 32 }, 45);
+                    
+                    BWAPI::Unit eu = BWAPI::Broodwar->getBestUnit(highKillScore, BWAPI::Filter::IsEnemy && !BWAPI::Filter::IsBuilding, { (startW + x + 1) * 32, (startH + y + 1) * 32 }, 45);
+                    BWAPI::Unit eb = BWAPI::Broodwar->getBestUnit(highKillScore, BWAPI::Filter::IsEnemy && BWAPI::Filter::IsBuilding, { (startW + x + 1) * 32, (startH + y + 1) * 32 }, 45);
 
-                    NEAT_TileType highestImportanceAlly = NEAT_TileType::NOTWALKABLE;
-                    NEAT_TileType highestImportanceEnemy = NEAT_TileType::NOTWALKABLE;
+                    NEAT_TileType fm     = NEAT_TileType::NOTWALKABLE;
+                    NEAT_TileType fmb    = NEAT_TileType::NOTWALKABLE;
+                    NEAT_TileType em     = NEAT_TileType::NOTWALKABLE;
+                    NEAT_TileType emb    = NEAT_TileType::NOTWALKABLE;
+
                     if (BWAPI::Broodwar->isWalkable(wp)) {
-                        highestImportanceAlly = NEAT_TileType::WALKABLE;
-                        highestImportanceEnemy = NEAT_TileType::WALKABLE;
+                        fm  = NEAT_TileType::WALKABLE;
+                        fmb = NEAT_TileType::WALKABLE;
+                        em  = NEAT_TileType::WALKABLE;
+                        emb = NEAT_TileType::WALKABLE;
                     }
+                    if (fu) fm = getTileType(fu->getType());
+                    if (fb) fmb = getTileType(fb->getType());
+                    if (eu) em = getTileType(eu->getType());
+                    if (eb) emb = getTileType(eb->getType());
+                    friendlyMapData[xi][yi] = double(fm) / double(NEAT_TileType::MAX);
+                    friendlyMapBuildingData[xi][yi] = double(fmb) / double(NEAT_TileType::MAX);
 
-                    for (BWAPI::Unit u : allyUnitsOnTile) {
-                        NEAT_TileType unitTileType = getTileType(u->getType());
-                        highestImportanceAlly = unitTileType > highestImportanceAlly ? unitTileType : highestImportanceAlly;
-                    }
-                    for (BWAPI::Unit u : enemyUnitsOnTile) {
-                        NEAT_TileType unitTileType = getTileType(u->getType());
-                        highestImportanceEnemy = unitTileType > highestImportanceEnemy ? unitTileType : highestImportanceEnemy;
-                    }
-                    friendlyMapData[i][j] = highestImportanceAlly;
-                    enemyMapData[i][j] = highestImportanceEnemy;
+                    enemyMapData[xi][yi] = double(em) / double(NEAT_TileType::MAX);
+                    enemyMapBuildingData[xi][yi] = double(emb) / double(NEAT_TileType::MAX);
                 }
             }
         }
+
     }
     
     bool NEATCommander::canMacro(MacroCommandType command)
@@ -824,14 +904,6 @@ namespace UAlbertaBot
         if (command == MacroCommandType::SPIDERMINE)
         {
             return the.my.completed.count(BWAPI::UnitTypes::Terran_Vulture) > 0 && BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Spider_Mines);
-        }
-        if (command == MacroCommandType::SIEGEMODE)
-        {
-            return the.my.completed.count(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode) > 0 && BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Tank_Siege_Mode);
-        }
-        if (command == MacroCommandType::UNSIEGEMODE)
-        {
-            return the.my.completed.count(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode) > 0 && BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Tank_Siege_Mode);
         }
         if (command == MacroCommandType::NUKE)
         {
@@ -1417,7 +1489,7 @@ namespace UAlbertaBot
             return NEAT_TileType::Protoss_Observer;
 
         default:
-            return NEAT_TileType::WALKABLE;
+            return NEAT_TileType::NOTWALKABLE;
         }
         
     }

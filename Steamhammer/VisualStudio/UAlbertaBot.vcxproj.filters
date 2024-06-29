@@ -244,6 +244,7 @@
     <ClCompile Include="..\Source\MicroSciVessel.cpp">
       <Filter>Micro\Terran</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\SkillNuke.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\CombatCommander.h">
@@ -437,5 +438,6 @@
     <ClInclude Include="..\Source\MicroSciVessel.h">
       <Filter>Micro\Terran</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\SkillNuke.h" />
   </ItemGroup>
 </Project>

@@ -47,9 +47,11 @@ namespace Config
         bool LoadNetworkFromJSON = false;
         std::string NetworkJSON = "";
 
-        int WinScore = 100;
-        int BuildingScore = 10;
-        int UnitCompleteScore = 1000;
+        int ArmyKillScore = 100; // awared for kills made by non-worker units and buildings (to avoid bot learning to kill zerglings with scv)
+        int AlliedUnitDeathPenalty = 1; // to encourage smart macro decision. penalty when any non-building unit is killed
+        int WinScore = 100; 
+        int BuildingScore = 10; // awarded for every building built
+        int UnitCompleteScore = 1000; // awared for every army unit created
 
         bool AutoSurrender = true;
 

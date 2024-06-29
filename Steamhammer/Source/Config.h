@@ -50,6 +50,7 @@ namespace Config
         extern std::string NetworkJSON;
 
         extern int WinScore;
+        extern int ArmyKillScore;
         extern int BuildingScore;
         extern int UnitCompleteScore;
 

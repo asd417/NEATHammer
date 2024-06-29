@@ -19,8 +19,6 @@ enum class MacroCommandType
     //Terran specific macrocommands
     , SCAN
     , SPIDERMINE
-    , SIEGEMODE
-    , UNSIEGEMODE
     , NUKE
     , QueueBarrier
     };

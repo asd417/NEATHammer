@@ -301,14 +301,17 @@ void Squad::microSpecialUnits(const UnitCluster & cluster)
         
         _microDefilers.updateMovement(cluster, vanguard);
         _microMedics.update(cluster, vanguard);
+        _microVessels.updateMovement(cluster, vanguard);
     }
     else if (spellPhase == 2)
     {
         _microDefilers.updateSwarm(cluster);
+        _microVessels.updateIrradiate(cluster);
     }
     else if (spellPhase == 4)
     {
         _microDefilers.updatePlague(cluster);
+        _microVessels.updateEMP(cluster);
     }
 }
 

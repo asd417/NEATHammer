@@ -492,7 +492,8 @@ void GameCommander::assignUnit(BWAPI::Unit unit, BWAPI::Unitset & set)
 // it's a question of taste.
 bool GameCommander::surrenderMonkey()
 {
-    if (!Config::Skills::SurrenderWhenHopeIsLost)
+    //Don't surrender during training
+    if (!Config::Skills::SurrenderWhenHopeIsLost || Config::NEAT::Train)
     {
         return false;
     }

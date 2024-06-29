@@ -13,6 +13,7 @@
     "NetworkJSON": "network.json",
 
     "WinScore": 100,
+    "ArmyKillScore": 100,
     "BuildingScore": 10,
     "UnitCompleteScore": 1000,
 

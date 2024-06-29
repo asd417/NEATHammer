@@ -8,18 +8,23 @@
 #include "MicroMelee.h"
 #include "MicroRanged.h"
 
-#include "MicroDefilers.h"
-#include "MicroDetectors.h"
-#include "MicroHighTemplar.h"
+#include "MicroTransports.h"
 #include "MicroIrradiated.h"
-#include "MicroLurkers.h"
+#include "MicroDetectors.h"
+
+#include "MicroHighTemplar.h"
+
+#include "MicroTanks.h"
 #include "MicroMedics.h"
+#include "MicroSciVessel.h"
+
+#include "MicroDefilers.h"
+#include "MicroLurkers.h"
 #include "MicroMutas.h"
 #include "MicroOverlords.h"
 #include "MicroQueens.h"
 #include "MicroScourge.h"
-#include "MicroTanks.h"
-#include "MicroTransports.h"
+
 
 namespace UAlbertaBot
 {
@@ -61,6 +66,7 @@ class Squad
     MicroHighTemplar	_microHighTemplar;
     MicroLurkers		_microLurkers;
     MicroMedics			_microMedics;
+    MicroSciVessel     _microVessels;
     //MicroMutas          _microMutas;
     MicroQueens			_microQueens;
     MicroScourge        _microScourge;

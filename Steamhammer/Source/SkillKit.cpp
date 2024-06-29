@@ -1,7 +1,7 @@
 #include "SkillKit.h"
 
+#include "SkillNuke.h"
 #include "SkillBattles.h"
-#include "SkillGasSteal.h"
 #include "SkillUnitTimings.h"
 #include "The.h"
 
@@ -25,6 +25,7 @@ void SkillKit::addSkill(Skill * skill)
 // This happens before skill data is read, necessarily.
 void SkillKit::initialize()
 {
+    addSkill(new SkillNuke);
     addSkill(new SkillBattles);
     addSkill(new SkillUnitTimings);
 }

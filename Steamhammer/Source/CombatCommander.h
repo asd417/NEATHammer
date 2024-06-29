@@ -62,6 +62,8 @@ namespace UAlbertaBot
         bool			isOptionalFlyingSquadUnit(const BWAPI::UnitType type) const;
         bool			isGroundSquadUnit(const BWAPI::UnitType type) const;
 
+        void            updateNukeSquad();
+
         bool			unitIsGoodToDrop(const BWAPI::Unit unit) const;
 
         void			cancelDyingItems();

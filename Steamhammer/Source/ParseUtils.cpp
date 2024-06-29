@@ -99,6 +99,7 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
 
         //Fitness function scores
         JSONTools::ReadInt("WinScore", neat, Config::NEAT::WinScore);
+        JSONTools::ReadInt("ArmyKillScore", neat, Config::NEAT::ArmyKillScore);
         JSONTools::ReadInt("BuildingScore", neat, Config::NEAT::BuildingScore);
         JSONTools::ReadInt("UnitCompleteScore", neat, Config::NEAT::UnitCompleteScore);
 

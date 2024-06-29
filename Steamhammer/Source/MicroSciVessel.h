@@ -16,6 +16,9 @@ class MicroSciVessel : public MicroManager
 
     int empScore(BWAPI::Unit u) const;
     bool maybeEMP(BWAPI::Unit defiler);
+
+    int irradiateScore(BWAPI::Unit u) const;
+    bool maybeIrradiate(BWAPI::Unit vessel);
    
 public:
     MicroSciVessel();
@@ -23,5 +26,7 @@ public:
 
     // The different updates are done on different frames to spread out the work.
     void updateMovement(const UnitCluster & cluster, BWAPI::Unit vanguard);
+    void updateEMP(const UnitCluster& cluster);
+    void updateIrradiate(const UnitCluster& cluster);
 };
 }

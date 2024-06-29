@@ -191,6 +191,7 @@
     <ClCompile Include="..\Source\Skill.cpp" />
     <ClCompile Include="..\Source\SkillBattles.cpp" />
     <ClCompile Include="..\Source\SkillKit.cpp" />
+    <ClCompile Include="..\Source\SkillNuke.cpp" />
     <ClCompile Include="..\Source\SkillUnitTimings.cpp" />
     <ClCompile Include="..\Source\Squad.cpp" />
     <ClCompile Include="..\Source\SquadData.cpp" />
@@ -278,6 +279,7 @@
     <ClInclude Include="..\Source\Skill.h" />
     <ClInclude Include="..\Source\SkillBattles.h" />
     <ClInclude Include="..\Source\SkillKit.h" />
+    <ClInclude Include="..\Source\SkillNuke.h" />
     <ClInclude Include="..\Source\SkillUnitTimings.h" />
     <ClInclude Include="..\Source\Squad.h" />
     <ClInclude Include="..\Source\SquadData.h" />
