@@ -37,6 +37,7 @@ FeedForwardNetwork::FeedForwardNetwork(json& inodes, json& onodes)
 
 void FeedForwardNetwork::FinishInitializing()
 {
+    _isValid = true;
 }
 
 void FeedForwardNetwork::AddNodeEval(const json& nodeEval)
@@ -251,6 +252,7 @@ void RecurrentNetwork::FinishInitializing()
             }
         }
     }
+    _isValid = true;
 }
 
 void RecurrentNetwork::Reset()

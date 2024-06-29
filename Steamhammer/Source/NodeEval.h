@@ -44,8 +44,10 @@ public:
 	virtual void						Reset();
 	virtual bool						IsNodeEvalEmpty();
 	int getOutputCount() const { return outputCount; }
+	bool isValid() const { return _isValid; }
 protected:
 	int outputCount;
+	bool _isValid = false;
 };
 
 class RecurrentNetwork : public Network {

@@ -85,6 +85,7 @@ namespace UAlbertaBot
     void NEATCommander::scoreFitness(double add)
     {
         if (!network) return; // Only score fitness if network is initialized
+        if (!network->isValid()) return;
         //UAB_ASSERT(fitness > 0.0f, "Negative Fitness: %s", std::to_string(fitness).c_str());
         fitness += add;
         fitness = fitness >= 0.0f ? fitness : 0.0f;
@@ -169,7 +170,6 @@ namespace UAlbertaBot
         }
         catch (std::exception e) {
             std::cout << "Error creating Network Structure: " << e.what() << "\n";
-            fitness = 0.0f;
             BWAPI::Broodwar->leaveGame();
         }
         if (Config::NEAT::LogOutputVector)
@@ -201,13 +201,12 @@ namespace UAlbertaBot
     {
         if (Config::NEAT::Train && !Config::NEAT::LoadNetworkFromJSON)
         {
-            std::cout << "Genome ID " << genomeID << " ";
-            std::cout << "Fitness Calculated: " << fitness << "\n";
+            if (!network->isValid()) fitness = -1000;
             DBKeySpace dbkeys{};
             dbkeys.push_back("Fitness");
 
             DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys };
-
+            
             try {
                 db.addToData("Fitness", fitness);
 
@@ -279,7 +278,7 @@ namespace UAlbertaBot
         }
         //To prevent bot from learning to score high fitness by dropping nuke on friendly unit,
         //add a small fitness penalty for allied units died.
-        if (unit->getPlayer() == the.self() && !unit->getType().isBuilding())
+        if (unit->getPlayer() == the.self() && !unit->getType().isBuilding() && !unit->getType().isWorker())
         {
             scoreFitness(-Config::NEAT::ArmyKillScore / 2);
         }
@@ -545,12 +544,12 @@ namespace UAlbertaBot
             {
                 //Draw all outputs
                 std::stringstream logStream;
-                for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)logToStream(logStream, "%4.5f\t", builderOutputs[i]);
+                for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)logToStream(logStream, "%4.5f\t", builderOutputs[i] / double(maxSections));
                 for (int i = 0; i < 60 - (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)logToStream(logStream, "%4.5f\t", 0.0f);
                 logToStream(logStream, "\n");
                 for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 0.0f);
                 logToStream(logStream, "\n");
-                for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)logToStream(logStream, "%4.5f\t", macroCommandTypeOutputs[i] );
+                for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)logToStream(logStream, "%4.5f\t", macroCommandTypeOutputs[i] / double(maxSections));
                 for (int i = 0; i < 60 - (int)MacroCommandType::QueueBarrier; i++)logToStream(logStream, "%4.5f\t", 0.0f);
                 logToStream(logStream, "\n");
                 for (int i = 0; i < 60; i++)logToStream(logStream, "%4.5f\t", 0.0f);
