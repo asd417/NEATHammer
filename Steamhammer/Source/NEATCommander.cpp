@@ -927,7 +927,9 @@ namespace UAlbertaBot
             {
                 Logger::LogAppendToFile(Config::NEAT::DecisionLogFileName.c_str(), "Frame %d: %s, Current mineral: %d, gas: %d\n", frame, type.c_str(), mineral, gas);
             }
-            return type.mineralPrice() < mineral && type.gasPrice() < gas && BWAPI::Broodwar->canMake(type);
+            return type.mineralPrice() < mineral && type.gasPrice() < gas && 
+                BWAPI::Broodwar->canMake(type) && 
+                type.supplyRequired() + BWAPI::Broodwar->self()->supplyUsed() <= BWAPI::Broodwar->self()->supplyTotal();
         }
         else if (option < NetworkTerranOptions::Apollo_Reactor)
         {
