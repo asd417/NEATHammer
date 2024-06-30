@@ -1,6 +1,6 @@
  NEATHammer
 
- Timestamp is 6681a1fe (Sun Jun 30 14:20:46 2024)
+ Timestamp is 6681aa9a (Sun Jun 30 14:57:30 2024)
 
  Preferred load address is 10000000
 
@@ -1847,19 +1847,19 @@
  0001:0008d5d0       ?erase@?$_Hash@V?$_Uset_traits@VUpgradeType@BWAPI@@V?$_Uhash_compare@VUpgradeType@BWAPI@@U?$hash@H@std@@U?$equal_to@VUpgradeType@BWAPI@@@4@@std@@V?$allocator@VUpgradeType@BWAPI@@@4@$0A@@std@@@std@@QAE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VUpgradeType@BWAPI@@@std@@@std@@@2@V32@@Z 1008e5d0 f i BWAPILIB:UnitType.obj
  0001:0008d5d0       ?erase@?$_Hash@V?$_Uset_traits@VUnitType@BWAPI@@V?$_Uhash_compare@VUnitType@BWAPI@@U?$hash@H@std@@U?$equal_to@VUnitType@BWAPI@@@4@@std@@V?$allocator@VUnitType@BWAPI@@@4@$0A@@std@@@std@@QAE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VUnitType@BWAPI@@@std@@@std@@@2@V32@@Z 1008e5d0 f i BWAPILIB:UnitType.obj
  0001:0008d5d0       ?erase@?$_Hash@V?$_Uset_traits@VRace@BWAPI@@V?$_Uhash_compare@VRace@BWAPI@@U?$hash@H@std@@U?$equal_to@VRace@BWAPI@@@4@@std@@V?$allocator@VRace@BWAPI@@@4@$0A@@std@@@std@@QAE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VRace@BWAPI@@@std@@@std@@@2@V32@@Z 1008e5d0 f i BWAPILIB:Race.obj
+ 0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VTechType@BWAPI@@V?$_Uhash_compare@VTechType@BWAPI@@U?$hash@H@std@@U?$equal_to@VTechType@BWAPI@@@4@@std@@V?$allocator@VTechType@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VTechType@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VTechType@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:UnitType.obj
+ 0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VBulletType@BWAPI@@V?$_Uhash_compare@VBulletType@BWAPI@@U?$hash@H@std@@U?$equal_to@VBulletType@BWAPI@@@4@@std@@V?$allocator@VBulletType@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VBulletType@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VBulletType@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:BulletType.obj
  0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VUnitType@BWAPI@@V?$_Uhash_compare@VUnitType@BWAPI@@U?$hash@H@std@@U?$equal_to@VUnitType@BWAPI@@@4@@std@@V?$allocator@VUnitType@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VUnitType@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VUnitType@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:UnitType.obj
  0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VOrder@BWAPI@@V?$_Uhash_compare@VOrder@BWAPI@@U?$hash@H@std@@U?$equal_to@VOrder@BWAPI@@@4@@std@@V?$allocator@VOrder@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VOrder@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VOrder@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:Order.obj
- 0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VUpgradeType@BWAPI@@V?$_Uhash_compare@VUpgradeType@BWAPI@@U?$hash@H@std@@U?$equal_to@VUpgradeType@BWAPI@@@4@@std@@V?$allocator@VUpgradeType@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VUpgradeType@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VUpgradeType@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:UnitType.obj
- 0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VTechType@BWAPI@@V?$_Uhash_compare@VTechType@BWAPI@@U?$hash@H@std@@U?$equal_to@VTechType@BWAPI@@@4@@std@@V?$allocator@VTechType@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VTechType@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VTechType@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:UnitType.obj
- 0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VRace@BWAPI@@V?$_Uhash_compare@VRace@BWAPI@@U?$hash@H@std@@U?$equal_to@VRace@BWAPI@@@4@@std@@V?$allocator@VRace@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VRace@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VRace@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:Race.obj
  0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VWeaponType@BWAPI@@V?$_Uhash_compare@VWeaponType@BWAPI@@U?$hash@H@std@@U?$equal_to@VWeaponType@BWAPI@@@4@@std@@V?$allocator@VWeaponType@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VWeaponType@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VWeaponType@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:WeaponType.obj
- 0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VBulletType@BWAPI@@V?$_Uhash_compare@VBulletType@BWAPI@@U?$hash@H@std@@U?$equal_to@VBulletType@BWAPI@@@4@@std@@V?$allocator@VBulletType@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VBulletType@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VBulletType@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:BulletType.obj
+ 0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VUpgradeType@BWAPI@@V?$_Uhash_compare@VUpgradeType@BWAPI@@U?$hash@H@std@@U?$equal_to@VUpgradeType@BWAPI@@@4@@std@@V?$allocator@VUpgradeType@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VUpgradeType@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VUpgradeType@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:UnitType.obj
+ 0001:0008d690       ?_Make_iter@?$_Hash@V?$_Uset_traits@VRace@BWAPI@@V?$_Uhash_compare@VRace@BWAPI@@U?$hash@H@std@@U?$equal_to@VRace@BWAPI@@@4@@std@@V?$allocator@VRace@BWAPI@@@4@$0A@@std@@@std@@QBE?AV?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VRace@BWAPI@@@std@@@std@@@2@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VRace@BWAPI@@@std@@@std@@U_Iterator_base0@2@@2@@Z 1008e690 f i BWAPILIB:Race.obj
  0001:0008d6a0       ??$_Buynode@ABVUpgradeType@BWAPI@@@?$_List_buy@VUpgradeType@BWAPI@@V?$allocator@VUpgradeType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VUpgradeType@BWAPI@@PAX@1@PAU21@0ABVUpgradeType@BWAPI@@@Z 1008e6a0 f i BWAPILIB:UnitType.obj
- 0001:0008d6a0       ??$_Buynode@ABVBulletType@BWAPI@@@?$_List_buy@VBulletType@BWAPI@@V?$allocator@VBulletType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VBulletType@BWAPI@@PAX@1@PAU21@0ABVBulletType@BWAPI@@@Z 1008e6a0 f i BWAPILIB:BulletType.obj
  0001:0008d6a0       ??$_Buynode@ABVWeaponType@BWAPI@@@?$_List_buy@VWeaponType@BWAPI@@V?$allocator@VWeaponType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VWeaponType@BWAPI@@PAX@1@PAU21@0ABVWeaponType@BWAPI@@@Z 1008e6a0 f i BWAPILIB:WeaponType.obj
  0001:0008d6a0       ??$_Buynode@ABVUnitType@BWAPI@@@?$_List_buy@VUnitType@BWAPI@@V?$allocator@VUnitType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VUnitType@BWAPI@@PAX@1@PAU21@0ABVUnitType@BWAPI@@@Z 1008e6a0 f i BWAPILIB:UnitType.obj
- 0001:0008d6a0       ??$_Buynode@ABVTechType@BWAPI@@@?$_List_buy@VTechType@BWAPI@@V?$allocator@VTechType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VTechType@BWAPI@@PAX@1@PAU21@0ABVTechType@BWAPI@@@Z 1008e6a0 f i BWAPILIB:UnitType.obj
  0001:0008d6a0       ??$_Buynode@ABVOrder@BWAPI@@@?$_List_buy@VOrder@BWAPI@@V?$allocator@VOrder@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VOrder@BWAPI@@PAX@1@PAU21@0ABVOrder@BWAPI@@@Z 1008e6a0 f i BWAPILIB:Order.obj
+ 0001:0008d6a0       ??$_Buynode@ABVTechType@BWAPI@@@?$_List_buy@VTechType@BWAPI@@V?$allocator@VTechType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VTechType@BWAPI@@PAX@1@PAU21@0ABVTechType@BWAPI@@@Z 1008e6a0 f i BWAPILIB:UnitType.obj
+ 0001:0008d6a0       ??$_Buynode@ABVBulletType@BWAPI@@@?$_List_buy@VBulletType@BWAPI@@V?$allocator@VBulletType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VBulletType@BWAPI@@PAX@1@PAU21@0ABVBulletType@BWAPI@@@Z 1008e6a0 f i BWAPILIB:BulletType.obj
  0001:0008d6a0       ??$_Buynode@ABVRace@BWAPI@@@?$_List_buy@VRace@BWAPI@@V?$allocator@VRace@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VRace@BWAPI@@PAX@1@PAU21@0ABVRace@BWAPI@@@Z 1008e6a0 f i BWAPILIB:Race.obj
  0001:0008d6c0       ??$_Buynode@ABH@?$_List_buy@VUpgradeType@BWAPI@@V?$allocator@VUpgradeType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VUpgradeType@BWAPI@@PAX@1@PAU21@0ABH@Z 1008e6c0 f i BWAPILIB:UnitType.obj
  0001:0008d6f0       ??$_Buynode@ABH@?$_List_buy@VTechType@BWAPI@@V?$allocator@VTechType@BWAPI@@@std@@@std@@QAEPAU?$_List_node@VTechType@BWAPI@@PAX@1@PAU21@0ABH@Z 1008e6f0 f i BWAPILIB:UnitType.obj
@@ -1895,8 +1895,8 @@
  0001:0008e490       ?drawTextMap@Game@BWAPI@@QAAXHHPBDZZ 1008f490 f   BWAPILIB:Game.obj
  0001:0008e4b0       ?drawTextScreen@Game@BWAPI@@QAAXHHPBDZZ 1008f4b0 f   BWAPILIB:Game.obj
  0001:0008e4d0       ?drawLineMap@Game@BWAPI@@QAEXV?$Point@H$00@2@0VColor@2@@Z 1008f4d0 f   BWAPILIB:Game.obj
- 0001:0008e500       ??_G?$basic_ostringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@UAEPAXI@Z 1008f500 f i BWAPILIB:Game.obj
  0001:0008e500       ??_E?$basic_ostringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@UAEPAXI@Z 1008f500 f i * CIL library *:* CIL module *
+ 0001:0008e500       ??_G?$basic_ostringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@UAEPAXI@Z 1008f500 f i BWAPILIB:Game.obj
  0001:0008e6ca       ??_E?$basic_ostringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@$4PPPPPPPM@A@AEPAXI@Z 1008f6ca f i BWAPILIB:Game.obj
  0001:0008e6e0       ?IsTransportImpl@Filter@BWAPI@@YA_NPAVUnitInterface@2@@Z 1008f6e0 f   BWAPILIB:Filters.obj
  0001:0008e720       ?CanProduceImpl@Filter@BWAPI@@YA_NPAVUnitInterface@2@@Z 1008f720 f   BWAPILIB:Filters.obj
@@ -2063,19 +2063,19 @@
  0001:000905a0       ??$_Insert@AAVRace@BWAPI@@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VRace@BWAPI@@@std@@@std@@U_Iterator_base0@2@@std@@@?$_Hash@V?$_Uset_traits@VRace@BWAPI@@V?$_Uhash_compare@VRace@BWAPI@@U?$hash@H@std@@U?$equal_to@VRace@BWAPI@@@4@@std@@V?$allocator@VRace@BWAPI@@@4@$0A@@std@@@std@@IAE?AU?$pair@V?$_List_const_iterator@V?$_List_val@U?$_List_simple_types@VRace@BWAPI@@@std@@@std@@@std@@_N@1@AAVRace@BWAPI@@V?$_List_unchecked_const_iterator@V?$_List_val@U?$_List_simple_types@VRace@BWAPI@@@std@@@std@@U_Iterator_base0@2@@1@@Z 100915a0 f i BWAPILIB:Race.obj
  0001:00090710       ??_GAIModule@BWAPI@@UAEPAXI@Z 10091710 f i BWAPILIB:AIModule.obj
  0001:00090710       ??_EAIModule@BWAPI@@UAEPAXI@Z 10091710 f i * CIL library *:* CIL module *
- 0001:00090740       ?onPlayerLeft@AIModule@BWAPI@@UAEXPAVPlayerInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
- 0001:00090740       ?onUnitMorph@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
- 0001:00090740       ?onUnitEvade@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
- 0001:00090740       ?onUnitShow@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
- 0001:00090740       ?onUnitHide@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
  0001:00090740       ?onUnitRenegade@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
- 0001:00090740       ?onUnitDestroy@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
- 0001:00090740       ?onUnitCreate@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
- 0001:00090740       ?onUnitComplete@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
  0001:00090740       ?onEnd@AIModule@BWAPI@@UAEX_N@Z 10091740 f   BWAPILIB:AIModule.obj
  0001:00090740       ?onUnitDiscover@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
- 0001:00090750       ?onSendText@AIModule@BWAPI@@UAEXV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z 10091750 f   BWAPILIB:AIModule.obj
+ 0001:00090740       ?onUnitHide@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
+ 0001:00090740       ?onUnitEvade@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
+ 0001:00090740       ?onUnitDestroy@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
+ 0001:00090740       ?onUnitComplete@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
+ 0001:00090740       ?onUnitShow@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
+ 0001:00090740       ?onUnitMorph@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
+ 0001:00090740       ?onUnitCreate@AIModule@BWAPI@@UAEXPAVUnitInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
+ 0001:00090740       ?onPlayerLeft@AIModule@BWAPI@@UAEXPAVPlayerInterface@2@@Z 10091740 f   BWAPILIB:AIModule.obj
  0001:00090750       ?onSaveGame@AIModule@BWAPI@@UAEXV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z 10091750 f   BWAPILIB:AIModule.obj
+ 0001:00090750       ?onSendText@AIModule@BWAPI@@UAEXV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z 10091750 f   BWAPILIB:AIModule.obj
  0001:00090790       ?onReceiveText@AIModule@BWAPI@@UAEXPAVPlayerInterface@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z 10091790 f   BWAPILIB:AIModule.obj
  0001:000907cb       ?_Lock@?$basic_streambuf@DU?$char_traits@D@std@@@std@@UAEXXZ 100917cb f   msvcprt:MSVCP140.dll
  0001:000907d1       ?_Unlock@?$basic_streambuf@DU?$char_traits@D@std@@@std@@UAEXXZ 100917d1 f   msvcprt:MSVCP140.dll
@@ -2114,8 +2114,8 @@
  0001:00090e9b       __onexit                   10091e9b f   MSVCRT:utility.obj
  0001:00090ed6       _atexit                    10091ed6 f   MSVCRT:utility.obj
  0001:00090eeb       ??3@YAXPAXI@Z              10091eeb f   MSVCRT:delete_scalar_size.obj
- 0001:00090ef9       ??_Etype_info@@UAEPAXI@Z   10091ef9 f i MSVCRT:std_type_info_static.obj
  0001:00090ef9       ??_Gtype_info@@UAEPAXI@Z   10091ef9 f i MSVCRT:std_type_info_static.obj
+ 0001:00090ef9       ??_Etype_info@@UAEPAXI@Z   10091ef9 f i MSVCRT:std_type_info_static.obj
  0001:00090f1c       ??2@YAPAXIABUnothrow_t@std@@@Z 10091f1c f   MSVCRT:new_scalar_nothrow.obj
  0001:00090f6c       ??_M@YGXPAXIIP6EX0@Z@Z     10091f6c f   MSVCRT:ehvecdtr.obj
  0001:00090ff1       ?__ArrayUnwind@@YGXPAXIIP6EX0@Z@Z 10091ff1 f   MSVCRT:ehvecdtr.obj
@@ -2133,9 +2133,9 @@
  0001:000916cf       ??1bad_alloc@std@@UAE@XZ   100926cf f i MSVCRT:throw_bad_alloc.obj
  0001:000916cf       ??1bad_array_new_length@std@@UAE@XZ 100926cf f i MSVCRT:throw_bad_alloc.obj
  0001:000916e0       ??_Ebad_array_new_length@std@@UAEPAXI@Z 100926e0 f i MSVCRT:throw_bad_alloc.obj
+ 0001:000916e0       ??_Gbad_array_new_length@std@@UAEPAXI@Z 100926e0 f i MSVCRT:throw_bad_alloc.obj
  0001:000916e0       ??_Ebad_alloc@std@@UAEPAXI@Z 100926e0 f i MSVCRT:throw_bad_alloc.obj
  0001:000916e0       ??_Gbad_alloc@std@@UAEPAXI@Z 100926e0 f i MSVCRT:throw_bad_alloc.obj
- 0001:000916e0       ??_Gbad_array_new_length@std@@UAEPAXI@Z 100926e0 f i MSVCRT:throw_bad_alloc.obj
  0001:0009170d       ?__scrt_throw_std_bad_alloc@@YAXXZ 1009270d f   MSVCRT:throw_bad_alloc.obj
  0001:0009172a       ?__scrt_throw_std_bad_array_new_length@@YAXXZ 1009272a f   MSVCRT:throw_bad_alloc.obj
  0001:00091747       ___isa_available_init      10092747 f   MSVCRT:cpu_disp.obj
@@ -2175,23 +2175,23 @@
  0001:00091b17       __initterm                 10092b17 f   ucrt:api-ms-win-crt-runtime-l1-1-0.dll
  0001:00091b1d       __initterm_e               10092b1d f   ucrt:api-ms-win-crt-runtime-l1-1-0.dll
  0001:00091b23       _IsProcessorFeaturePresent@4 10092b23 f   kernel32:KERNEL32.dll
- 0001:00091b29       ___acrt_uninitialize       10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___scrt_stub_for_acrt_uninitialize 10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___acrt_initialize         10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___scrt_stub_for_acrt_uninitialize_critical 10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___vcrt_uninitialize_critical 10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___acrt_thread_detach      10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___scrt_stub_for_acrt_thread_attach 10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___scrt_stub_for_acrt_thread_detach 10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___scrt_stub_for_acrt_initialize 10092b29 f   MSVCRT:ucrt_stubs.obj
  0001:00091b29       ___acrt_uninitialize_critical 10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b29       ___vcrt_thread_attach      10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___acrt_thread_detach      10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___scrt_stub_for_acrt_initialize 10092b29 f   MSVCRT:ucrt_stubs.obj
  0001:00091b29       ___vcrt_initialize         10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___scrt_stub_for_acrt_thread_attach 10092b29 f   MSVCRT:ucrt_stubs.obj
  0001:00091b29       ___vcrt_uninitialize       10092b29 f   MSVCRT:ucrt_stubs.obj
  0001:00091b29       ___acrt_thread_attach      10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___vcrt_thread_attach      10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___acrt_initialize         10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___scrt_stub_for_acrt_thread_detach 10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___acrt_uninitialize       10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___scrt_stub_for_acrt_uninitialize 10092b29 f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___scrt_stub_for_acrt_uninitialize_critical 10092b29 f   MSVCRT:ucrt_stubs.obj
  0001:00091b29       ___vcrt_thread_detach      10092b29 f   MSVCRT:ucrt_stubs.obj
- 0001:00091b2c       __is_c_termination_complete 10092b2c f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b29       ___vcrt_uninitialize_critical 10092b29 f   MSVCRT:ucrt_stubs.obj
  0001:00091b2c       ___scrt_stub_for_is_c_termination_complete 10092b2c f   MSVCRT:ucrt_stubs.obj
+ 0001:00091b2c       __is_c_termination_complete 10092b2c f   MSVCRT:ucrt_stubs.obj
  0001:00091b30       __alldiv                   10092b30 f   MSVCRT:lldiv.obj
  0001:00091be0       __alldvrm                  10092be0 f   MSVCRT:lldvrm.obj
  0001:00091cc0       __allmul                   10092cc0 f   MSVCRT:llmul.obj
@@ -2593,8 +2593,8 @@
  0002:0000c41c       ??_8?$basic_stringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@7B?$basic_ostream@DU?$char_traits@D@std@@@1@@ 100b041c     BuildOrderQueue.obj
  0002:0000c428       ??_7?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@6B@ 100b0428     BuildOrderQueue.obj
  0002:0000c468       ??_7?$basic_stringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@6B@ 100b0468     BuildOrderQueue.obj
- 0002:0000c46c       ??_8?$basic_ofstream@DU?$char_traits@D@std@@@std@@7B@ 100b046c     Logger.obj
  0002:0000c46c       ??_8?$basic_stringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@7B?$basic_istream@DU?$char_traits@D@std@@@1@@ 100b046c     BuildOrderQueue.obj
+ 0002:0000c46c       ??_8?$basic_ofstream@DU?$char_traits@D@std@@@std@@7B@ 100b046c     Logger.obj
  0002:0000c474       ??_C@_08CHAIDNIC@no?5units@ 100b0474     CombatSimulation.obj
  0002:0000c480       ??_C@_0FP@HKGOOHGH@c?3?2users?2ylee5?2documents?2starcr@ 100b0480     CombatSimulation.obj
  0002:0000c4e0       ??_C@_0BD@LLLBEPMK@air?1ground?5mistake@ 100b04e0     CombatSimulation.obj
@@ -2668,9 +2668,9 @@
  0002:0000c8f4       ??_7other_error@detail@json_abi_v3_11_3@nlohmann@@6B@ 100b08f4     db.obj
  0002:0000c900       ??_7?$_Ref_count_obj@V?$output_string_adapter@DV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@detail@json_abi_v3_11_3@nlohmann@@@std@@6B@ 100b0900     db.obj
  0002:0000c914       ??_7?$output_stream_adapter@D@detail@json_abi_v3_11_3@nlohmann@@6B@ 100b0914     db.obj
+ 0002:0000c920       ?digits_to_99@?1???$dump_integer@E$0A@@?$serializer@V?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@AAEXE@Z@4V?$array@V?$array@D$01@std@@$0GE@@std@@B 100b0920     db.obj
  0002:0000c920       ?digits_to_99@?1???$dump_integer@_J$0A@@?$serializer@V?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@AAEX_J@Z@4V?$array@V?$array@D$01@std@@$0GE@@std@@B 100b0920     db.obj
  0002:0000c920       ?digits_to_99@?1???$dump_integer@_K$0A@@?$serializer@V?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@AAEX_K@Z@4V?$array@V?$array@D$01@std@@$0GE@@std@@B 100b0920     db.obj
- 0002:0000c920       ?digits_to_99@?1???$dump_integer@E$0A@@?$serializer@V?$basic_json@Vmap@std@@Vvector@2@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@_N_J_KNVallocator@2@Uadl_serializer@json_abi_v3_11_3@nlohmann@@V?$vector@EV?$allocator@E@std@@@2@X@json_abi_v3_11_3@nlohmann@@@detail@json_abi_v3_11_3@nlohmann@@AAEXE@Z@4V?$array@V?$array@D$01@std@@$0GE@@std@@B 100b0920     db.obj
  0002:0000c9ec       ??_7out_of_range@detail@json_abi_v3_11_3@nlohmann@@6B@ 100b09ec     db.obj
  0002:0000c9f8       ??_7invalid_iterator@detail@json_abi_v3_11_3@nlohmann@@6B@ 100b09f8     db.obj
  0002:0000ca04       ??_7exception@detail@json_abi_v3_11_3@nlohmann@@6B@ 100b0a04     db.obj
@@ -4031,14 +4031,13 @@
  0002:00014768       __real@7fb9999999999999    100b8768     ParseUtils.obj
  0002:00014770       __real@bf8ff2e48e8a71de    100b8770     UnitData.obj
  0002:00014778       __real@bf9eb851eb851eb8    100b8778     CombatSimulation.obj
- 0002:00014780       __real@bff0000000000000    100b8780     NodeEval.obj
+ 0002:00014780       __real@bff0000000000000    100b8780     NEATCommander.obj
  0002:00014788       __real@c014000000000000    100b8788     NodeEval.obj
  0002:00014790       __real@c044000000000000    100b8790     MicroQueens.obj
  0002:00014798       __real@c048000000000000    100b8798     Micro.obj
  0002:000147a0       __real@c060000000000000    100b87a0     MicroQueens.obj
  0002:000147a8       __real@c070000000000000    100b87a8     MicroDetectors.obj
- 0002:000147b0       __real@c08f400000000000    100b87b0     NEATCommander.obj
- 0002:000147b8       __real@c12e847e00000000    100b87b8     MapTools.obj
+ 0002:000147b0       __real@c12e847e00000000    100b87b0     MapTools.obj
  0002:000147c0       __xmm@00000000000000000000003d0000002c 100b87c0     NEATCommander.obj
  0002:000147d0       __xmm@000000000000000000000060000000a0 100b87d0     The.obj
  0002:000147e0       __xmm@0000000000000000ffffffff00000001 100b87e0     MapPartitions.obj

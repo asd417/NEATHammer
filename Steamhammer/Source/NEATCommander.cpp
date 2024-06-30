@@ -201,7 +201,7 @@ namespace UAlbertaBot
     {
         if (Config::NEAT::Train && !Config::NEAT::LoadNetworkFromJSON)
         {
-            if (!network->isValid()) fitness = -1000;
+            if (!network->isValid()) fitness = -1;
             DBKeySpace dbkeys{};
             dbkeys.push_back("Fitness");
 
