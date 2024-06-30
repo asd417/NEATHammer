@@ -55,7 +55,6 @@ namespace UAlbertaBot
 		Lockdown,
 		Optical_Flare,
 		Personnel_Cloaking,
-		Scanner_Sweep,
 		Spider_Mines,
 		Stim_Packs,
 		Tank_Siege_Mode,

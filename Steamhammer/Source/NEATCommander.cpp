@@ -519,7 +519,7 @@ namespace UAlbertaBot
         }
         constexpr int outputVectorOffset = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
         tilePosX += network->getOutputVector()[outputVectorOffset];
-        tilePosY += network->getOutputVector()[outputVectorOffset + 1]; //72 output nodes
+        tilePosY += network->getOutputVector()[outputVectorOffset + 1]; //71 output nodes
         
         //We scanned through the whole map
         curSection++;
@@ -1098,8 +1098,6 @@ namespace UAlbertaBot
             return BWAPI::TechTypes::Optical_Flare;
         case NetworkTerranOptions::Personnel_Cloaking:
             return BWAPI::TechTypes::Personnel_Cloaking;
-        case NetworkTerranOptions::Scanner_Sweep:
-            return BWAPI::TechTypes::Scanner_Sweep;
         case NetworkTerranOptions::Spider_Mines:
             return BWAPI::TechTypes::Spider_Mines;
         case NetworkTerranOptions::Stim_Packs:
