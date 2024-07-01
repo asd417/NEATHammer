@@ -1,6 +1,7 @@
 # Define the application to be monitored and the batch script to run
 $applicationName = "Starcraft"  # Name of the application to monitor
 $batchScriptPath = "C:\Users\ylee5\Desktop\STARTcraft\starcraft\RunStarcraftWithBWAPI.bat"
+
 # Function to get the PIDs of running instances of the application
 function Get-ApplicationPIDs {
     param (
@@ -54,13 +55,14 @@ function Monitor-Processes {
                 # Rescan for all instances and update the PID
                 $newPids = Get-ApplicationPIDs -appName $applicationName
                 
-                # Find the new PID that was added
-                foreach ($newPid in $newPids) {
-                    if ($newPid -notin $processIds) {
-                        $processIds[$i] = $newPid
-                        Write-Output "New process with PID $($processIds[$i]) started."
-                        break
-                    }
+            }
+
+            # Find the new PID that was added
+            foreach ($newPid in $newPids) {
+                if ($newPid -notin $processIds) {
+                    $processIds[$i] = $newPid
+                    Write-Output "New process with PID $($processIds[$i]) started."
+                    break
                 }
             }
         }
