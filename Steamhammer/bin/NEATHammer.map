@@ -1,6 +1,6 @@
  NEATHammer
 
- Timestamp is 66830a53 (Mon Jul  1 15:58:11 2024)
+ Timestamp is 66830ec5 (Mon Jul  1 16:17:09 2024)
 
  Preferred load address is 10000000
 
@@ -3993,7 +3993,7 @@
  0002:00014630       __real@3ed8775e638384aa    100b8630     NEATCommander.obj
  0002:00014638       __real@3ee4f8b588e368f1    100b8638     Micro.obj
  0002:00014640       __real@3f1a36e2eb1c432d    100b8640     NEATCommander.obj
- 0002:00014648       __real@3f50624dd2f1a9fc    100b8648     GameCommander.obj
+ 0002:00014648       __real@3f50624dd2f1a9fc    100b8648     TimerManager.obj
  0002:00014650       __real@3f647ae147ae147b    100b8650     MapTools.obj
  0002:00014658       __real@3f747ae147ae147b    100b8658     NEATCommander.obj
  0002:00014660       __real@3f847ae147ae147b    100b8660     CombatSimulation.obj
@@ -4025,13 +4025,13 @@
  0002:00014730       __real@4068000000000000    100b8730     CombatCommander.obj
  0002:00014738       __real@4070000000000000    100b8738     CombatCommander.obj
  0002:00014740       __real@40d4400000000000    100b8740     MicroManager.obj
- 0002:00014748       __real@40d9000000000000    100b8748     ProductionManager.obj
+ 0002:00014748       __real@40d9000000000000    100b8748     WorkerManager.obj
  0002:00014750       __real@412e847fcccccccd    100b8750     MicroTransports.obj
- 0002:00014758       __real@412e848000000000    100b8758     GameCommander.obj
+ 0002:00014758       __real@412e848000000000    100b8758     TimerManager.obj
  0002:00014760       __real@7fb9999999999999    100b8760     ParseUtils.obj
  0002:00014768       __real@bf8ff2e48e8a71de    100b8768     UnitData.obj
  0002:00014770       __real@bf9eb851eb851eb8    100b8770     CombatSimulation.obj
- 0002:00014778       __real@bff0000000000000    100b8778     NEATCommander.obj
+ 0002:00014778       __real@bff0000000000000    100b8778     NodeEval.obj
  0002:00014780       __real@c014000000000000    100b8780     NodeEval.obj
  0002:00014788       __real@c044000000000000    100b8788     MicroQueens.obj
  0002:00014790       __real@c048000000000000    100b8790     Micro.obj
