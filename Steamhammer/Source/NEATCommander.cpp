@@ -204,11 +204,13 @@ namespace UAlbertaBot
             if (!network->isValid()) fitness = -1;
             DBKeySpace dbkeys{};
             dbkeys.push_back("Fitness");
+            dbkeys.push_back("isWinner");
 
             DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys };
             
             try {
                 db.addToData("Fitness", fitness);
+                db.addToData("isWinner", _winner);
 
                 std::string url = "/genome/" + std::to_string(genomeID) + "/fitness";
                 std::cout << url << "\n";
@@ -292,7 +294,7 @@ namespace UAlbertaBot
         //if (unit->getPlayer() == the.enemy()) scoreFitness(Config::NEAT::EnemyShowScore);
     }
 
-    void NEATCommander::onEnd()
+    void NEATCommander::onEnd(bool isWinner)
     {
         int globalKills = 0;
         for (auto it = killMap.begin(); it != killMap.end(); it++)
@@ -300,6 +302,7 @@ namespace UAlbertaBot
             globalKills += it->second;
         }
         scoreFitness(globalKills * Config::NEAT::ArmyKillScore);
+        _winner = isWinner;
     }
 
     void NEATCommander::drawDebug(int x, int y)

@@ -288,7 +288,7 @@ namespace UAlbertaBot
 		void onUnitHide(BWAPI::Unit unit);
 		void onUnitShow(BWAPI::Unit unit);
 
-		void onEnd();
+		void onEnd(bool isWinner);
 
 		void drawDebug(int x, int y);
 		void setTimeManager(TimerManager* t); 
@@ -337,6 +337,8 @@ namespace UAlbertaBot
 		std::array<double, (size_t)MacroCommandType::QueueBarrier> macroCommandTypeOutputs;
 		double tilePosX; //0~256
 		double tilePosY; //0~256
+		
+		bool _winner;
 
 		Network* network;
 		int genomeID = 0;

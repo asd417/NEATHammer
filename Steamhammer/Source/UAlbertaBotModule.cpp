@@ -59,7 +59,7 @@ void UAlbertaBotModule::onStart()
 void UAlbertaBotModule::onEnd(bool isWinner)
 {
     if(isWinner) NEATCommander::Instance().scoreFitness(Config::NEAT::WinScore);
-    NEATCommander::Instance().onEnd();
+    NEATCommander::Instance().onEnd(isWinner);
     GameCommander::Instance().onEnd(isWinner);
 }
 
