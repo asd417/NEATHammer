@@ -52,15 +52,20 @@ function Monitor-Processes {
                 Write-Output "Process with PID $($processIds[$i]) has crashed. Restarting..."
                 Run-BatchScript -scriptPath $scriptPath
             }
-
-                
         }
         # Rescan for all instances and update the PID
         $newPids = Get-ApplicationPIDs -appName $applicationName
         # Find the new PID that was added
         foreach ($newPid in $newPids) {
             if ($newPid -notin $processIds) {
-                $processIds[$i] = $newPid
+                try {
+                    $processIds[$i] = $newPid
+                    Write-Output "Process count stayed same. Process count is $($processIds.Count)"
+                }
+                catch {
+                    $processIds += $newPid
+                    Write-Output "New Process found. Process count is now $($processIds.Count)"
+                }
                 Write-Output "New process with PID $($processIds[$i]) started."
                 break
             }
