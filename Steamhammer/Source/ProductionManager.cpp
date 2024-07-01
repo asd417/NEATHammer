@@ -555,12 +555,12 @@ void ProductionManager::executeCommand(const MacroAct & act)
         BWAPI::Unit v = BWAPI::Broodwar->getClosestUnit({tp.x*32, tp.y*32}, BWAPI::Filter::GetType==BWAPI::UnitTypes::Terran_Vulture && BWAPI::Filter::SpiderMineCount > 0);
         v->useTech(BWAPI::TechTypes::Spider_Mines, { tp.x * 32, tp.y * 32 });
     }
-    else if (cmd == MacroCommandType::NUKE)
+    /*else if (cmd == MacroCommandType::NUKE)
     {
         BWAPI::TilePosition tp = act.getTileLocation();
         BWAPI::Unit v = BWAPI::Broodwar->getClosestUnit({ tp.x * 32, tp.y * 32 }, BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Ghost);
         v->useTech(BWAPI::TechTypes::Nuclear_Strike, { tp.x * 32, tp.y * 32 });
-    }
+    }*/
     else if (cmd == MacroCommandType::QueueBarrier || cmd == MacroCommandType::None)
     {
         // It does nothing! Every command is a queue barrier

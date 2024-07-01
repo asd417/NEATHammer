@@ -280,7 +280,7 @@ namespace UAlbertaBot
         //add a small fitness penalty for allied units died.
         if (unit->getPlayer() == the.self() && !unit->getType().isBuilding() && !unit->getType().isWorker())
         {
-            scoreFitness(-Config::NEAT::ArmyKillScore / 2);
+            //scoreFitness(-Config::NEAT::ArmyKillScore / 2);
         }
     }
     void NEATCommander::onUnitHide(BWAPI::Unit unit)
@@ -519,7 +519,7 @@ namespace UAlbertaBot
         }
         constexpr int outputVectorOffset = (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + (int)MacroCommandType::QueueBarrier;
         tilePosX += network->getOutputVector()[outputVectorOffset];
-        tilePosY += network->getOutputVector()[outputVectorOffset + 1]; //71 output nodes
+        tilePosY += network->getOutputVector()[outputVectorOffset + 1]; //70 output nodes
         
         //We scanned through the whole map
         curSection++;
@@ -904,10 +904,10 @@ namespace UAlbertaBot
         {
             return the.my.completed.count(BWAPI::UnitTypes::Terran_Vulture) > 0 && BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Spider_Mines);
         }
-        if (command == MacroCommandType::NUKE)
+        /*if (command == MacroCommandType::NUKE)
         {
             return the.my.completed.count(BWAPI::UnitTypes::Terran_Nuclear_Missile) > 0;
-        }
+        }*/
         return true;
     }
 
