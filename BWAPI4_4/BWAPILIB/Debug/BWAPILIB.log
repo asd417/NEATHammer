@@ -1,0 +1,33 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Preview\MSBuild\Microsoft\VC\v150\Platforms\Win32\PlatformToolsets\v141_xp\Toolset.targets(39,5): warning MSB8051: Support for targeting Windows XP is deprecated and will not be present in future releases of Visual Studio. Please see https://go.microsoft.com/fwlink/?linkid=2023588 for more information.
+  AIModule.cpp
+  BroodwarOutputDevice.cpp
+  BulletType.cpp
+  BWAPI.cpp
+  Color.cpp
+  DamageType.cpp
+  Error.cpp
+  Event.cpp
+  ExplosionType.cpp
+  Filters.cpp
+  Forceset.cpp
+  Game.cpp
+  GameType.cpp
+  Order.cpp
+  Player.cpp
+  Playerset.cpp
+  PlayerType.cpp
+  Position.cpp
+  Race.cpp
+  Region.cpp
+  Regionset.cpp
+  Streams.cpp
+  TechType.cpp
+  Unit.cpp
+  Unitset.cpp
+  UnitCommand.cpp
+  UnitCommandType.cpp
+  UnitSizeType.cpp
+  UnitType.cpp
+  UpgradeType.cpp
+  WeaponType.cpp
+  BWAPILIB.vcxproj -> C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\Debug\BWAPILIB.lib

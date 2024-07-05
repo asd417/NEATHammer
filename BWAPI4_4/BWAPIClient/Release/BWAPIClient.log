@@ -1,0 +1,33 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Preview\MSBuild\Microsoft\VC\v150\Platforms\Win32\PlatformToolsets\v141_xp\Toolset.targets(39,5): warning MSB8051: Support for targeting Windows XP is deprecated and will not be present in future releases of Visual Studio. Please see https://go.microsoft.com/fwlink/?linkid=2023588 for more information.
+  BulletImpl.cpp
+  BulletShared.cpp
+  Client.cpp
+  ForceImpl.cpp
+  ForceShared.cpp
+  GameImpl.cpp
+  GameShared.cpp
+  PlayerImpl.cpp
+  PlayerShared.cpp
+  RegionImpl.cpp
+  RegionShared.cpp
+  UnitImpl.cpp
+  UnitShared.cpp
+c:\users\ylee5\documents\starcraft_research\bwapi4_4\bwapiclient\source\convenience.h(22): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compiling source file Source\GameImpl.cpp)
+  c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\string.h(340): note: see declaration of 'strncpy' (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\bwapiclient\source\gameimpl.cpp(45): note: see reference to function template instantiation 'void StrCopy<1024>(char (&)[1024],const char *)' being compiled
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\unitcommandtype.h(75): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::UnitCommandType,45>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\techtype.h(74): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::TechType,46>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\playertype.h(40): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::PlayerType,12>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\gametype.h(48): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::GameType,33>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\explosiontype.h(54): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::ExplosionType,25>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\error.h(61): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::Error,27>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\damagetype.h(46): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::DamageType,6>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\color.h(14): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::Color,255>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\bullettype.h(73): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::BulletType,210>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\race.h(41): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::Race,8>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\order.h(221): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::Order,190>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\weapontype.h(148): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::WeaponType,131>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\upgradetype.h(88): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::UpgradeType,62>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\unitsizetype.h(41): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::UnitSizeType,5>' being compiled (compiling source file Source\GameImpl.cpp)
+  c:\users\ylee5\documents\starcraft_research\bwapi4_4\include\bwapi\unittype.h(274): note: see reference to class template instantiation 'BWAPI::Type<BWAPI::UnitType,233>' being compiled (compiling source file Source\GameImpl.cpp)
+  BWAPIClient.vcxproj -> C:\Users\ylee5\Documents\Starcraft_Research\BWAPI4_4\Release\BWAPIClient.lib
