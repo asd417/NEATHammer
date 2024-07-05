@@ -17,7 +17,6 @@ namespace JSONTools
             dest = (T)value[key].GetInt();
         }
     }
-
     void ReadBool(const char * key, const rapidjson::Value & value, bool & dest);
     void ReadString(const char * key, const rapidjson::Value & value, std::string & dest);
 }

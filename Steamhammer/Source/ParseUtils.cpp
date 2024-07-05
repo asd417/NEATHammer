@@ -112,6 +112,7 @@ void ParseUtils::ParseConfigFile(const std::string & filename)
         JSONTools::ReadBool("LogOutputDecision", neat, Config::NEAT::LogOutputDecision);
         JSONTools::ReadString("DecisionLogFileName", neat, Config::NEAT::DecisionLogFileName);
         JSONTools::ReadInt("RetryTimer", neat, Config::NEAT::RetryTimer);
+        JSONTools::ReadInt("OutputSpaceAvailabilityScore", neat, Config::NEAT::OutputSpaceAvailabilityScore);
     }
 
     // Parse the Debug Options

@@ -1,0 +1,1 @@
+as shown in the near-winning examples, the map view part of the input space is flipped in x axis and rotated in 90 degrees anti-clockwise.

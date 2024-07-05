@@ -46,6 +46,7 @@ namespace Config
     {
         extern bool Train;
         extern std::string TrainingServerIP;
+        extern int RetryTimer;
         extern bool LoadNetworkFromJSON;
         extern std::string NetworkJSON;
 
@@ -64,7 +65,8 @@ namespace Config
         extern std::string OutputLogFileName;
         extern bool LogOutputDecision;
         extern std::string DecisionLogFileName;
-        extern int RetryTimer;
+
+        extern int OutputSpaceAvailabilityScore;
     }
     namespace BWAPIOptions
     {

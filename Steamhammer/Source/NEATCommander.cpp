@@ -108,7 +108,7 @@ namespace UAlbertaBot
                     //network
                     id = r[0]["id"];
                     std::cout << id << std::endl;
-
+                   
                     if (id == -1 || !res) throw std::exception("id is -1");
                     retry = false;
                     networkType = r[0]["NetworkType"];
@@ -188,7 +188,7 @@ namespace UAlbertaBot
             logToStream(logStream, "\n");
             logToStream(logStream, "\n");
             std::ofstream logFStream;
-            logFStream.open(Config::NEAT::OutputLogFileName, std::ofstream::app);
+            logFStream.open(Config::NEAT::OutputLogFileName + std::to_string(genomeID), std::ofstream::app);
             logFStream << logStream.rdbuf();
             logFStream.flush();
             logFStream.close();
@@ -201,14 +201,18 @@ namespace UAlbertaBot
     {
         if (Config::NEAT::Train && !Config::NEAT::LoadNetworkFromJSON)
         {
+            fitness += (_totalUnlockedActions / _totalActions) * Config::NEAT::OutputSpaceAvailabilityScore;
             if (!network->isValid()) fitness = -1;
+            
             DBKeySpace dbkeys{};
             dbkeys.push_back("Fitness");
+            dbkeys.push_back("isWinner");
 
             DBConnector db{ Config::NEAT::TrainingServerIP.c_str(), dbkeys };
             
             try {
                 db.addToData("Fitness", fitness);
+                db.addToData("isWinner", _winner);
 
                 std::string url = "/genome/" + std::to_string(genomeID) + "/fitness";
                 std::cout << url << "\n";
@@ -292,7 +296,7 @@ namespace UAlbertaBot
         //if (unit->getPlayer() == the.enemy()) scoreFitness(Config::NEAT::EnemyShowScore);
     }
 
-    void NEATCommander::onEnd()
+    void NEATCommander::onEnd(bool isWinner)
     {
         int globalKills = 0;
         for (auto it = killMap.begin(); it != killMap.end(); it++)
@@ -300,6 +304,7 @@ namespace UAlbertaBot
             globalKills += it->second;
         }
         scoreFitness(globalKills * Config::NEAT::ArmyKillScore);
+        _winner = isWinner;
     }
 
     void NEATCommander::drawDebug(int x, int y)
@@ -492,7 +497,7 @@ namespace UAlbertaBot
             logToStream(logStream, "\n");
 
             std::ofstream logFStream;
-            logFStream.open(Config::NEAT::InputLogFileName.c_str(), std::ofstream::app);
+            logFStream.open((Config::NEAT::InputLogFileName + std::to_string(genomeID)).c_str(), std::ofstream::app);
             logFStream << logStream.rdbuf();
             logFStream.flush();
             logFStream.close();
@@ -560,7 +565,7 @@ namespace UAlbertaBot
                 logToStream(logStream, "\n");
                 logToStream(logStream, "\n");
                 std::ofstream logFStream;
-                logFStream.open(Config::NEAT::OutputLogFileName.c_str(), std::ofstream::app);
+                logFStream.open((Config::NEAT::OutputLogFileName + std::to_string(genomeID)).c_str(), std::ofstream::app);
                 logFStream << logStream.rdbuf();
                 logFStream.flush();
                 logFStream.close();
@@ -572,12 +577,17 @@ namespace UAlbertaBot
             {
                 timer->startTimer(TimerManager::net_ev1);
             }
+            int actionSpaceOpen = 2; //Tile pos x and y are always open.
             for (int i = 0; i < (int)NetworkTerranOptions::NETWORK_OPTION_COUNT; i++)
             {
-                if (builderOutputs[i] > maxBuildScore && canBuild((NetworkTerranOptions)i, buildPos, min, gas))
+                if (canBuild((NetworkTerranOptions)i, buildPos, min, gas))
                 {
-                    maxBuildChoice = i;
-                    maxBuildScore = builderOutputs[i];
+                    actionSpaceOpen++;
+                    if (builderOutputs[i] > maxBuildScore)
+                    {
+                        maxBuildChoice = i;
+                        maxBuildScore = builderOutputs[i];
+                    }
                 }
             }
             if (timer != nullptr)
@@ -592,13 +602,21 @@ namespace UAlbertaBot
             double maxCommandScore = 0.0f;
             for (int i = 0; i < (int)MacroCommandType::QueueBarrier; i++)
             {
-                //Check if unit exists
-                if (macroCommandTypeOutputs[i] > maxCommandScore && canMacro((MacroCommandType)i))
+                if (canMacro((MacroCommandType)i))
                 {
-                    maxCommandType = i;
-                    maxCommandScore = macroCommandTypeOutputs[i];
+                    actionSpaceOpen++;
+                    //Check if unit exists
+                    if (macroCommandTypeOutputs[i] > maxCommandScore)
+                    {
+                        maxCommandType = i;
+                        maxCommandScore = macroCommandTypeOutputs[i];
+                    }
                 }
             }
+            _totalUnlockedActions += actionSpaceOpen;
+            constexpr int outputSpaceSize = (int)MacroCommandType::QueueBarrier + (int)NetworkTerranOptions::NETWORK_OPTION_COUNT + 2;
+            _totalActions += outputSpaceSize;
+
             if (timer != nullptr)
             {
                 timer->stopTimer(TimerManager::net_ev2);

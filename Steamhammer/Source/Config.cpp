@@ -63,6 +63,10 @@ namespace Config
         std::string OutputLogFileName = "Log_NEAT_Output.txt";
         bool LogOutputDecision = false;
         std::string DecisionLogFileName = "Log_NEAT_Reasoning.txt";
+
+        // (sum(UnlockedOutput per action) / action * totalOutputVectorSize) * OutputSpaceAvailabilityScore is added to the fitness
+        // Default set to 0
+        int OutputSpaceAvailabilityScore = 0;
     }
 
     namespace BotInfo

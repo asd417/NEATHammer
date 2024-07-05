@@ -54,12 +54,23 @@ void UAlbertaBotModule::onStart()
 
     // Turn on latency compensation, in case somebody sets it off by default.
     BWAPI::Broodwar->setLatCom(true);
+    if (Config::NEAT::Train)
+    {
+        BWAPI::Broodwar->printf("Connected To Training Server At %s", Config::NEAT::TrainingServerIP.c_str());
+    }
+    else if (Config::NEAT::LoadNetworkFromJSON)
+    {
+        BWAPI::Broodwar->printf("Loading Pretrained Network from %s", Config::NEAT::NetworkJSON.c_str());
+    }
+    else {
+        BWAPI::Broodwar->printf("Unexpected Config Setting! Either Config::NEAT::Train or Config::NEAT::LoadNetworkFromJSON must be Set");
+    }
 }
 
 void UAlbertaBotModule::onEnd(bool isWinner)
 {
     if(isWinner) NEATCommander::Instance().scoreFitness(Config::NEAT::WinScore);
-    NEATCommander::Instance().onEnd();
+    NEATCommander::Instance().onEnd(isWinner);
     GameCommander::Instance().onEnd(isWinner);
 }
 
