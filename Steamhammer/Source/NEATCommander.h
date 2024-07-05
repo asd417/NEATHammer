@@ -338,9 +338,12 @@ namespace UAlbertaBot
 		double tilePosX; //0~256
 		double tilePosY; //0~256
 		
+<<<<<<< HEAD
 		int _totalUnlockedActions;
 		int _totalActions;
 
+=======
+>>>>>>> d3dc9f9a811b9d830181efaa8386dd129fe3645e
 		bool _winner;
 
 		Network* network;
