@@ -1,0 +1,3 @@
+﻿  dllmain.c
+     Creating library C:/local/curl-master/lib/Release/libcurl_imp.lib and object C:/local/curl-master/lib/Release/libcurl_imp.exp
+  libcurl_shared.vcxproj -> C:\local\curl-master\lib\Release\libcurl.dll
