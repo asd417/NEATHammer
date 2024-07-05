@@ -1,0 +1,7 @@
+# CMake generation dependency list for this directory.
+C:/local/curl-master/lib/CMakeLists.txt
+C:/local/curl-master/lib/Makefile.inc
+C:/local/curl-master/lib/Makefile.inc.cmake
+C:/local/curl-master/lib/Makefile.soname
+C:/local/curl-master/lib/Makefile.soname.cmake
+C:/local/curl-master/lib/curl_config.h.cmake

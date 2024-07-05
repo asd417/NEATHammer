@@ -1,0 +1,190 @@
+Performing Test HAVE_WIN32_WINNT passed with the following output:
+Change Dir: 'C:/local/curl-master/CMakeFiles/CMakeTmp'
+
+Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Preview/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_10800.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+MSBuild version 17.10.4+10fbfbf2e for .NET Framework
+Build started 6/6/2024 11:52:44 PM.
+
+Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_10800.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_10800.dir\Debug\".
+  Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+  Creating directory "C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_10800.dir\Debug\cmTC_10800.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_10800.dir\Debug\cmTC_10800.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+  Touching "cmTC_10800.dir\Debug\cmTC_10800.tlog\unsuccessfulbuild".
+ClCompile:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_10800.dir\Debug\\" /Fd"cmTC_10800.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33808 for x64
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_10800.dir\Debug\\" /Fd"cmTC_10800.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  CurlTests.c
+  _WIN32_WINNT=0x0A00
+Link:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_10800.exe" /INCREMENTAL /ILK:"cmTC_10800.dir\Debug\cmTC_10800.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_10800.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_10800.lib" /MACHINE:X64  /machine:x64 cmTC_10800.dir\Debug\CurlTests.obj
+  cmTC_10800.vcxproj -> C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_10800.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_10800.dir\Debug\cmTC_10800.tlog\unsuccessfulbuild".
+  Touching "cmTC_10800.dir\Debug\cmTC_10800.tlog\cmTC_10800.lastbuildstate".
+Done Building Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_10800.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.52
+
+
+Performing Test HAVE_WIN32_WINNT passed with the following output:
+Change Dir: 'C:/local/curl-master/CMakeFiles/CMakeTmp'
+
+Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Preview/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_56f9a.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+MSBuild version 17.10.4+10fbfbf2e for .NET Framework
+Build started 6/7/2024 12:07:59 AM.
+
+Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_56f9a.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_56f9a.dir\Debug\".
+  Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+  Creating directory "C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_56f9a.dir\Debug\cmTC_56f9a.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_56f9a.dir\Debug\cmTC_56f9a.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+  Touching "cmTC_56f9a.dir\Debug\cmTC_56f9a.tlog\unsuccessfulbuild".
+ClCompile:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_56f9a.dir\Debug\\" /Fd"cmTC_56f9a.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33808 for x64
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_56f9a.dir\Debug\\" /Fd"cmTC_56f9a.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  CurlTests.c
+  _WIN32_WINNT=0x0A00
+Link:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_56f9a.exe" /INCREMENTAL /ILK:"cmTC_56f9a.dir\Debug\cmTC_56f9a.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_56f9a.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_56f9a.lib" /MACHINE:X64  /machine:x64 cmTC_56f9a.dir\Debug\CurlTests.obj
+  cmTC_56f9a.vcxproj -> C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_56f9a.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_56f9a.dir\Debug\cmTC_56f9a.tlog\unsuccessfulbuild".
+  Touching "cmTC_56f9a.dir\Debug\cmTC_56f9a.tlog\cmTC_56f9a.lastbuildstate".
+Done Building Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_56f9a.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.57
+
+
+Performing Test HAVE_WIN32_WINNT passed with the following output:
+Change Dir: 'C:/local/curl-master/CMakeFiles/CMakeTmp'
+
+Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Preview/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_b11f8.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+MSBuild version 17.10.4+10fbfbf2e for .NET Framework
+Build started 6/8/2024 5:34:51 PM.
+
+Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_b11f8.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_b11f8.dir\Debug\".
+  Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+  Creating directory "C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_b11f8.dir\Debug\cmTC_b11f8.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_b11f8.dir\Debug\cmTC_b11f8.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+  Touching "cmTC_b11f8.dir\Debug\cmTC_b11f8.tlog\unsuccessfulbuild".
+ClCompile:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_b11f8.dir\Debug\\" /Fd"cmTC_b11f8.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33808 for x64
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_b11f8.dir\Debug\\" /Fd"cmTC_b11f8.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  CurlTests.c
+  _WIN32_WINNT=0x0A00
+Link:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_b11f8.exe" /INCREMENTAL /ILK:"cmTC_b11f8.dir\Debug\cmTC_b11f8.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_b11f8.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_b11f8.lib" /MACHINE:X64  /machine:x64 cmTC_b11f8.dir\Debug\CurlTests.obj
+  cmTC_b11f8.vcxproj -> C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_b11f8.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_b11f8.dir\Debug\cmTC_b11f8.tlog\unsuccessfulbuild".
+  Touching "cmTC_b11f8.dir\Debug\cmTC_b11f8.tlog\cmTC_b11f8.lastbuildstate".
+Done Building Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_b11f8.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.74
+
+
+Performing Test HAVE_WIN32_WINNT passed with the following output:
+Change Dir: 'C:/local/curl-master/CMakeFiles/CMakeTmp'
+
+Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Preview/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_62864.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+MSBuild version 17.10.4+10fbfbf2e for .NET Framework
+Build started 6/8/2024 5:35:05 PM.
+
+Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_62864.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_62864.dir\Debug\".
+  Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+  Creating directory "C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_62864.dir\Debug\cmTC_62864.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_62864.dir\Debug\cmTC_62864.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+  Touching "cmTC_62864.dir\Debug\cmTC_62864.tlog\unsuccessfulbuild".
+ClCompile:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_62864.dir\Debug\\" /Fd"cmTC_62864.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33808 for x64
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_62864.dir\Debug\\" /Fd"cmTC_62864.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  CurlTests.c
+  _WIN32_WINNT=0x0A00
+Link:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_62864.exe" /INCREMENTAL /ILK:"cmTC_62864.dir\Debug\cmTC_62864.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_62864.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_62864.lib" /MACHINE:X64  /machine:x64 cmTC_62864.dir\Debug\CurlTests.obj
+  cmTC_62864.vcxproj -> C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_62864.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_62864.dir\Debug\cmTC_62864.tlog\unsuccessfulbuild".
+  Touching "cmTC_62864.dir\Debug\cmTC_62864.tlog\cmTC_62864.lastbuildstate".
+Done Building Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_62864.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.52
+
+
+Performing Test HAVE_WIN32_WINNT passed with the following output:
+Change Dir: 'C:/local/curl-master/CMakeFiles/CMakeTmp'
+
+Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Preview/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_4b272.vcxproj /p:Configuration=Debug /p:Platform=Win32 /p:VisualStudioVersion=17.0 /v:n
+MSBuild version 17.10.4+10fbfbf2e for .NET Framework
+Build started 6/8/2024 5:48:36 PM.
+
+Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_4b272.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTC_4b272.dir\Debug\".
+  Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+  Creating directory "C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\".
+  Creating directory "cmTC_4b272.dir\Debug\cmTC_4b272.tlog\".
+InitializeBuildStatus:
+  Creating "cmTC_4b272.dir\Debug\cmTC_4b272.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+  Touching "cmTC_4b272.dir\Debug\cmTC_4b272.tlog\unsuccessfulbuild".
+ClCompile:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x86\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_4b272.dir\Debug\\" /Fd"cmTC_4b272.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /analyze- /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33808 for x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /Oy- /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_WIN32_WINNT /D "CMAKE_INTDIR=\"Debug\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_4b272.dir\Debug\\" /Fd"cmTC_4b272.dir\Debug\vc143.pdb" /external:W1 /Gd /TC /analyze- /errorReport:queue "C:\local\curl-master\CMake\CurlTests.c"
+  CurlTests.c
+  _WIN32_WINNT=0x0A00
+Link:
+  C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.40.33807\bin\HostX64\x86\link.exe /ERRORREPORT:QUEUE /OUT:"C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_4b272.exe" /INCREMENTAL /ILK:"cmTC_4b272.dir\Debug\cmTC_4b272.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_4b272.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/local/curl-master/CMakeFiles/CMakeTmp/Debug/cmTC_4b272.lib" /MACHINE:X86 /SAFESEH  /machine:X86 cmTC_4b272.dir\Debug\CurlTests.obj
+  cmTC_4b272.vcxproj -> C:\local\curl-master\CMakeFiles\CMakeTmp\Debug\cmTC_4b272.exe
+FinalizeBuildStatus:
+  Deleting file "cmTC_4b272.dir\Debug\cmTC_4b272.tlog\unsuccessfulbuild".
+  Touching "cmTC_4b272.dir\Debug\cmTC_4b272.tlog\cmTC_4b272.lastbuildstate".
+Done Building Project "C:\local\curl-master\CMakeFiles\CMakeTmp\cmTC_4b272.vcxproj" (default targets).
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.53
+
+

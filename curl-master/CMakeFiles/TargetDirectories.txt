@@ -1,0 +1,10 @@
+C:/local/curl-master/CMakeFiles/curl_uninstall.dir
+C:/local/curl-master/CMakeFiles/INSTALL.dir
+C:/local/curl-master/CMakeFiles/ALL_BUILD.dir
+C:/local/curl-master/CMakeFiles/ZERO_CHECK.dir
+C:/local/curl-master/lib/CMakeFiles/libcurl_object.dir
+C:/local/curl-master/lib/CMakeFiles/libcurl_shared.dir
+C:/local/curl-master/lib/CMakeFiles/INSTALL.dir
+C:/local/curl-master/src/CMakeFiles/curl.dir
+C:/local/curl-master/src/CMakeFiles/curltool.dir
+C:/local/curl-master/src/CMakeFiles/INSTALL.dir
