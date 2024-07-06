@@ -302,11 +302,13 @@ void Squad::microSpecialUnits(const UnitCluster & cluster)
         _microDefilers.updateMovement(cluster, vanguard);
         _microMedics.update(cluster, vanguard);
         _microVessels.updateMovement(cluster, vanguard);
+        _microGhosts.updateMovement(cluster, vanguard);
     }
     else if (spellPhase == 2)
     {
         _microDefilers.updateSwarm(cluster);
         _microVessels.updateIrradiate(cluster);
+        _microGhosts.updateLockdown(cluster);
     }
     else if (spellPhase == 4)
     {
@@ -596,20 +598,25 @@ void Squad::setOrderForMicroManagers()
 void Squad::addUnitsToMicroManagers()
 {
     BWAPI::Unitset irradiatedUnits;
-    BWAPI::Unitset overlordUnits;
     BWAPI::Unitset airToAirUnits;
     BWAPI::Unitset meleeUnits;
     BWAPI::Unitset rangedUnits;
-    BWAPI::Unitset defilerUnits;
     BWAPI::Unitset detectorUnits;
-    BWAPI::Unitset highTemplarUnits;
-    BWAPI::Unitset scourgeUnits;
     BWAPI::Unitset transportUnits;
+
+    BWAPI::Unitset overlordUnits;
+    BWAPI::Unitset defilerUnits;
+    BWAPI::Unitset scourgeUnits;
     BWAPI::Unitset lurkerUnits;
     //BWAPI::Unitset mutaUnits;
     BWAPI::Unitset queenUnits;
+
+    BWAPI::Unitset highTemplarUnits;
+
     BWAPI::Unitset tankUnits;
     BWAPI::Unitset medicUnits;
+    BWAPI::Unitset vesselUnits;
+    BWAPI::Unitset ghostUnits;
 
     // We will assign zerglings as defiler food. The defiler micro manager will control them.
     int defilerFoodWanted = 0;
@@ -675,6 +682,14 @@ void Squad::addUnitsToMicroManagers()
             {
                 medicUnits.insert(unit);
             }
+            else if (unit->getType() == BWAPI::UnitTypes::Terran_Science_Vessel)
+            {
+                vesselUnits.insert(unit);
+            }
+            else if (unit->getType() == BWAPI::UnitTypes::Terran_Ghost)
+            {
+                ghostUnits.insert(unit);
+            }
             else if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode ||
                 unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
             {
@@ -733,20 +748,25 @@ void Squad::addUnitsToMicroManagers()
     }
 
     _microIrradiated.setUnits(irradiatedUnits);
-    _microOverlords.setUnits(overlordUnits);
     _microAirToAir.setUnits(airToAirUnits);
     _microMelee.setUnits(meleeUnits);
     _microRanged.setUnits(rangedUnits);
-    _microDefilers.setUnits(defilerUnits);
     _microDetectors.setUnits(detectorUnits);
-    _microHighTemplar.setUnits(highTemplarUnits);
+    _microTransports.setUnits(transportUnits);
+
+    _microOverlords.setUnits(overlordUnits);
+    _microDefilers.setUnits(defilerUnits);
     _microLurkers.setUnits(lurkerUnits);
-    _microMedics.setUnits(medicUnits);
-    //_microMutas.setUnits(mutaUnits);
     _microScourge.setUnits(scourgeUnits);
     _microQueens.setUnits(queenUnits);
+    //_microMutas.setUnits(mutaUnits);
+
+    _microHighTemplar.setUnits(highTemplarUnits);
+
+    _microMedics.setUnits(medicUnits);
     _microTanks.setUnits(tankUnits);
-    _microTransports.setUnits(transportUnits);
+    _microVessels.setUnits(vesselUnits);
+    _microGhosts.setUnits(ghostUnits);
 }
 
 // Calculates whether to regroup, aka retreat. Does combat sim if necessary.

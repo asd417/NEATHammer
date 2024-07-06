@@ -245,6 +245,9 @@
       <Filter>Micro\Terran</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\SkillNuke.cpp" />
+    <ClCompile Include="..\Source\MicroGhosts.cpp">
+      <Filter>Micro\Terran</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\CombatCommander.h">
@@ -439,5 +442,8 @@
       <Filter>Micro\Terran</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\SkillNuke.h" />
+    <ClInclude Include="..\Source\MicroGhosts.h">
+      <Filter>Micro\Terran</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

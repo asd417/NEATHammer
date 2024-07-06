@@ -162,6 +162,7 @@
     <ClCompile Include="..\Source\MicroDarkArchon.cpp" />
     <ClCompile Include="..\Source\MicroDefilers.cpp" />
     <ClCompile Include="..\Source\MicroDetectors.cpp" />
+    <ClCompile Include="..\Source\MicroGhosts.cpp" />
     <ClCompile Include="..\Source\MicroHighTemplar.cpp" />
     <ClCompile Include="..\Source\MicroIrradiated.cpp" />
     <ClCompile Include="..\Source\MicroLurkers.cpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="..\Source\MicroDarkArchon.h" />
     <ClInclude Include="..\Source\MicroDefilers.h" />
     <ClInclude Include="..\Source\MicroDetectors.h" />
+    <ClInclude Include="..\Source\MicroGhosts.h" />
     <ClInclude Include="..\Source\MicroHighTemplar.h" />
     <ClInclude Include="..\Source\MicroIrradiated.h" />
     <ClInclude Include="..\Source\MicroLurkers.h" />

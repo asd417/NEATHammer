@@ -7,7 +7,6 @@
 #include "MicroAirToAir.h"
 #include "MicroMelee.h"
 #include "MicroRanged.h"
-
 #include "MicroTransports.h"
 #include "MicroIrradiated.h"
 #include "MicroDetectors.h"
@@ -17,6 +16,7 @@
 #include "MicroTanks.h"
 #include "MicroMedics.h"
 #include "MicroSciVessel.h"
+#include "MicroGhosts.h"
 
 #include "MicroDefilers.h"
 #include "MicroLurkers.h"
@@ -57,21 +57,25 @@ class Squad
     BWAPI::Position     _regroupPosition;   // cached because it is used in different code locations
 
     MicroIrradiated     _microIrradiated;
-    MicroOverlords      _microOverlords;
     MicroAirToAir		_microAirToAir;
     MicroMelee			_microMelee;
     MicroRanged			_microRanged;
-    MicroDefilers		_microDefilers;
     MicroDetectors		_microDetectors;
-    MicroHighTemplar	_microHighTemplar;
+    MicroTransports		_microTransports;
+
+    MicroOverlords      _microOverlords;
+    MicroDefilers		_microDefilers;
     MicroLurkers		_microLurkers;
-    MicroMedics			_microMedics;
-    MicroSciVessel     _microVessels;
-    //MicroMutas          _microMutas;
     MicroQueens			_microQueens;
     MicroScourge        _microScourge;
+    //MicroMutas          _microMutas;
+
+    MicroHighTemplar	_microHighTemplar;
+
+    MicroMedics			_microMedics;
+    MicroSciVessel     _microVessels;
     MicroTanks			_microTanks;
-    MicroTransports		_microTransports;
+    MicroGhosts        _microGhosts;
 
     std::map<BWAPI::Unit, bool> _nearEnemy;
 

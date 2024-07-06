@@ -21,22 +21,70 @@ void MicroMedics::update(const UnitCluster & cluster, BWAPI::Unit vanguard)
     {
         return;
     }
-
+    updateCasters(medics);
     // create a set of all medic targets
     BWAPI::Unitset medicTargets;
+    BWAPI::Unitset restorationTargets;
     for (BWAPI::Unit unit : BWAPI::Broodwar->self()->getUnits())
     {
         if (unit->getHitPoints() < unit->getInitialHitPoints() && unit->getType().isOrganic())
         {
             medicTargets.insert(unit);
         }
+        if (BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Restoration))
+        {
+            if (unit->isLockedDown() || 
+                unit->isEnsnared() || 
+                unit->isIrradiated() || 
+                unit->isPlagued() || 
+                unit->isParasited())
+            {
+                restorationTargets.insert(unit);
+            }
+        }
     }
     
     BWAPI::Unitset availableMedics(medics);
 
+    for (const auto target : restorationTargets)
+    {
+        int closestMedicDist = MAX_DISTANCE;
+        BWAPI::Unit closestMedic = nullptr;
+
+        for (const auto medic : availableMedics)
+        {
+            int dist = medic->getDistance(target);
+
+            if (dist < closestMedicDist)
+            {
+                closestMedic = medic;
+                closestMedicDist = dist;
+            }
+        }
+        // if we found a medic, use restoration
+        if (closestMedic)
+        {
+            if (closestMedic->getEnergy() > 50)
+            {
+                setReadyToCast(closestMedic, CasterSpell::RESTORATION);
+                closestMedic->useTech(BWAPI::TechTypes::Restoration, target);
+            }
+            else {
+                //Not enough energy. Can not use restoration on anyone yet
+                availableMedics.erase(closestMedic);
+            }
+        }
+        else
+        {
+            // We didn't find a medic, so they're all in use. Stop looping.
+            break;
+        }
+    }
+
     // for each target, send the closest medic to heal it
     for (const auto target : medicTargets)
     {
+        
         // only one medic can heal a target at a time
         if (target->isBeingHealed())
         {
@@ -50,7 +98,7 @@ void MicroMedics::update(const UnitCluster & cluster, BWAPI::Unit vanguard)
         {
             int dist = medic->getDistance(target);
 
-            if (dist < closestMedicDist)
+            if (dist < closestMedicDist && !isReadyToCast(medic))
             {
                 closestMedic = medic;
                 closestMedicDist = dist;
@@ -77,6 +125,8 @@ void MicroMedics::update(const UnitCluster & cluster, BWAPI::Unit vanguard)
     {
         the.micro.AttackMove(medic, medicGoal);		// the same as heal-move
     }
+
+    
 }
 
 // Add up the energy of all medics.

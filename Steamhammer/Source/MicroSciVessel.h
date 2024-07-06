@@ -6,12 +6,6 @@ namespace UAlbertaBot
 {
 class MicroSciVessel : public MicroManager
 {
-    // NOTE
-    // This micro manager controls all defilers plus any units assigned as defiler food.
-    // That means its set of units can include both defilers and zerglings.
-
-    BWAPI::Unitset getVessels(const UnitCluster & cluster) const;
-
     bool aboutToDie(const BWAPI::Unit defiler) const;
 
     int empScore(BWAPI::Unit u) const;
