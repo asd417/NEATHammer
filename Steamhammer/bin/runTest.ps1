@@ -16,7 +16,7 @@ function Run-BatchScript {
     param (
         [string]$scriptPath
     )
-    Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$scriptPath`"" -NoNewWindow -Wait
+    Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$scriptPath`""
 }
 
 # Get the initial PIDs of the application instances
@@ -40,7 +40,7 @@ function Monitor-Processes {
     while ($true) {
         # Rescan for all instances and update the PID
         $newPids = Get-ApplicationPIDs -appName $applicationName
-	if(newPids.count -lt 6){
+	if($newPids.count -lt 6){
 		Run-BatchScript -scriptPath $scriptPath
 		Write-Output "Process Count less than 6. Opening new process"
 	}
