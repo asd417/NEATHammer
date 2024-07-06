@@ -22,11 +22,6 @@ function Run-BatchScript {
 # Get the initial PIDs of the application instances
 $pids = Get-ApplicationPIDs -appName $applicationName
 
-if ($pids -eq $null -or $pids.Count -eq 0) {
-    Write-Output "No instances of $applicationName found. Exiting..."
-    exit 1
-}
-
 # Function to check if a process is running by PID
 function Is-ProcessRunning {
     param (
@@ -43,33 +38,12 @@ function Monitor-Processes {
         [string]$scriptPath
     )
     while ($true) {
-        for ($i = 0; $i -lt $processIds.Count; $i++) {
-            if ($processIds[$i] -eq $null) {
-                continue
-            }
-
-            if (-not (Is-ProcessRunning -processId $processIds[$i])) {
-                Write-Output "Process with PID $($processIds[$i]) has crashed. Restarting..."
-                Run-BatchScript -scriptPath $scriptPath
-            }
-        }
         # Rescan for all instances and update the PID
         $newPids = Get-ApplicationPIDs -appName $applicationName
-        # Find the new PID that was added
-        foreach ($newPid in $newPids) {
-            if ($newPid -notin $processIds) {
-                try {
-                    $processIds[$i] = $newPid
-                    Write-Output "Process count stayed same. Process count is $($processIds.Count)"
-                }
-                catch {
-                    $processIds += $newPid
-                    Write-Output "New Process found. Process count is now $($processIds.Count)"
-                }
-                Write-Output "New process with PID $($processIds[$i]) started."
-                break
-            }
-        }
+	if(newPids.count -lt 6){
+		Run-BatchScript -scriptPath $scriptPath
+		Write-Output "Process Count less than 6. Opening new process"
+	}
         Start-Sleep -Seconds 30
     }
 }
