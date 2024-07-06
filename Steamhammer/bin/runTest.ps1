@@ -1,6 +1,6 @@
 # Define the application to be monitored and the batch script to run
 $applicationName = "Starcraft"  # Name of the application to monitor
-$batchScriptPath = "C:\Users\ylee5\Desktop\STARTcraft\starcraft\RunStarcraftWithBWAPI.bat"
+$batchScriptPath = ".\RunStarcraftWithBWAPI.bat"
 
 # Function to get the PIDs of running instances of the application
 function Get-ApplicationPIDs {
