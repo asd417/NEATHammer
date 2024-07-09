@@ -1,6 +1,6 @@
  NEATHammer
 
- Timestamp is 668d5ca9 (Tue Jul  9 11:52:09 2024)
+ Timestamp is 668d60ce (Tue Jul  9 12:09:50 2024)
 
  Preferred load address is 10000000
 
@@ -1405,8 +1405,8 @@
  0001:0006b410       ??1DBConnector@@QAE@XZ     1006c410 f i NEATCommander.obj
  0001:0006b430       ??_D?$basic_ifstream@DU?$char_traits@D@std@@@std@@QAEXXZ 1006c430 f i NEATCommander.obj
  0001:0006b4e0       ?sendFitnessToTrainServer@NEATCommander@UAlbertaBot@@QAEXXZ 1006c4e0 f   NEATCommander.obj
- 0001:0006bac0       ?onUnitDestroy@NEATCommander@UAlbertaBot@@QAEXPAVUnitInterface@BWAPI@@@Z 1006cac0 f   NEATCommander.obj
- 0001:0006bd10       ?drawDebug@NEATCommander@UAlbertaBot@@QAEXHH@Z 1006cd10 f   NEATCommander.obj
+ 0001:0006bad0       ?onUnitDestroy@NEATCommander@UAlbertaBot@@QAEXPAVUnitInterface@BWAPI@@@Z 1006cad0 f   NEATCommander.obj
+ 0001:0006bd20       ?drawDebug@NEATCommander@UAlbertaBot@@QAEXHH@Z 1006cd20 f   NEATCommander.obj
  0001:0006bf20       ?evaluate@NEATCommander@UAlbertaBot@@AAEXXZ 1006cf20 f   NEATCommander.obj
  0001:0006d370       ?getVisibleMapSimple@NEATCommander@UAlbertaBot@@AAEXH@Z 1006e370 f   NEATCommander.obj
  0001:0006d770       ??0overflow_error@std@@QAE@ABV01@@Z 1006e770 f i NEATCommander.obj
@@ -5304,7 +5304,7 @@
  0001:0006b3d0       $LN1901                    1006c3d0     NEATCommander.obj
  0001:0006b3e0       $LN1902                    1006c3e0     NEATCommander.obj
  0001:0006b3f0       $LN1903                    1006c3f0     NEATCommander.obj
- 0001:0006ba09       __catch$?sendFitnessToTrainServer@NEATCommander@UAlbertaBot@@QAEXXZ$2 1006ca09 f   NEATCommander.obj
+ 0001:0006ba19       __catch$?sendFitnessToTrainServer@NEATCommander@UAlbertaBot@@QAEXXZ$2 1006ca19 f   NEATCommander.obj
  0001:0006d348       $LN2073                    1006e348     NEATCommander.obj
  0001:0006de28       $LN39                      1006ee28     NEATCommander.obj
  0001:0006df60       $LN19                      1006ef60     NEATCommander.obj

@@ -202,7 +202,7 @@ namespace UAlbertaBot
         if (Config::NEAT::Train && !Config::NEAT::LoadNetworkFromJSON)
         {
             try {
-                fitness += (_totalUnlockedActions / _totalActions) * Config::NEAT::OutputSpaceAvailabilityScore;
+                fitness += ((double) _totalUnlockedActions / (double) _totalActions) * Config::NEAT::OutputSpaceAvailabilityScore;
             }
             catch(std::exception e){
                 fitness = 0;
