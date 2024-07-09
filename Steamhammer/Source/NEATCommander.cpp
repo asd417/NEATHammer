@@ -201,7 +201,13 @@ namespace UAlbertaBot
     {
         if (Config::NEAT::Train && !Config::NEAT::LoadNetworkFromJSON)
         {
-            fitness += (_totalUnlockedActions / _totalActions) * Config::NEAT::OutputSpaceAvailabilityScore;
+            try {
+                fitness += (_totalUnlockedActions / _totalActions) * Config::NEAT::OutputSpaceAvailabilityScore;
+            }
+            catch(std::exception e){
+                fitness = 0;
+            }
+
             if (!network->isValid()) fitness = -1;
             
             DBKeySpace dbkeys{};

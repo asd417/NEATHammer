@@ -338,8 +338,8 @@ namespace UAlbertaBot
 		double tilePosX; //0~256
 		double tilePosY; //0~256
 		
-		int _totalUnlockedActions;
-		int _totalActions;
+		int _totalUnlockedActions = 0;
+		int _totalActions = 0;
 
 		bool _winner;
 
