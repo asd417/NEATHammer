@@ -52,7 +52,10 @@ namespace Config
         int WinScore = 100; 
         int BuildingScore = 10; // awarded for every building built
         int UnitCompleteScore = 1000; // awared for every army unit created
-
+        int BuildingKillScore = 5000;
+        // (sum(UnlockedOutput per action) / action * totalOutputVectorSize) * OutputSpaceAvailabilityScore is added to the fitness
+        // Default set to 0
+        int OutputSpaceAvailabilityScore = 0;
         bool AutoSurrender = true;
 
         bool PrintNetworkOutput = false;
@@ -64,9 +67,7 @@ namespace Config
         bool LogOutputDecision = false;
         std::string DecisionLogFileName = "Log_NEAT_Reasoning.txt";
 
-        // (sum(UnlockedOutput per action) / action * totalOutputVectorSize) * OutputSpaceAvailabilityScore is added to the fitness
-        // Default set to 0
-        int OutputSpaceAvailabilityScore = 0;
+
     }
 
     namespace BotInfo

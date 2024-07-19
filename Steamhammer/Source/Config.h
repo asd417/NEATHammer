@@ -67,6 +67,7 @@ namespace Config
         extern std::string DecisionLogFileName;
 
         extern int OutputSpaceAvailabilityScore;
+        extern int BuildingKillScore;
     }
     namespace BWAPIOptions
     {

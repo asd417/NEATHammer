@@ -272,8 +272,9 @@ namespace UAlbertaBot
     }
     void NEATCommander::onUnitDestroy(BWAPI::Unit unit)
     {
-        //Enemy killed. update all kill counts
-        //This could technically count friendly kills.
+        // Enemy killed. update all kill counts
+        // This is required to determine whether the killer is worker or not
+        // This could technically count friendly kills.
         if (unit->getPlayer() != the.self())
         {
             auto all = BWAPI::Broodwar->getAllUnits();
@@ -282,15 +283,15 @@ namespace UAlbertaBot
                 if (!u->getType().isWorker() && u->getPlayer() == the.self())
                 {
                     //Make pointer value into int
+                    if (unit->getType().isBuilding())
+                    {
+                        buildingKillCount++;
+                    }
+                    
                     killMap[(int)u] = u->getKillCount();
+                    
                 }
             }
-        }
-        //To prevent bot from learning to score high fitness by dropping nuke on friendly unit,
-        //add a small fitness penalty for allied units died.
-        if (unit->getPlayer() == the.self() && !unit->getType().isBuilding() && !unit->getType().isWorker())
-        {
-            //scoreFitness(-Config::NEAT::ArmyKillScore / 2);
         }
     }
     void NEATCommander::onUnitHide(BWAPI::Unit unit)
@@ -309,7 +310,8 @@ namespace UAlbertaBot
         {
             globalKills += it->second;
         }
-        scoreFitness(globalKills * Config::NEAT::ArmyKillScore);
+        globalKills = globalKills - buildingKillCount;
+        scoreFitness(globalKills * Config::NEAT::ArmyKillScore + buildingKillCount * Config::NEAT::BuildingKillScore);
         _winner = isWinner;
     }
 

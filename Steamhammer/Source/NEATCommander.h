@@ -353,6 +353,7 @@ namespace UAlbertaBot
 
 		//Kill tracker
 		std::map<int, int> killMap;
+		int buildingKillCount = 0;
 		
 		//Misc
 
