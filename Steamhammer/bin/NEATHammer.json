@@ -16,6 +16,7 @@
     "ArmyKillScore": 100,
     "BuildingScore": 10,
     "UnitCompleteScore": 1000,
+    "OutputSpaceAvailabilityScore": 500,
 
     "AutoSurrender": true,
     "PrintNetworkOutput": false,
