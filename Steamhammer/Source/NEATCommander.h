@@ -356,7 +356,8 @@ namespace UAlbertaBot
 		int buildingKillCount = 0;
 		
 		//Misc
-
+		int buildingsBuilt = -1;
+		int armyUnitMade = 0;
 		/// <summary>
 		/// NOT OWNED BY NEATCOMMANDER DO NOT DELETE
 		/// </summary>

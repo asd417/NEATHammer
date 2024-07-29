@@ -256,6 +256,7 @@ namespace UAlbertaBot
             {
                 //Not a huge motivation to build buildings
                 scoreFitness(Config::NEAT::BuildingScore);
+                buildingsBuilt++;
             }
             else if(type.isWorker())
             {
@@ -266,6 +267,7 @@ namespace UAlbertaBot
             {
                 //Huge Motivation to build army
                 scoreFitness(Config::NEAT::UnitCompleteScore);
+                armyUnitMade++;
             }
         }
         
@@ -274,9 +276,10 @@ namespace UAlbertaBot
     {
         // Enemy killed. update all kill counts
         // This is required to determine whether the killer is worker or not
-        // This could technically count friendly kills.
-        if (unit->getPlayer() != the.self())
+        // When a mineral field mines out it is considered destroyed, triggering the onUnitDestroy callback.
+        if (unit->getPlayer() != the.self() && !unit->getType().isMineralField())
         {
+            UAB_ASSERT_WARNING(false, "Unit destroyed: %s", unit->getType().c_str());
             auto all = BWAPI::Broodwar->getAllUnits();
             for (auto& u : all)
             {
@@ -395,6 +398,21 @@ namespace UAlbertaBot
 
         if (the.now() == _lastUpdateFrame) return;
 
+        {
+            int globalKills = 0;
+            for (auto it = killMap.begin(); it != killMap.end(); it++)
+            {
+                globalKills += it->second;
+            }
+            globalKills = globalKills - buildingKillCount;
+            double killfit = globalKills * Config::NEAT::ArmyKillScore + buildingKillCount * Config::NEAT::BuildingKillScore;
+            BWAPI::Broodwar->drawTextScreen(50, 50, "Total Fitness: %2.8f", fitness + killfit + ((double)_totalUnlockedActions / (double)_totalActions) * Config::NEAT::OutputSpaceAvailabilityScore);
+            BWAPI::Broodwar->drawTextScreen(50, 65, "Army Kill Fitness: %d", globalKills * Config::NEAT::ArmyKillScore);
+            BWAPI::Broodwar->drawTextScreen(50, 80, "Building Destroyed Fitness: %d", buildingKillCount * Config::NEAT::BuildingKillScore);
+            BWAPI::Broodwar->drawTextScreen(50, 95, "Building Fitness: %d", std::max(0,buildingsBuilt * Config::NEAT::BuildingScore));
+            BWAPI::Broodwar->drawTextScreen(50, 110, "Army Fitness: %d", armyUnitMade * Config::NEAT::UnitCompleteScore);
+            BWAPI::Broodwar->drawTextScreen(50, 125, "Output Space Fitness: %2.8f", ((double)_totalUnlockedActions / (double)_totalActions) * Config::NEAT::OutputSpaceAvailabilityScore);
+        }
         //Make sure to only call this once per frame
         _lastUpdateFrame = the.now();
 
